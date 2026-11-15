@@ -67,6 +67,16 @@ impl KeyModifiers {
         }
     }
 
+    /// Create modifiers with Ctrl/Command + Shift + Alt
+    pub const fn ctrl_shift_alt() -> Self {
+        Self {
+            ctrl: true,
+            shift: true,
+            alt: true,
+            raw_ctrl: false,
+        }
+    }
+
     /// Create modifiers with only Alt
     pub const fn alt() -> Self {
         Self {
@@ -639,6 +649,19 @@ pub enum ShortcutCommand {
     PrintPreview,
     InsertToc,
     ToggleFrontmatter,
+    // Developer tools
+    ToggleProblems,
+    FormatDocument,
+    SortKeys,
+    MinifyJson,
+    ConvertToJson,
+    ConvertToYaml,
+    ConvertToToml,
+    CompareWithHead,
+    NewReadme,
+    NewChangelog,
+    NewAdr,
+    CheckWorkspaceLinks,
 }
 
 impl ShortcutCommand {
@@ -719,6 +742,18 @@ impl ShortcutCommand {
             PrintPreview,
             InsertToc,
             ToggleFrontmatter,
+            ToggleProblems,
+            FormatDocument,
+            SortKeys,
+            MinifyJson,
+            ConvertToJson,
+            ConvertToYaml,
+            ConvertToToml,
+            CompareWithHead,
+            NewReadme,
+            NewChangelog,
+            NewAdr,
+            CheckWorkspaceLinks,
         ]
     }
 
@@ -799,6 +834,18 @@ impl ShortcutCommand {
             ShortcutCommand::PrintPreview => "Print Preview",
             ShortcutCommand::InsertToc => "Insert/Update TOC",
             ShortcutCommand::ToggleFrontmatter => "Toggle Frontmatter Panel",
+            ShortcutCommand::ToggleProblems => "Toggle Problems Panel",
+            ShortcutCommand::FormatDocument => "Format Document (JSON/YAML/TOML)",
+            ShortcutCommand::SortKeys => "Sort Keys (JSON/YAML/TOML)",
+            ShortcutCommand::MinifyJson => "Minify JSON",
+            ShortcutCommand::ConvertToJson => "Convert to JSON",
+            ShortcutCommand::ConvertToYaml => "Convert to YAML",
+            ShortcutCommand::ConvertToToml => "Convert to TOML",
+            ShortcutCommand::CompareWithHead => "Compare with Last Commit",
+            ShortcutCommand::NewReadme => "New README from Template",
+            ShortcutCommand::NewChangelog => "New Changelog from Template",
+            ShortcutCommand::NewAdr => "New Architecture Decision Record",
+            ShortcutCommand::CheckWorkspaceLinks => "Check Links in Workspace",
         }
     }
 
@@ -877,7 +924,19 @@ impl ShortcutCommand {
             | ShortcutCommand::ExportPdf
             | ShortcutCommand::PrintPreview
             | ShortcutCommand::InsertToc
-            | ShortcutCommand::ToggleFrontmatter => "Other",
+            | ShortcutCommand::ToggleFrontmatter
+            | ShortcutCommand::ToggleProblems
+            | ShortcutCommand::FormatDocument
+            | ShortcutCommand::SortKeys
+            | ShortcutCommand::MinifyJson
+            | ShortcutCommand::ConvertToJson
+            | ShortcutCommand::ConvertToYaml
+            | ShortcutCommand::ConvertToToml
+            | ShortcutCommand::CompareWithHead
+            | ShortcutCommand::NewReadme
+            | ShortcutCommand::NewChangelog
+            | ShortcutCommand::NewAdr
+            | ShortcutCommand::CheckWorkspaceLinks => "Other",
         }
     }
 
@@ -962,6 +1021,18 @@ impl ShortcutCommand {
             ShortcutCommand::PrintPreview => KeyBinding::new(M::ctrl_alt(), P),
             ShortcutCommand::InsertToc => KeyBinding::new(M::ctrl_shift(), U),
             ShortcutCommand::ToggleFrontmatter => KeyBinding::new(M::ctrl_shift(), M),
+            ShortcutCommand::ToggleProblems => KeyBinding::new(M::ctrl_shift_alt(), P),
+            ShortcutCommand::FormatDocument => KeyBinding::new(M::ctrl_shift_alt(), F),
+            ShortcutCommand::SortKeys => KeyBinding::new(M::ctrl_shift_alt(), S),
+            ShortcutCommand::MinifyJson => KeyBinding::new(M::ctrl_shift_alt(), M),
+            ShortcutCommand::ConvertToJson => KeyBinding::new(M::ctrl_shift_alt(), J),
+            ShortcutCommand::ConvertToYaml => KeyBinding::new(M::ctrl_shift_alt(), Y),
+            ShortcutCommand::ConvertToToml => KeyBinding::new(M::ctrl_shift_alt(), T),
+            ShortcutCommand::CompareWithHead => KeyBinding::new(M::ctrl_shift_alt(), H),
+            ShortcutCommand::NewReadme => KeyBinding::new(M::ctrl_shift_alt(), R),
+            ShortcutCommand::NewChangelog => KeyBinding::new(M::ctrl_shift_alt(), C),
+            ShortcutCommand::NewAdr => KeyBinding::new(M::ctrl_shift_alt(), A),
+            ShortcutCommand::CheckWorkspaceLinks => KeyBinding::new(M::ctrl_shift_alt(), L),
         }
     }
 }
@@ -2157,6 +2228,10 @@ pub struct Settings {
     #[serde(default)]
     pub allow_multiple_instances: bool,
 
+    /// Developer tools (schema validation, query bar, git editor mode).
+    #[serde(default)]
+    pub devtools: crate::devtools::DevtoolsSettings,
+
     /// Recently opened files (most recent first)
     pub recent_files: Vec<PathBuf>,
 
@@ -2623,6 +2698,7 @@ impl Default for Settings {
             restore_session: true, // Restore previous session by default
             show_welcome_on_empty_launch: true,
             allow_multiple_instances: false,
+            devtools: crate::devtools::DevtoolsSettings::default(),
             recent_files: Vec::new(),
             max_recent_files: 20,
             last_open_tabs: Vec::new(),
@@ -2884,7 +2960,9 @@ fn remove_config_value_at_path(
             }
         } else if let serde_json::Value::Object(map) = current {
             if is_last {
-                return map.remove(*segment);
+                // shift_remove keeps key order under serde_json `preserve_order`;
+                // a swap-remove reorders keys and changes which error serde hits first.
+                return map.shift_remove(*segment);
             }
             current = map.get_mut(*segment)?;
         } else {
@@ -4238,6 +4316,18 @@ mod tests {
         assert!(!Settings::default().allow_multiple_instances);
         let parsed: Settings = serde_json::from_str("{}").unwrap();
         assert!(!parsed.allow_multiple_instances);
+    }
+
+    #[test]
+    fn settings_without_devtools_key_loads() {
+        let parsed: Settings = serde_json::from_str("{}").unwrap();
+        assert_eq!(
+            parsed.devtools,
+            crate::devtools::DevtoolsSettings::default()
+        );
+        let partial: Settings =
+            serde_json::from_str(r#"{"devtools":{"query_bar":false}}"#).unwrap();
+        assert!(!partial.devtools.query_bar && partial.devtools.schema_validation);
     }
 
     #[test]

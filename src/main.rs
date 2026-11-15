@@ -31,6 +31,7 @@ rust_i18n::i18n!("locales", fallback = "en");
 
 mod app;
 mod config;
+mod devtools;
 mod diag;
 mod editor;
 mod error;
@@ -177,6 +178,54 @@ struct Cli {
     /// Start a new Ferrite process even if another instance is already running.
     #[arg(long)]
     new_instance: bool,
+
+    /// Open PATH:LINE[:COL] at that position (same as passing `PATH:LINE:COL`).
+    #[arg(long, value_name = "PATH:LINE[:COL]")]
+    goto: Vec<String>,
+
+    /// Block until the opened files are closed. Use as `$EDITOR` / `git config
+    /// core.editor`. Git's own editor files (COMMIT_EDITMSG, ...) imply it.
+    #[arg(short = 'w', long)]
+    wait: bool,
+
+    /// Compare two files: JSON/YAML/TOML by value, anything else as a line diff.
+    #[arg(long, num_args = 2, value_names = ["OLD", "NEW"])]
+    diff: Option<Vec<PathBuf>>,
+}
+
+/// Turn CLI arguments into open targets, creating files for stdin and `--diff`.
+fn build_cli_targets(cli: &Cli) -> Result<Vec<devtools::cli_target::OpenTarget>, String> {
+    use devtools::cli_input::{build_diff_file, read_capped, write_stdin_file, STDIN_CAP};
+    use devtools::cli_target::{parse_open_target, OpenTarget};
+
+    let temp = std::env::temp_dir().join("ferrite-cli");
+    let mut targets = Vec::new();
+    for p in &cli.paths {
+        let raw = p.to_string_lossy();
+        if raw == "-" {
+            let (data, truncated) = read_capped(std::io::stdin().lock(), STDIN_CAP)
+                .map_err(|e| format!("cannot read stdin: {e}"))?;
+            if truncated {
+                eprintln!(
+                    "ferrite: stdin truncated at {} MB",
+                    STDIN_CAP / (1024 * 1024)
+                );
+            }
+            let file = write_stdin_file(&temp, &data).map_err(|e| e.to_string())?;
+            targets.push(OpenTarget::plain(file));
+        } else {
+            targets.push(parse_open_target(&raw));
+        }
+    }
+    for g in &cli.goto {
+        targets.push(parse_open_target(g));
+    }
+    if let Some(pair) = &cli.diff {
+        if let [a, b] = pair.as_slice() {
+            targets.push(OpenTarget::plain(build_diff_file(a, b, &temp)?));
+        }
+    }
+    Ok(targets)
 }
 
 /// Parse a log level string into a LogLevel enum.
@@ -221,7 +270,19 @@ fn main() -> eframe::Result<()> {
     // CLI paths. macOS Finder Open With paths usually arrive later (during
     // AppKit finish-launching); an early drain here is typically empty. The
     // eframe CreationContext drains again via `platform::take_opened_files`.
-    let mut initial_paths = cli.paths;
+    // Command-line targets: `path`, `path:line[:col]`, `-` (stdin), `--goto`, `--diff`.
+    let cli_targets = match build_cli_targets(&cli) {
+        Ok(t) => t,
+        Err(msg) => {
+            eprintln!("ferrite: {msg}");
+            std::process::exit(2);
+        }
+    };
+    let wait = cli.wait
+        || cli_targets
+            .iter()
+            .any(|t| devtools::cli_target::should_wait(false, &t.path));
+    let mut initial_paths: Vec<PathBuf> = cli_targets.iter().map(|t| t.path.clone()).collect();
     let early_apple_event_paths = platform::get_open_file_paths();
     if !early_apple_event_paths.is_empty() {
         initial_paths.extend(early_apple_event_paths);
@@ -233,13 +294,18 @@ fn main() -> eframe::Result<()> {
     let settings = load_config();
     let skip_single_instance = cli.new_instance || settings.allow_multiple_instances;
     let instance_listener =
-        match single_instance::try_acquire_instance(&initial_paths, skip_single_instance) {
+        match single_instance::try_acquire_instance(&cli_targets, wait, skip_single_instance) {
             single_instance::InstanceAcquire::Primary(listener) => Some(listener),
             single_instance::InstanceAcquire::Forwarded => {
                 diag::trace("secondary instance — forwarded paths, exiting");
                 // Paths were forwarded to the existing instance — exit cleanly.
                 // No logging here since logger isn't initialized yet.
                 return Ok(());
+            }
+            single_instance::InstanceAcquire::ForwardedWaitInterrupted => {
+                diag::trace("secondary instance — primary ended before files were closed");
+                // The running Ferrite went away (crash/kill) before closing the files.
+                std::process::exit(1);
             }
             single_instance::InstanceAcquire::Independent => {
                 diag::trace("independent instance — skip single-instance lock");
@@ -374,6 +440,7 @@ fn main() -> eframe::Result<()> {
             // Open files/directories from CLI arguments and Apple Events
             let has_initial_paths = !initial_paths.is_empty();
             app.open_initial_paths(initial_paths);
+            app.apply_cli_targets(&cli_targets, wait);
 
             // Only show welcome screen when no files were passed via CLI / Open With
             if !has_initial_paths {

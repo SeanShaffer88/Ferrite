@@ -23,6 +23,7 @@
 //!   not merely the last-focused window.
 
 use crate::config::get_config_dir;
+use crate::devtools::cli_target::{decode_target, encode_target, OpenTarget};
 use crate::path_utils::normalize_path;
 use log::{debug, error, info, warn};
 use std::fs::{File, OpenOptions, TryLockError};
@@ -55,12 +56,57 @@ pub enum InstanceAcquire {
     Forwarded,
     /// Setting or `--new-instance`: no lock, no forwarding.
     Independent,
+    /// `--wait`: the primary went away before the files were closed.
+    ForwardedWaitInterrupted,
+}
+
+/// Keeps a `--wait` connection open until the waited files are closed.
+///
+/// [`WaitHandle::notify_closed`] (or dropping the last clone on a normal
+/// shutdown) sends `CLOSED`; a crash closes the socket without it, which the
+/// waiting process reports as exit code 1.
+#[derive(Debug, Clone)]
+pub struct WaitHandle(Arc<WaitInner>);
+
+#[derive(Debug)]
+struct WaitInner(Mutex<Option<TcpStream>>);
+
+impl WaitInner {
+    fn send_closed(&self) {
+        if let Ok(mut guard) = self.0.lock() {
+            if let Some(mut stream) = guard.take() {
+                let _ = stream.write_all(b"CLOSED\n");
+                let _ = stream.flush();
+            }
+        }
+    }
+}
+
+impl Drop for WaitInner {
+    fn drop(&mut self) {
+        self.send_closed();
+    }
+}
+
+impl WaitHandle {
+    fn new(stream: TcpStream) -> Self {
+        Self(Arc::new(WaitInner(Mutex::new(Some(stream)))))
+    }
+
+    /// Tell the waiting process its files are closed.
+    pub fn notify_closed(&self) {
+        self.0.send_closed();
+    }
 }
 
 /// Payload delivered from the single-instance accept thread to the UI.
 #[derive(Debug, Clone, Default)]
 pub struct InstanceIncoming {
     pub paths: Vec<PathBuf>,
+    /// Same entries as `paths`, with the optional line/column.
+    pub targets: Vec<OpenTarget>,
+    /// Present when the secondary asked to wait (`--wait`).
+    pub wait: Option<WaitHandle>,
     /// True when the secondary instance sent `__FOCUS__` with no file paths.
     pub focus_only: bool,
 }
@@ -69,7 +115,11 @@ pub struct InstanceIncoming {
 ///
 /// When `skip_single_instance` is true (setting or `--new-instance`), no lock or
 /// pid files are written and the caller should run independently.
-pub fn try_acquire_instance(paths: &[PathBuf], skip_single_instance: bool) -> InstanceAcquire {
+pub fn try_acquire_instance(
+    targets: &[OpenTarget],
+    wait: bool,
+    skip_single_instance: bool,
+) -> InstanceAcquire {
     if skip_single_instance {
         debug!("single-instance: independent (setting or --new-instance); no lock");
         return InstanceAcquire::Independent;
@@ -108,16 +158,17 @@ pub fn try_acquire_instance(paths: &[PathBuf], skip_single_instance: bool) -> In
         }
         Err(TryLockError::WouldBlock) => {
             debug!("single-instance: lock held; attempting to forward paths");
-            match try_forward_with_retry(paths) {
+            match try_forward_with_retry(targets, wait) {
                 ForwardResult::Success => {
                     debug!("single-instance: forwarded paths; handshake OK");
                     InstanceAcquire::Forwarded
                 }
+                ForwardResult::WaitInterrupted => InstanceAcquire::ForwardedWaitInterrupted,
                 ForwardResult::NoInstance => {
                     debug!(
                         "single-instance: no live instance (missing port or OK); becoming primary"
                     );
-                    become_primary_after_stale(paths)
+                    become_primary_after_stale(targets, wait)
                 }
             }
         }
@@ -178,7 +229,7 @@ pub(crate) fn process_is_alive(pid: u32) -> bool {
     }
 }
 
-fn become_primary_after_stale(paths: &[PathBuf]) -> InstanceAcquire {
+fn become_primary_after_stale(targets: &[OpenTarget], wait: bool) -> InstanceAcquire {
     remove_stale_instance_files();
 
     let Some(lock_path) = get_lock_file_path() else {
@@ -203,8 +254,9 @@ fn become_primary_after_stale(paths: &[PathBuf]) -> InstanceAcquire {
         }
         Err(TryLockError::WouldBlock) => {
             debug!("single-instance: lock re-acquired by another process; retrying forward");
-            match try_forward_with_retry(paths) {
+            match try_forward_with_retry(targets, wait) {
                 ForwardResult::Success => InstanceAcquire::Forwarded,
+                ForwardResult::WaitInterrupted => InstanceAcquire::ForwardedWaitInterrupted,
                 ForwardResult::NoInstance => InstanceAcquire::Primary(create_listener(None)),
             }
         }
@@ -320,16 +372,21 @@ fn read_message_from_stream(stream: TcpStream) -> InstanceIncoming {
     let _ = stream.set_write_timeout(Some(Duration::from_secs(2)));
 
     let mut reply = stream.try_clone().ok();
-    let message = read_paths_from_stream(stream);
+    let (mut message, wait_requested) = read_paths_from_stream(stream);
     if let Some(ref mut reply) = reply {
         let _ = reply.write_all(b"OK\n");
         let _ = reply.flush();
     }
+    if wait_requested && !message.paths.is_empty() {
+        message.wait = reply.take().map(WaitHandle::new);
+    }
     message
 }
 
-fn read_paths_from_stream(stream: TcpStream) -> InstanceIncoming {
+fn read_paths_from_stream(stream: TcpStream) -> (InstanceIncoming, bool) {
     let mut paths = Vec::new();
+    let mut targets = Vec::new();
+    let mut wait_requested = false;
     let mut focus_only = false;
     let reader = BufReader::new(stream);
 
@@ -344,13 +401,27 @@ fn read_paths_from_stream(stream: TcpStream) -> InstanceIncoming {
                     focus_only = true;
                     continue;
                 }
-                paths.push(PathBuf::from(trimmed));
+                if trimmed == "W" {
+                    wait_requested = true;
+                    continue;
+                }
+                let target = decode_target(&trimmed);
+                paths.push(target.path.clone());
+                targets.push(target);
             }
             Err(_) => break,
         }
     }
 
-    InstanceIncoming { paths, focus_only }
+    (
+        InstanceIncoming {
+            paths,
+            targets,
+            wait: None,
+            focus_only,
+        },
+        wait_requested,
+    )
 }
 
 fn read_published_port() -> Option<u16> {
@@ -375,6 +446,8 @@ fn read_lock_port(lock_path: &Path) -> Option<u16> {
 enum ForwardResult {
     Success,
     NoInstance,
+    /// `--wait` connection ended before `CLOSED`.
+    WaitInterrupted,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -382,14 +455,16 @@ enum ForwardAttempt {
     Ok,
     ConnectFailed,
     NoHandshake,
+    WaitInterrupted,
 }
 
-fn try_forward_with_retry(paths: &[PathBuf]) -> ForwardResult {
+fn try_forward_with_retry(targets: &[OpenTarget], wait: bool) -> ForwardResult {
     let deadline = Instant::now() + STARTUP_RETRY_BUDGET;
     loop {
         match read_published_port() {
-            Some(port) => match try_forward_paths(port, paths) {
+            Some(port) => match try_forward_targets(port, targets, wait) {
                 ForwardAttempt::Ok => return ForwardResult::Success,
+                ForwardAttempt::WaitInterrupted => return ForwardResult::WaitInterrupted,
                 ForwardAttempt::NoHandshake => {
                     debug!("single-instance: connected but missing OK handshake");
                     return ForwardResult::NoInstance;
@@ -413,7 +488,14 @@ fn try_forward_with_retry(paths: &[PathBuf]) -> ForwardResult {
 /// Try to connect to an existing instance and forward file paths.
 ///
 /// Returns [`ForwardAttempt::Ok`] only when the primary replies `OK`.
+#[cfg(test)]
 fn try_forward_paths(port: u16, paths: &[PathBuf]) -> ForwardAttempt {
+    let targets: Vec<OpenTarget> = paths.iter().cloned().map(OpenTarget::plain).collect();
+    try_forward_targets(port, &targets, false)
+}
+
+/// Forward targets (and, with `wait`, block until the primary reports them closed).
+fn try_forward_targets(port: u16, targets: &[OpenTarget], wait: bool) -> ForwardAttempt {
     use std::net::SocketAddr;
 
     let addr: SocketAddr = ([127, 0, 0, 1], port).into();
@@ -428,12 +510,23 @@ fn try_forward_paths(port: u16, paths: &[PathBuf]) -> ForwardAttempt {
     let _ = stream.set_read_timeout(Some(HANDSHAKE_TIMEOUT));
     allow_primary_foreground_from_secondary();
 
-    let forwarded = canonicalize_forward_paths(paths);
-    for path in &forwarded {
-        let line = format!("{}\n", path.display());
+    let forwarded: Vec<OpenTarget> = targets
+        .iter()
+        .map(|t| OpenTarget {
+            path: canonicalize_forward_path(&t.path),
+            line: t.line,
+            col: t.col,
+        })
+        .collect();
+    for target in &forwarded {
+        let line = format!("{}\n", encode_target(target));
         if stream.write_all(line.as_bytes()).is_err() {
             return ForwardAttempt::ConnectFailed;
         }
+    }
+    let wait = wait && !forwarded.is_empty();
+    if wait && stream.write_all(b"W\n").is_err() {
+        return ForwardAttempt::ConnectFailed;
     }
 
     if forwarded.is_empty() {
@@ -447,15 +540,28 @@ fn try_forward_paths(port: u16, paths: &[PathBuf]) -> ForwardAttempt {
     }
     let _ = stream.shutdown(Shutdown::Write);
 
-    if wait_for_ok(&stream) {
-        ForwardAttempt::Ok
-    } else {
-        ForwardAttempt::NoHandshake
+    // One reader for both replies: "OK" and "CLOSED" can arrive in a single
+    // segment, and a second BufReader would lose what the first buffered.
+    let mut reader = BufReader::new(&stream);
+    if !read_ok(&mut reader) {
+        return ForwardAttempt::NoHandshake;
     }
+    if wait {
+        let _ = stream.set_read_timeout(None);
+        if !read_closed(&mut reader) {
+            return ForwardAttempt::WaitInterrupted;
+        }
+    }
+    ForwardAttempt::Ok
 }
 
-fn wait_for_ok(stream: &TcpStream) -> bool {
-    let mut reader = BufReader::new(stream);
+/// Block until the primary sends `CLOSED`. EOF or an error means it went away.
+fn read_closed(reader: &mut impl BufRead) -> bool {
+    let mut line = String::new();
+    matches!(reader.read_line(&mut line), Ok(n) if n > 0 && line.trim() == "CLOSED")
+}
+
+fn read_ok(reader: &mut impl BufRead) -> bool {
     let mut line = String::new();
     match reader.read_line(&mut line) {
         Ok(0) => false,
@@ -464,16 +570,17 @@ fn wait_for_ok(stream: &TcpStream) -> bool {
     }
 }
 
+#[cfg(test)]
+fn wait_for_ok(stream: &TcpStream) -> bool {
+    read_ok(&mut BufReader::new(stream))
+}
+
 /// Resolve a path the secondary is about to forward against *this* process CWD.
 fn canonicalize_forward_path(p: &Path) -> PathBuf {
     let resolved = std::fs::canonicalize(p)
         .or_else(|_| std::env::current_dir().map(|d| d.join(p)))
         .unwrap_or_else(|_| p.to_path_buf());
     normalize_path(resolved)
-}
-
-fn canonicalize_forward_paths(paths: &[PathBuf]) -> Vec<PathBuf> {
-    paths.iter().map(|p| canonicalize_forward_path(p)).collect()
 }
 
 fn write_port_to_lock(file: &mut File, port: u16) -> std::io::Result<()> {
@@ -672,6 +779,101 @@ mod tests {
 
         assert_eq!(message.paths, vec![PathBuf::from("/tmp/a.md")]);
         assert!(message.focus_only);
+    }
+
+    #[test]
+    fn test_wait_round_trip_closed_message() {
+        let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+        let port = listener.local_addr().unwrap().port();
+        let server = std::thread::spawn(move || {
+            let (stream, _) = listener.accept().expect("accept");
+            let message = read_message_from_stream(stream);
+            assert_eq!(message.targets[0].line, Some(5));
+            let handle = message.wait.expect("wait handle");
+            std::thread::sleep(Duration::from_millis(100));
+            handle.notify_closed();
+        });
+        let target = OpenTarget {
+            path: PathBuf::from("/tmp/w.md"),
+            line: Some(5),
+            col: None,
+        };
+        let attempt = try_forward_targets(port, &[target], true);
+        server.join().expect("server thread");
+        assert_eq!(attempt, ForwardAttempt::Ok);
+    }
+
+    #[test]
+    fn test_wait_exits_interrupted_when_primary_dies() {
+        let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+        let port = listener.local_addr().unwrap().port();
+        let server = std::thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept");
+            // Drain the request to EOF: closing with unread bytes makes Windows
+            // send RST, which can discard the OK before the client reads it.
+            let mut sink = Vec::new();
+            let _ = std::io::Read::read_to_end(&mut stream, &mut sink);
+            stream.write_all(b"OK\n").expect("ok");
+            // Simulate a crash: close without CLOSED.
+            drop(stream);
+        });
+        let attempt =
+            try_forward_targets(port, &[OpenTarget::plain(PathBuf::from("/tmp/x.md"))], true);
+        server.join().expect("server thread");
+        assert_eq!(attempt, ForwardAttempt::WaitInterrupted);
+    }
+
+    #[test]
+    fn test_wait_ok_and_closed_in_one_write_is_normal_close() {
+        let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+        let port = listener.local_addr().unwrap().port();
+        let server = std::thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept");
+            let mut sink = Vec::new();
+            let _ = std::io::Read::read_to_end(&mut stream, &mut sink);
+            // Tab closed immediately: both replies land in one segment.
+            stream.write_all(b"OK\nCLOSED\n").expect("write");
+        });
+        let attempt =
+            try_forward_targets(port, &[OpenTarget::plain(PathBuf::from("/tmp/z.md"))], true);
+        server.join().expect("server thread");
+        assert_eq!(attempt, ForwardAttempt::Ok);
+    }
+
+    #[test]
+    fn test_wait_handle_drop_sends_closed() {
+        let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+        let port = listener.local_addr().unwrap().port();
+        let server = std::thread::spawn(move || {
+            let (stream, _) = listener.accept().expect("accept");
+            let message = read_message_from_stream(stream);
+            drop(message); // normal shutdown path
+        });
+        let attempt =
+            try_forward_targets(port, &[OpenTarget::plain(PathBuf::from("/tmp/y.md"))], true);
+        server.join().expect("server thread");
+        assert_eq!(attempt, ForwardAttempt::Ok);
+    }
+
+    #[test]
+    fn test_legacy_plain_paths_still_decode() {
+        let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+        let port = listener.local_addr().unwrap().port();
+        let server = std::thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept");
+            stream
+                .write_all(b"/tmp/a.md\nT\t3\t\t/tmp/b.md\n")
+                .expect("write");
+        });
+        let stream = TcpStream::connect(("127.0.0.1", port)).expect("connect");
+        let message = read_message_from_stream(stream);
+        server.join().expect("server thread");
+        assert_eq!(
+            message.targets[0],
+            OpenTarget::plain(PathBuf::from("/tmp/a.md"))
+        );
+        assert_eq!(message.targets[1].line, Some(3));
+        assert!(message.wait.is_none());
     }
 
     #[test]

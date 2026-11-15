@@ -930,6 +930,7 @@ impl FerriteApp {
                             // Raw mode: use the plain EditorWidget with optional minimap
                             let zen_max_column_width = self.state.settings.zen_max_column_width;
                             let max_line_width = self.state.settings.max_line_width;
+                            let git_editor_ruler = self.state.settings.devtools.git_editor_ruler;
 
                             // Capture scroll offset before mutable borrow for scroll detection
                             let prev_scroll_offset = self.state
@@ -1220,6 +1221,7 @@ impl FerriteApp {
                                     .scroll_to_line(scroll_to_line)
                                     .zen_mode(zen_mode, zen_max_column_width)
                                     .max_line_width(max_line_width) // Apply when not in Zen Mode
+                                    .git_editor_ruler(git_editor_ruler)
                                     .transient_highlight(transient_hl)
                                     .highlight_matching_pairs(highlight_matching_pairs)
                                     .syntax_highlighting(
@@ -2693,6 +2695,7 @@ impl FerriteApp {
                                 // Note: For structured files, the outline panel shows statistics
                                 // rather than navigation, so scroll_to_line is not used here.
                                 let tree_state = self.tree_viewer_states.entry(tab_id).or_default();
+                                let query_bar_enabled = self.state.settings.devtools.query_bar;
 
                                 if let Some(tab) = self.state.active_tab_mut() {
                                     tab.prepare_undo_snapshot_hashed();
@@ -2705,6 +2708,7 @@ impl FerriteApp {
                                     )
                                         .font_size(font_size)
                                         .preview_locked(preview_locked)
+                                        .query_bar(query_bar_enabled)
                                         .show(ui);
 
                                     if output.changed {
@@ -4118,6 +4122,18 @@ impl FerriteApp {
             ShortcutCommand::ExportPdf => self.handle_open_pdf_export_dialog(),
             ShortcutCommand::PrintPreview => self.handle_print_preview(ctx),
             ShortcutCommand::InsertToc => self.handle_insert_toc(),
+            ShortcutCommand::ToggleProblems
+            | ShortcutCommand::FormatDocument
+            | ShortcutCommand::SortKeys
+            | ShortcutCommand::MinifyJson
+            | ShortcutCommand::ConvertToJson
+            | ShortcutCommand::ConvertToYaml
+            | ShortcutCommand::ConvertToToml
+            | ShortcutCommand::CompareWithHead
+            | ShortcutCommand::NewReadme
+            | ShortcutCommand::NewChangelog
+            | ShortcutCommand::NewAdr
+            | ShortcutCommand::CheckWorkspaceLinks => self.handle_devtools_command(ctx, cmd),
             ShortcutCommand::ToggleFrontmatter => {
                 if !self.state.settings.outline_enabled {
                     self.state.settings.outline_enabled = true;

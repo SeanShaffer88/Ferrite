@@ -210,6 +210,8 @@ pub struct FerriteEditor {
     /// Horizontal offset for centering content (used in Zen Mode).
     /// When non-zero, text is rendered starting at text_start_x + content_offset_x.
     pub(crate) content_offset_x: f32,
+    /// Column guide drawn after this many characters (git message mode).
+    pub(crate) ruler_column: Option<u32>,
     // ─────────────────────────────────────────────────────────────────────────
     // Auto-Close Brackets
     // ─────────────────────────────────────────────────────────────────────────
@@ -316,6 +318,7 @@ impl FerriteEditor {
             show_line_numbers: true,
             // Content centering (Zen Mode)
             content_offset_x: 0.0,
+            ruler_column: None,
             // Auto-close brackets (default off, configured via EditorWidget)
             auto_close_brackets: false,
             // Vim mode (default off, configured via EditorWidget)
@@ -401,6 +404,7 @@ impl FerriteEditor {
             show_line_numbers: true,
             // Content centering (Zen Mode)
             content_offset_x: 0.0,
+            ruler_column: None,
             // Auto-close brackets (default off, configured via EditorWidget)
             auto_close_brackets: false,
             // Vim mode (default off, configured via EditorWidget)
@@ -1934,6 +1938,29 @@ impl FerriteEditor {
         // Add content_offset_x for centering (Zen Mode)
         let text_start_x = rect.min.x + gutter_width + gutter_padding + self.content_offset_x;
 
+        // Column guide (git message mode). Drawn before text so glyphs stay on top.
+        if let Some(col) = self.ruler_column {
+            let col_w = painter
+                .layout_no_wrap("0".repeat(64), font_id.clone(), text_color)
+                .size()
+                .x
+                / 64.0;
+            let scroll = if self.wrap_enabled {
+                0.0
+            } else {
+                self.view.horizontal_scroll()
+            };
+            if let Some(x) = ruler_x(text_start_x, col, col_w, scroll) {
+                if x > text_start_x - scroll && x < rect.max.x {
+                    painter.vline(
+                        x,
+                        rect.y_range(),
+                        egui::Stroke::new(1.0_f32, separator_color),
+                    );
+                }
+            }
+        }
+
         // Track max line width for horizontal scrollbar (only when word wrap is off)
         let mut max_line_width: f32 = 0.0;
 
@@ -3382,6 +3409,11 @@ impl FerriteEditor {
         self.content_offset_x = offset;
     }
 
+    /// Draw a vertical column guide after `column` characters (`None` = off).
+    pub fn set_ruler_column(&mut self, column: Option<u32>) {
+        self.ruler_column = column;
+    }
+
     /// Returns the preferred column for vertical movement.
     #[must_use]
     pub fn preferred_column(&self) -> Option<usize> {
@@ -4300,9 +4332,25 @@ impl FerriteEditor {
     }
 }
 
+/// X position of a column guide after `column` monospace cells.
+fn ruler_x(text_start_x: f32, column: u32, col_width: f32, h_scroll: f32) -> Option<f32> {
+    (column > 0).then_some(text_start_x + column as f32 * col_width - h_scroll)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ruler_sits_after_n_columns_and_follows_horizontal_scroll() {
+        assert_eq!(ruler_x(100.0, 72, 7.0, 0.0), Some(604.0));
+        assert_eq!(ruler_x(100.0, 72, 7.0, 50.0), Some(554.0));
+        assert_eq!(ruler_x(100.0, 0, 7.0, 0.0), None);
+        let mut ed = FerriteEditor::new();
+        assert_eq!(ed.ruler_column, None);
+        ed.set_ruler_column(Some(72));
+        assert_eq!(ed.ruler_column, Some(72));
+    }
 
     #[test]
     fn test_new_editor() {

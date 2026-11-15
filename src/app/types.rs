@@ -96,6 +96,8 @@ pub(crate) enum KeyboardAction {
     InsertToc,
     /// Toggle Frontmatter Panel (Ctrl+Shift+M)
     ToggleFrontmatter,
+    /// Developer-tools command (Ctrl+Shift+Alt+key); routed to the palette dispatcher
+    Devtools(crate::config::ShortcutCommand),
     /// Zoom in (Ctrl+=)
     ZoomIn,
     /// Zoom out (Ctrl+-)

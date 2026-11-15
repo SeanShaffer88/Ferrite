@@ -86,6 +86,18 @@ pub(super) fn shortcut_command_name(cmd: &ShortcutCommand) -> String {
             t!("shortcuts.commands.toggle_productivity_hub").to_string()
         }
         ShortcutCommand::ToggleFrontmatter => "Toggle Frontmatter Panel".to_string(),
+        ShortcutCommand::ToggleProblems => "Toggle Problems Panel".to_string(),
+        ShortcutCommand::FormatDocument => "Format Document (JSON/YAML/TOML)".to_string(),
+        ShortcutCommand::SortKeys => "Sort Keys (JSON/YAML/TOML)".to_string(),
+        ShortcutCommand::MinifyJson => "Minify JSON".to_string(),
+        ShortcutCommand::ConvertToJson => "Convert to JSON".to_string(),
+        ShortcutCommand::ConvertToYaml => "Convert to YAML".to_string(),
+        ShortcutCommand::ConvertToToml => "Convert to TOML".to_string(),
+        ShortcutCommand::CompareWithHead => "Compare with Last Commit".to_string(),
+        ShortcutCommand::NewReadme => "New README from Template".to_string(),
+        ShortcutCommand::NewChangelog => "New Changelog from Template".to_string(),
+        ShortcutCommand::NewAdr => "New Architecture Decision Record".to_string(),
+        ShortcutCommand::CheckWorkspaceLinks => "Check Links in Workspace".to_string(),
         ShortcutCommand::ZoomIn => t!("shortcuts.commands.zoom_in").to_string(),
         ShortcutCommand::ZoomOut => t!("shortcuts.commands.zoom_out").to_string(),
         ShortcutCommand::ResetZoom => t!("shortcuts.commands.reset_zoom").to_string(),

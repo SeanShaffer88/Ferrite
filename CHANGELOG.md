@@ -5,6 +5,31 @@ All notable changes to Ferrite will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+#### Developer tools — config/data editor (phase 1)
+- **Schema validation** — JSON/YAML/TOML checked off the UI thread against a schema from the file (`$schema`, `# yaml-language-server: $schema=`, `#:schema`), `devtools.schema_mappings`, or a bundled set (package.json, tsconfig*.json, Cargo.toml, pyproject.toml, GitHub workflows, Compose). Remote schema URLs are never fetched. See [`devtools.md`](docs/devtools.md).
+- **Problems panel** — Bottom panel and status-bar count; click a problem to jump to it (Ctrl+Shift+Alt+P).
+- **Query bar** — JSONPath (RFC 9535) in the tree viewer, newest query wins, 10 000-match cap.
+- **Format / Sort Keys / Minify / Convert** — Key order kept; conversion writes a sibling file and reports what did not survive (comments, nulls).
+- **Compare with Last Commit** — Value-level diff for structured files, line diff otherwise.
+
+#### Developer tools — `$EDITOR` replacement (phase 2)
+- **`ferrite path:line[:col]`, `--goto`, `-` (stdin)** — Positions are forwarded to a running instance; Windows drive letters handled.
+- **`--wait`** — Blocks until the files are closed; exit code 1 if the running Ferrite dies first. Git message files imply it.
+- **Git editor mode** — `COMMIT_EDITMSG` and friends get a column guide (`devtools.git_editor_ruler`, default 72) and stay out of session restore.
+- **`--diff <OLD> <NEW>`** — Structured or line diff opened as a tab. See [`cli.md`](docs/cli.md#exit-codes) for exit codes.
+
+#### Developer tools — docs workbench (phase 3)
+- **Link checking** — Broken relative links and `#anchors` in Markdown show as warnings in the Problems panel; **Check Links in Workspace** (Ctrl+Shift+Alt+L) writes a report for the whole folder. Offline; web links are skipped. See [`devtools.md`](docs/devtools.md#docs-workbench).
+- **Frontmatter validation** — YAML frontmatter checked against a schema named in the frontmatter or mapped with `devtools.schema_mappings`.
+- **Templates** — New README, Keep a Changelog file, and numbered MADR decision records (Ctrl+Shift+Alt+R / C / A).
+
+### Changed
+- `serde_json` and `toml` now use `preserve_order` so Format/Convert keep key order. New crates: `jsonschema`, `serde_json_path`, `similar` (exact pins). See [`devtools-credits.md`](docs/devtools-credits.md).
+
 ## [0.3.1] - 2026-11-11
 
 ### Added

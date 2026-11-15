@@ -430,6 +430,8 @@ pub struct EditorWidget<'a> {
     workspace_root: Option<PathBuf>,
     /// LSP diagnostics for this file (set each frame from AppState).
     diagnostics: Vec<crate::lsp::state::DiagnosticEntry>,
+    /// Column guide for git message files (only applied to those files).
+    git_editor_ruler: Option<u32>,
 }
 
 impl<'a> EditorWidget<'a> {
@@ -465,7 +467,16 @@ impl<'a> EditorWidget<'a> {
             middle_click_paste: true,
             workspace_root: None,
             diagnostics: Vec::new(),
+            git_editor_ruler: None,
         }
+    }
+
+    /// Column guide shown when this tab is a git message file
+    /// (COMMIT_EDITMSG, TAG_EDITMSG, MERGE_MSG, ...). Ignored for other files.
+    #[must_use]
+    pub fn git_editor_ruler(mut self, column: Option<u32>) -> Self {
+        self.git_editor_ruler = column;
+        self
     }
 
     /// Set the font size for the editor.
@@ -891,6 +902,14 @@ impl<'a> EditorWidget<'a> {
             self.max_line_width, max_wrap_width_px, char_width
         );
         editor.set_max_wrap_width(max_wrap_width_px);
+
+        // Column guide only for git's message files (git editor mode).
+        let is_git_message = self
+            .file_path
+            .as_deref()
+            .and_then(crate::devtools::cli_target::detect_git_editor_file)
+            .is_some();
+        editor.set_ruler_column(self.git_editor_ruler.filter(|_| is_git_message));
 
         // Calculate centering offset for Zen Mode
         // When zen_mode is enabled and we have a max width, center the content
