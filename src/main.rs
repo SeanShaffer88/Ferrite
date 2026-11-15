@@ -159,7 +159,7 @@ pub fn log_memory(label: &str) {
 
 /// Ferrite - A fast, lightweight text editor for Markdown, JSON, and more.
 #[derive(Parser, Debug)]
-#[command(name = "ferrite", version, about, long_about = None)]
+#[command(name = "forgepad", version, about, long_about = None)]
 struct Cli {
     /// Files or directory to open on startup.
     ///
@@ -198,7 +198,7 @@ fn build_cli_targets(cli: &Cli) -> Result<Vec<devtools::cli_target::OpenTarget>,
     use devtools::cli_input::{build_diff_file, read_capped, write_stdin_file, STDIN_CAP};
     use devtools::cli_target::{parse_open_target, OpenTarget};
 
-    let temp = std::env::temp_dir().join("ferrite-cli");
+    let temp = devtools::scratch::dir("cli");
     let mut targets = Vec::new();
     for p in &cli.paths {
         let raw = p.to_string_lossy();
@@ -207,7 +207,7 @@ fn build_cli_targets(cli: &Cli) -> Result<Vec<devtools::cli_target::OpenTarget>,
                 .map_err(|e| format!("cannot read stdin: {e}"))?;
             if truncated {
                 eprintln!(
-                    "ferrite: stdin truncated at {} MB",
+                    "forgepad: stdin truncated at {} MB",
                     STDIN_CAP / (1024 * 1024)
                 );
             }
@@ -226,6 +226,33 @@ fn build_cli_targets(cli: &Cli) -> Result<Vec<devtools::cli_target::OpenTarget>,
         }
     }
     Ok(targets)
+}
+
+/// Whether a saved window position still overlaps a connected monitor.
+///
+/// Windows checks the title-bar strip with `MonitorFromRect`. Other platforms
+/// return `true` here and rely on the first-frames check in the app, which
+/// moves the window back if it ends up on no monitor.
+fn saved_position_visible(x: f32, y: f32, width: f32) -> bool {
+    #[cfg(windows)]
+    {
+        use windows::Win32::Foundation::RECT;
+        use windows::Win32::Graphics::Gdi::{MonitorFromRect, MONITOR_DEFAULTTONULL};
+        let strip = RECT {
+            left: x as i32,
+            top: y as i32,
+            right: (x + width.max(100.0)) as i32,
+            bottom: (y + 40.0) as i32,
+        };
+        // SAFETY: `strip` is a valid RECT for the duration of the call.
+        let monitor = unsafe { MonitorFromRect(&strip, MONITOR_DEFAULTTONULL) };
+        !monitor.0.is_null()
+    }
+    #[cfg(not(windows))]
+    {
+        let _ = (x, y, width);
+        true
+    }
 }
 
 /// Parse a log level string into a LogLevel enum.
@@ -247,11 +274,12 @@ fn parse_log_level(s: &str) -> Result<LogLevel, String> {
 // can opt into native decorations via Settings → Appearance → Use system title bar.
 
 /// Application name constant.
-const APP_NAME: &str = "Ferrite";
+const APP_NAME: &str = "Forgepad";
 
 fn main() -> eframe::Result<()> {
     // Trace file works in release (no console on Windows). Check %TEMP%\ferrite_startup_trace.log
-    if std::env::var("FERRITE_DIAG")
+    if std::env::var("FORGEPAD_DIAG")
+        .or_else(|_| std::env::var("FERRITE_DIAG"))
         .ok()
         .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes" | "on"))
     {
@@ -274,7 +302,7 @@ fn main() -> eframe::Result<()> {
     let cli_targets = match build_cli_targets(&cli) {
         Ok(t) => t,
         Err(msg) => {
-            eprintln!("ferrite: {msg}");
+            eprintln!("forgepad: {msg}");
             std::process::exit(2);
         }
     };
@@ -375,7 +403,7 @@ fn main() -> eframe::Result<()> {
     let mut viewport = crate::ui::apply_window_chrome(
         eframe::egui::ViewportBuilder::default()
             .with_title(APP_NAME)
-            .with_app_id("ferrite")
+            .with_app_id("forgepad")
             .with_inner_size([window_size.width, window_size.height])
             .with_min_inner_size([400.0, 300.0]),
         use_native_decorations,
@@ -386,11 +414,13 @@ fn main() -> eframe::Result<()> {
         viewport = viewport.with_icon(icon);
     }
 
-    // Apply position if saved
-    let viewport = if let (Some(x), Some(y)) = (window_size.x, window_size.y) {
-        viewport.with_position([x, y])
-    } else {
-        viewport
+    // Apply position if saved, unless it is on a monitor that is no longer
+    // connected (upstream Ferrite #188); then the OS picks the position.
+    let viewport = match (window_size.x, window_size.y) {
+        (Some(x), Some(y)) if saved_position_visible(x, y, window_size.width) => {
+            viewport.with_position([x, y])
+        }
+        _ => viewport,
     };
 
     // Apply maximized state

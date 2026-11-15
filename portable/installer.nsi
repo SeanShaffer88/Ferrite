@@ -1,4 +1,4 @@
-; Ferrite MD Portable - PortableApps.com Format Installer
+; Forgepad MD Portable - PortableApps.com Format Installer
 ; This script creates a .paf.exe self-extracting installer that follows
 ; the PortableApps.com Format specification.
 ;
@@ -13,8 +13,8 @@ Unicode true
 !include "FileFunc.nsh"
 
 ; --- Application metadata ---
-!define APPNAME "Ferrite MD Portable"
-!define APPID "FerriteMDPortable"
+!define APPNAME "Forgepad MD Portable"
+!define APPID "ForgepadPortable"
 !ifndef APPVERSION
   !define APPVERSION "0.0.0"
 !endif
@@ -32,7 +32,7 @@ SetCompressor /SOLID lzma
 SetCompressorDictSize 32
 
 ; --- MUI settings ---
-!define MUI_ICON "FerriteMDPortable\App\AppInfo\appicon.ico"
+!define MUI_ICON "ForgepadPortable\App\AppInfo\appicon.ico"
 !define MUI_ABORTWARNING
 
 ; --- Directory page ---
@@ -50,32 +50,32 @@ SetCompressorDictSize 32
 Section "Install"
     SetOutPath "$INSTDIR"
 
-    ; Copy the entire FerriteMDPortable directory structure
-    File "FerriteMDPortable\FerriteMDPortable.exe"
-    File "FerriteMDPortable\help.html"
+    ; Copy the entire ForgepadPortable directory structure
+    File "ForgepadPortable\ForgepadPortable.exe"
+    File "ForgepadPortable\help.html"
 
     SetOutPath "$INSTDIR\App\AppInfo"
-    File "FerriteMDPortable\App\AppInfo\appinfo.ini"
-    File "FerriteMDPortable\App\AppInfo\appicon.ico"
-    File "FerriteMDPortable\App\AppInfo\appicon_16.png"
-    File "FerriteMDPortable\App\AppInfo\appicon_32.png"
-    File "FerriteMDPortable\App\AppInfo\appicon_128.png"
+    File "ForgepadPortable\App\AppInfo\appinfo.ini"
+    File "ForgepadPortable\App\AppInfo\appicon.ico"
+    File "ForgepadPortable\App\AppInfo\appicon_16.png"
+    File "ForgepadPortable\App\AppInfo\appicon_32.png"
+    File "ForgepadPortable\App\AppInfo\appicon_128.png"
 
     SetOutPath "$INSTDIR\App\AppInfo\Launcher"
-    File "FerriteMDPortable\App\AppInfo\Launcher\FerriteMDPortable.ini"
+    File "ForgepadPortable\App\AppInfo\Launcher\ForgepadPortable.ini"
 
-    SetOutPath "$INSTDIR\App\Ferrite"
-    File "FerriteMDPortable\App\Ferrite\ferrite.exe"
+    SetOutPath "$INSTDIR\App\Forgepad"
+    File "ForgepadPortable\App\Forgepad\forgepad.exe"
 
     SetOutPath "$INSTDIR\App\DefaultData\settings"
 
     SetOutPath "$INSTDIR\Data\settings"
 
     SetOutPath "$INSTDIR\Other\Source"
-    File "FerriteMDPortable\Other\Source\LICENSE"
+    File "ForgepadPortable\Other\Source\LICENSE"
 
     SetOutPath "$INSTDIR\Other\Help"
-    File "FerriteMDPortable\Other\Help\help.html"
+    File "ForgepadPortable\Other\Help\help.html"
 
     CreateDirectory "$INSTDIR\Other\Help\Images"
 SectionEnd

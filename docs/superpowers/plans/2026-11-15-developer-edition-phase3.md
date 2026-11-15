@@ -19,8 +19,8 @@ no test runs. This is a deliberate trade-off; the audit note says so.
 | README / ADR / changelog templates | **Build** (T1) |
 | Link checker (relative links + anchors) | **Build** (T2, T3) |
 | Frontmatter validation (Phase 1 engine) | **Build** (T4) |
-| Git-aware preview (uncommitted changes in rendered view) | **Defer** — needs diff hunks mapped onto rendered blocks; large change to the preview renderer |
-| Code-block lint/run (extend Code Run) | **Defer** — spec gives no concrete behaviour; needs Sean's call on what "lint" means |
+| Git-aware preview (uncommitted changes in rendered view) | **Partly built:** gutter change bars vs `HEAD` in Raw and Split view. Marking changes inside the rendered (WYSIWYG) view is still deferred |
+| Code-block lint/run (extend Code Run) | **Built (narrow):** syntax check of fenced json/yaml/toml blocks; "run" is the existing Code Run. Other languages need Sean's call |
 
 ## Global constraints (same as Phase 1–2)
 

@@ -6,8 +6,8 @@
 use serde::Deserialize;
 use std::sync::mpsc;
 
-const GITHUB_API: &str = "https://api.github.com/repos/OlaProeis/Ferrite/releases/latest";
-const GITHUB_RELEASES_PREFIX: &str = "https://github.com/OlaProeis/Ferrite/releases/";
+const GITHUB_API: &str = "https://api.github.com/repos/SeanShaffer88/Forgepad/releases/latest";
+const GITHUB_RELEASES_PREFIX: &str = "https://github.com/SeanShaffer88/Forgepad/releases/";
 const CURRENT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 // ============================================================================
@@ -107,7 +107,7 @@ pub fn current_version() -> &'static str {
 /// is available, or an error occurred.
 fn check_for_update_blocking() -> UpdateCheckResult {
     let response = match ureq::get(GITHUB_API)
-        .set("User-Agent", &format!("Ferrite/{}", CURRENT_VERSION))
+        .set("User-Agent", &format!("Forgepad/{}", CURRENT_VERSION))
         .set("Accept", "application/vnd.github+json")
         .call()
     {
@@ -229,7 +229,7 @@ mod tests {
     #[test]
     fn test_github_url_validation() {
         // Valid URLs pass through
-        let valid = "https://github.com/OlaProeis/Ferrite/releases/tag/v0.2.7";
+        let valid = "https://github.com/SeanShaffer88/Forgepad/releases/tag/v0.2.7";
         assert!(valid.starts_with(GITHUB_RELEASES_PREFIX));
 
         // Malicious URLs are rejected
@@ -237,7 +237,7 @@ mod tests {
         assert!(!malicious.starts_with(GITHUB_RELEASES_PREFIX));
 
         // Subtle spoofs are rejected
-        let spoof = "https://github.com.evil.com/OlaProeis/Ferrite/releases/tag/v1.0";
+        let spoof = "https://github.com.evil.com/SeanShaffer88/Forgepad/releases/tag/v1.0";
         assert!(!spoof.starts_with(GITHUB_RELEASES_PREFIX));
     }
 }

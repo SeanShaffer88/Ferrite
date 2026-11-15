@@ -1,10 +1,10 @@
-# Ferrite - Norwegian Bokmål (Norsk bokmål)
+# Forgepad - Norwegian Bokmål (Norsk bokmål)
 # This file contains all user-facing strings for internationalization.
 # Naming convention: category.subcategory.key (e.g., menu.file.open)
 
 # Application metadata
 app:
-  name: "Ferrite"
+  name: "Forgepad"
 
 # Menu bar items
 menu:
@@ -113,7 +113,7 @@ settings:
   recently_changed: "Nylig endret"
   essentials: "Grunnleggende"
   essentials_hint: "Vanlige innstillinger. Bruk søk eller kategorifiltrene over for å se alt."
-  about_button_tooltip: "Om Ferrite, oppdateringer og lenker"
+  about_button_tooltip: "Om Forgepad, oppdateringer og lenker"
   default_view_hint: "Visningsmodus for nye faner (eksisterende faner beholder sin
     lagrede visningsmodus)"
   font_size:
@@ -133,14 +133,14 @@ settings:
     quick_note_workflow_tooltip: "Faner uten fil stenges uten lagre-dialog; ulagrede nye faner blokkerer ikke avslutning. Tekst lagres fortsatt i øktgjenoppretting når gjenoppretting er på."
     quick_note_workflow_hint: "Dobbeltklikk en uten-navn-fane for visningsnavn. Skru av for vanlig lagre-bekreftelse."
     show_welcome: "Vis velkomst ved tom oppstart"
-    show_welcome_tooltip: "Åpne velkomstfanen når Ferrite starter uten dokumenter."
-    allow_multiple_instances: "Tillat flere Ferrite-vinduer/instanser"
-    allow_multiple_instances_tooltip: "Når dette er på, åpner hver oppstart et nytt Ferrite-vindu i stedet for å sende filer til den kjørende instansen. Flagget --new-instance gjelder én oppstart."
+    show_welcome_tooltip: "Åpne velkomstfanen når Forgepad starter uten dokumenter."
+    allow_multiple_instances: "Tillat flere Forgepad-vinduer/instanser"
+    allow_multiple_instances_tooltip: "Når dette er på, åpner hver oppstart et nytt Forgepad-vindu i stedet for å sende filer til den kjørende instansen. Flagget --new-instance gjelder én oppstart."
   appearance:
     system_title_bar: "Bruk systemtittellinje"
-    system_title_bar_hint: "Vis det native vindustittelfeltet i stedet for Ferrites egendefinerte vindusramme."
-    system_title_bar_restart: "Start Ferrite på nytt for at endringen skal tre i kraft."
-    system_title_bar_windows_tooltip: "Støttes ikke på Windows. Ferrite bruker egendefinert vindusramme på Windows på grunn av renderingsbegrensninger."
+    system_title_bar_hint: "Vis det native vindustittelfeltet i stedet for Forgepads egendefinerte vindusramme."
+    system_title_bar_restart: "Start Forgepad på nytt for at endringen skal tre i kraft."
+    system_title_bar_windows_tooltip: "Støttes ikke på Windows. Forgepad bruker egendefinert vindusramme på Windows på grunn av renderingsbegrensninger."
   terminal:
     font_family: "Terminalskrift"
     font_family_hint: "Foretrekk en Mono Nerd Font for Powerlevel10k og ikonprompter. Proporsjonale skrifter holder rutenettet via «M»-mål."
@@ -246,7 +246,7 @@ about:
   # License section
   license: "Lisens"
   license_type: "MIT-lisens"
-  copyright: "© 2026 Ferrite-bidragsytere"
+  copyright: "© 2026 Forgepad-bidragsytere"
   version: "Versjon %{version}"
 
 # Keyboard shortcuts

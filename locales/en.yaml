@@ -1,4 +1,4 @@
-# Ferrite - English (Base Language)
+# Forgepad - English (Base Language)
 # This file contains all user-facing strings for internationalization.
 # Naming convention: category.subcategory.key (e.g., menu.file.open)
 
@@ -8,7 +8,7 @@ print_preview:
 
 # Application metadata
 app:
-  name: "Ferrite"
+  name: "Forgepad"
 
 # Menu bar items
 menu:
@@ -110,7 +110,7 @@ dialog:
     confirm: "'%{title}' has unsaved changes. Reload from disk anyway?"
   code_execution_consent:
     title: "Allow running code from this document?"
-    body_intro: "Running a fenced snippet starts a real subprocess on your computer using your user privileges. Ferrite does not sandbox runners or filter network access."
+    body_intro: "Running a fenced snippet starts a real subprocess on your computer using your user privileges. Forgepad does not sandbox runners or filter network access."
     body_settings_echo: "Same caveats as in Settings → Editor → Code execution: no sandbox — only use with documents you trust."
     enable_and_run: "Enable & run"
     enable_and_run_tooltip: "Turn on code execution, remember this choice, and run the snippet you clicked."
@@ -189,7 +189,7 @@ settings:
   recently_changed: "Recently Changed"
   essentials: "Essentials"
   essentials_hint: "Common settings. Use search or the category filters above to see everything."
-  about_button_tooltip: "About Ferrite, updates and links"
+  about_button_tooltip: "About Forgepad, updates and links"
   default_view_hint: "View mode for new tabs (existing tabs retain their saved view mode)"
   font_size:
     small: "Small"
@@ -201,6 +201,23 @@ settings:
     theme_light: "Light"
     theme_system: "System"
     restore_session: "Restore previous session on startup"
+  devtools:
+    schema_validation: "Check JSON, YAML and TOML against schemas"
+    schema_validation_tooltip: "Show syntax and schema problems in the Problems panel. Schemas come from the file, your mappings, or the bundled set. Never downloads."
+    query_bar: "Show the JSONPath query bar in the tree viewer"
+    query_bar_tooltip: "Run JSONPath queries over JSON, YAML and TOML documents."
+    link_check: "Check relative links in Markdown"
+    link_check_tooltip: "Warn about links to missing files and #anchors that don't exist. Web links are not checked."
+    code_block_lint: "Check JSON, YAML and TOML code blocks in Markdown"
+    code_block_lint_tooltip: "Warn when a fenced json, yaml or toml block has a syntax error."
+    git_editor_ruler: "Column guide in git commit messages"
+    git_editor_ruler_tooltip: "Draw a vertical guide in COMMIT_EDITMSG and other git message files."
+    git_gutter: "Show changes since the last commit in the gutter"
+    breadcrumb: "Show the JSON/YAML/TOML path at the caret in the status bar"
+    breadcrumb_tooltip: "For example $.jobs.build.steps[2].run. Click it to copy."
+    history_max: "Version history: snapshots kept per file"
+    history_max_tooltip: "A snapshot of each file is kept when you save (saves within 2 minutes replace the newest). 0 turns version history off. Snapshots are stored in Forgepad's config folder, not next to your files."
+    git_gutter_tooltip: "Green bar: added line. Blue bar: changed line. Red mark: lines deleted here. Compares with git HEAD."
   editor:
     title: "Editor"
     font_family: "Font"
@@ -330,7 +347,7 @@ settings:
     title: "Files"
     restore_session_tooltip: "When enabled, restores previously open tabs on startup. When disabled, starts with a single empty tab. Session data is always saved."
     quick_note_workflow: "Quick note workflow (ephemeral untitled tabs)"
-    quick_note_workflow_tooltip: "Pathless tabs close without a save prompt, and a modified untitled tab no longer blocks quitting. Unsaved text is still stored in the session recovery folder under your Ferrite config directory when Restore session is on."
+    quick_note_workflow_tooltip: "Pathless tabs close without a save prompt, and a modified untitled tab no longer blocks quitting. Unsaved text is still stored in the session recovery folder under your Forgepad config directory when Restore session is on."
     quick_note_workflow_hint: "Double-click an untitled tab to set its display name. Turn off to restore the usual save confirmation for new tabs."
     enable_auto_save: "Enable Auto-Save by Default"
     auto_save_tooltip: "New documents will have auto-save enabled. Uses temp files to prevent data loss."
@@ -342,12 +359,12 @@ settings:
     remember_files: "Remember last %{count} files"
     files_count: "%{count} files"
     show_welcome: "Show welcome on empty launch"
-    show_welcome_tooltip: "Open the Welcome tab when Ferrite starts with no documents loaded."
-    allow_multiple_instances: "Allow multiple Ferrite windows/instances"
-    allow_multiple_instances_tooltip: "When enabled, each launch opens a new Ferrite window instead of forwarding files to the running instance. The --new-instance flag does the same for a single launch."
+    show_welcome_tooltip: "Open the Welcome tab when Forgepad starts with no documents loaded."
+    allow_multiple_instances: "Allow multiple Forgepad windows/instances"
+    allow_multiple_instances_tooltip: "When enabled, each launch opens a new Forgepad window instead of forwarding files to the running instance. The --new-instance flag does the same for a single launch."
   appearance:
     title: "Appearance"
-    accent_color: "Ferrite accent"
+    accent_color: "Forgepad accent"
     accent_color_hint: "Rendered headings (H1–H6), selection tint, tabs, and highlighted controls. Hyperlinks stay standard blue."
     accent_reset: "Reset color"
     language: "Language"
@@ -356,9 +373,9 @@ settings:
     syntax_theme_hint: "Color theme for code syntax highlighting"
     syntax_theme_auto: "Auto (match app theme)"
     system_title_bar: "Use system title bar"
-    system_title_bar_hint: "Show the native window title bar instead of Ferrite custom chrome."
-    system_title_bar_restart: "Restart Ferrite for this change to take effect."
-    system_title_bar_windows_tooltip: "Not supported on Windows. Ferrite uses custom window chrome on Windows due to rendering limitations."
+    system_title_bar_hint: "Show the native window title bar instead of Forgepad custom chrome."
+    system_title_bar_restart: "Restart Forgepad for this change to take effect."
+    system_title_bar_windows_tooltip: "Not supported on Windows. Forgepad uses custom window chrome on Windows due to rendering limitations."
   keyboard:
     title: "Keyboard"
     reset_all: "Reset All Shortcuts"
@@ -387,6 +404,7 @@ settings:
     all_releases: "All Releases"
     report_issue: "Report an Issue"
     source_code: "Source Code"
+    based_on_ferrite: "Based on Ferrite by Ola Proeis (MIT)"
     license: "Licensed under MIT"
   terminal:
     title: "Terminal"
@@ -591,7 +609,7 @@ about:
   # License section
   license: "License"
   license_type: "MIT License"
-  copyright: "© 2026 Ferrite Contributors"
+  copyright: "© 2026 Forgepad Contributors"
   version: "Version %{version}"
 
 # Keyboard shortcuts
@@ -854,7 +872,7 @@ recovery:
     time_label: "Last modified: %{time}"
   session:
     title: "Session Recovery"
-    crash_detected: "Ferrite detected that your previous session was not closed properly."
+    crash_detected: "Forgepad detected that your previous session was not closed properly."
     restore_question: "Would you like to restore your previous session?"
     restore: "Restore Session"
     start_fresh: "Start Fresh"
@@ -1064,11 +1082,11 @@ welcome:
     files: "Files"
   label:
     theme: "Theme"
-    accent_color: "Ferrite accent color"
+    accent_color: "Forgepad accent color"
     language: "Language"
   line_width_hint: "Limits how wide text lines can grow. Set a value for centered text in Zen Mode (F11)."
   show_on_empty_launch: "Show welcome on empty launch"
-  show_on_empty_launch_hint: "Open this page when Ferrite starts with no documents loaded. Uncheck to start with a blank tab instead."
+  show_on_empty_launch_hint: "Open this page when Forgepad starts with no documents loaded. Uncheck to start with a blank tab instead."
 
 # Terminal panel
 terminal:
@@ -1125,7 +1143,7 @@ terminal:
     macros: "Macros"
   filter:
     terminal_layout: "Terminal Layout"
-    ferrite_workspace: "Ferrite Workspace"
+    ferrite_workspace: "Forgepad Workspace"
   error:
     shell_not_found: "Check that the shell is installed and the path is correct"
     pty_failed: "PTY allocation failed. Try closing other terminals or restarting the app"
@@ -1253,6 +1271,49 @@ devtools:
     saved: "Saved %{path}"
     lost: "Not preserved: %{what}"
     minify_json_only: "Minify applies to JSON files only"
+  transform:
+    title: "Transform Selection"
+    filter: "Type to filter, Enter to apply the first"
+    select_first: "Select some text first"
+    failed: "Could not transform: %{error}"
+    sort_lines: "Sort lines (A→Z)"
+    sort_lines_desc: "Sort lines (Z→A)"
+    unique_lines: "Remove duplicate lines"
+    reverse_lines: "Reverse lines"
+    trim_trailing: "Trim trailing whitespace"
+    upper: "UPPERCASE"
+    lower: "lowercase"
+    title_case: "Title Case"
+    snake: "snake_case"
+    camel: "camelCase"
+    kebab: "kebab-case"
+    base64_encode: "Base64 encode"
+    base64_decode: "Base64 decode"
+    url_encode: "URL encode"
+    url_decode: "URL decode"
+    json_escape: "JSON string escape"
+    json_unescape: "JSON string unescape"
+    insert_uuid: "Insert UUID"
+    insert_timestamp: "Insert timestamp (ISO 8601)"
+    insert_unix_time: "Insert Unix time"
+  breadcrumb:
+    tooltip: "%{path} — click to copy this JSONPath"
+    copied: "JSONPath copied"
+  history:
+    title: "History — %{name}"
+    hint: "Snapshots taken when this file was saved, newest first."
+    empty: "No snapshots yet. One is kept each time you save."
+    original: "before first save"
+    compare: "Compare"
+    compare_tooltip: "Show what changed between this snapshot and the current text"
+    restore: "Restore"
+    restore_tooltip: "Replace the editor text with this snapshot. Undo with Ctrl+Z; nothing is saved until you save."
+    clear: "Clear history for this file"
+    clear_tooltip: "Delete every snapshot of this file"
+    no_file: "Save the file first to start its history"
+    disabled: "Version history is off (Settings → Editor)"
+    open_first: "Open the file to restore a snapshot into it"
+    restored: "Restored the snapshot from %{when}. Save to keep it."
   links:
     started: "Checking links in the workspace…"
     running: "A link check is already running"

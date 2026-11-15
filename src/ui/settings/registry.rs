@@ -12,7 +12,9 @@ use rust_i18n::t;
 
 use crate::config::Settings;
 
-use super::{about, appearance, editor, files, keyboard, terminal, SettingsPanel, SettingsSection};
+use super::{
+    about, appearance, devtools, editor, files, keyboard, terminal, SettingsPanel, SettingsSection,
+};
 
 /// Maximum number of setting ids kept in the persisted recently-changed list.
 pub const MAX_RECENTLY_CHANGED: usize = 8;
@@ -653,5 +655,121 @@ static ENTRIES: &[SettingEntry] = &[
         keywords: &["about", "version", "update", "release", "license", "github"],
         featured: false,
         render: about::render_about_link,
+    },
+    SettingEntry {
+        id: "devtools.schema_validation",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.schema_validation").to_string(),
+        keywords: &[
+            "schema",
+            "json schema",
+            "validate",
+            "validation",
+            "problems",
+            "yaml",
+            "toml",
+            "developer",
+        ],
+        featured: false,
+        render: devtools::render_schema_validation,
+    },
+    SettingEntry {
+        id: "devtools.query_bar",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.query_bar").to_string(),
+        keywords: &["jsonpath", "query", "tree viewer", "json", "developer"],
+        featured: false,
+        render: devtools::render_query_bar,
+    },
+    SettingEntry {
+        id: "devtools.link_check",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.link_check").to_string(),
+        keywords: &["links", "broken links", "anchor", "markdown", "developer"],
+        featured: false,
+        render: devtools::render_link_check,
+    },
+    SettingEntry {
+        id: "devtools.code_block_lint",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.code_block_lint").to_string(),
+        keywords: &[
+            "code block",
+            "fence",
+            "lint",
+            "json",
+            "yaml",
+            "toml",
+            "markdown",
+            "developer",
+        ],
+        featured: false,
+        render: devtools::render_code_block_lint,
+    },
+    SettingEntry {
+        id: "devtools.git_editor_ruler",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.git_editor_ruler").to_string(),
+        keywords: &[
+            "git",
+            "commit",
+            "ruler",
+            "column",
+            "guide",
+            "72",
+            "editor",
+            "developer",
+        ],
+        featured: false,
+        render: devtools::render_git_editor_ruler,
+    },
+    SettingEntry {
+        id: "devtools.git_gutter",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.git_gutter").to_string(),
+        keywords: &[
+            "git",
+            "gutter",
+            "changes",
+            "diff",
+            "modified",
+            "added",
+            "developer",
+        ],
+        featured: false,
+        render: devtools::render_git_gutter,
+    },
+    SettingEntry {
+        id: "devtools.history_max",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.history_max").to_string(),
+        keywords: &[
+            "history",
+            "version",
+            "snapshot",
+            "backup",
+            "restore",
+            "local history",
+            "developer",
+        ],
+        featured: false,
+        render: devtools::render_history_max,
+    },
+    SettingEntry {
+        id: "devtools.breadcrumb",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.breadcrumb").to_string(),
+        keywords: &[
+            "breadcrumb",
+            "path",
+            "jsonpath",
+            "status bar",
+            "json",
+            "yaml",
+            "toml",
+            "developer",
+        ],
+        featured: false,
+        render: devtools::render_breadcrumb,
     },
 ];

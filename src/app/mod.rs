@@ -183,6 +183,16 @@ pub struct FerriteApp {
     problems_panel: crate::ui::ProblemsPanel,
     /// `--wait` callers blocked on open files.
     wait_groups: Vec<devtools::WaitGroup>,
+    /// Gutter change bars against git HEAD for the active tab.
+    git_gutter: devtools::GitGutter,
+    /// Frames left to check that a restored window is on a connected monitor.
+    offscreen_check_frames: u8,
+    /// Open "File History" window, if any.
+    history_view: Option<devtools::HistoryView>,
+    /// Status-bar structure path: (tab id, content version, caret, path).
+    breadcrumb_cache: Option<(usize, u64, usize, String)>,
+    /// Open "Transform Selection" picker: its filter text.
+    transform_picker: Option<String>,
     /// Running "Check Links in Workspace" job: report file or error.
     link_report_rx: Option<std::sync::mpsc::Receiver<Result<std::path::PathBuf, String>>>,
     /// Terminal panel state
@@ -606,6 +616,11 @@ impl FerriteApp {
             terminal_panel,
             problems_panel: crate::ui::ProblemsPanel::new(),
             wait_groups: Vec::new(),
+            git_gutter: Default::default(),
+            offscreen_check_frames: 30,
+            history_view: None,
+            breadcrumb_cache: None,
+            transform_picker: None,
             link_report_rx: None,
             terminal_panel_state,
             productivity_panel,
@@ -2414,7 +2429,8 @@ impl FerriteApp {
         // Developer tools: Problems panel (schema / syntax checks for JSON, YAML, TOML)
         {
             let dt = &self.state.settings.devtools;
-            let enabled = (dt.schema_validation || dt.link_check) && !zen_mode;
+            let enabled =
+                (dt.schema_validation || dt.link_check || dt.code_block_lint) && !zen_mode;
             let doc = self.state.active_tab().and_then(|tab| {
                 let path = tab.path.as_deref()?;
                 let ext = path.extension()?.to_str()?.to_ascii_lowercase();
@@ -2430,6 +2446,7 @@ impl FerriteApp {
                             crate::ui::DocKind::Markdown {
                                 frontmatter: dt.schema_validation,
                                 links: dt.link_check,
+                                code_blocks: dt.code_block_lint,
                             }
                         }
                         None => return None,
@@ -3109,6 +3126,21 @@ impl eframe::App for FerriteApp {
             }
         }
 
+        // A restored position on an unplugged monitor leaves the window on no
+        // monitor at all (upstream Ferrite #188): move it back to the main screen.
+        if self.offscreen_check_frames > 0 {
+            self.offscreen_check_frames -= 1;
+            let restored = self.state.settings.window_size.x.is_some();
+            let offscreen = ctx.input(|i| {
+                i.viewport().outer_rect.is_some() && i.viewport().monitor_size.is_none()
+            });
+            if restored && offscreen && self.offscreen_check_frames < 28 {
+                log::warn!("Window is not on any monitor; moving it to the main screen");
+                ctx.send_viewport_cmd(egui::ViewportCommand::OuterPosition(egui::pos2(64.0, 64.0)));
+                self.offscreen_check_frames = 0;
+            }
+        }
+
         // Track primary window geometry for persistence
         self.update_window_geometry_for(crate::state::PRIMARY_WINDOW_ID, ctx);
 
@@ -3116,6 +3148,9 @@ impl eframe::App for FerriteApp {
         self.handle_instance_paths(ctx);
         self.poll_wait_groups(ctx);
         self.poll_link_report(ctx);
+        self.update_git_gutter(ctx);
+        self.show_history_window(ctx);
+        self.show_transform_picker(ctx);
         if let Some(viewport_id) = self.pending_forwarded_open_viewport.take() {
             ctx.send_viewport_cmd_to(viewport_id, egui::ViewportCommand::Focus);
         }

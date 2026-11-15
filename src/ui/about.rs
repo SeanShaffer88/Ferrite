@@ -306,7 +306,7 @@ impl AboutPanel {
             });
             ui.add_space(8.0);
 
-            const GITHUB_REPO: &str = "https://github.com/OlaProeis/Ferrite";
+            const GITHUB_REPO: &str = "https://github.com/SeanShaffer88/Forgepad";
 
             ui.horizontal(|ui| {
                 ui.label(t!("about.github_label"));

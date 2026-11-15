@@ -1,7 +1,7 @@
-# Build the optional Ferrite Inno Setup installer (Windows only).
+# Build the optional Forgepad Inno Setup installer (Windows only).
 #
 # Prerequisites:
-#   - cargo build --release  (target\release\ferrite.exe must exist)
+#   - cargo build --release  (target\release\forgepad.exe must exist)
 #   - Inno Setup 6.x         (https://jrsoftware.org/isinfo.php)
 #
 # Usage (from repo root):
@@ -16,7 +16,7 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $RepoRoot
 
-$ExePath = Join-Path $RepoRoot "target\release\ferrite.exe"
+$ExePath = Join-Path $RepoRoot "target\release\forgepad.exe"
 if (-not (Test-Path $ExePath)) {
     Write-Error "Release binary not found at $ExePath. Run 'cargo build --release' first."
 }
@@ -58,11 +58,11 @@ imgs[0].save(dst, format='ICO', sizes=sizes, append_images=imgs[1:])
 "@
 }
 
-Write-Host "Building ferrite-windows-x64-setup.exe (version $Version) ..."
-& $Iscc "/DMyAppVersion=$Version" (Join-Path $PSScriptRoot "ferrite.iss")
+Write-Host "Building forgepad-windows-x64-setup.exe (version $Version) ..."
+& $Iscc "/DMyAppVersion=$Version" (Join-Path $PSScriptRoot "forgepad.iss")
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-$Output = Join-Path $PSScriptRoot "Output\ferrite-windows-x64-setup.exe"
+$Output = Join-Path $PSScriptRoot "Output\forgepad-windows-x64-setup.exe"
 Write-Host "Done: $Output"

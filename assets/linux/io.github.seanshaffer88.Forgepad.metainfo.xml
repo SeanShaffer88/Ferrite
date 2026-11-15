@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.olaproeis.Ferrite</id>
-  <name>Ferrite</name>
+  <id>io.github.seanshaffer88.Forgepad</id>
+  <name>Forgepad</name>
   <summary>Write and preview markdown</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
 
   <developer id="io.github.olaproeis">
-    <name>OlaProeis</name>
+    <name>SeanShaffer88</name>
   </developer>
 
   <branding>
@@ -17,7 +17,7 @@
 
   <description>
     <p>
-      Ferrite is a fast, native markdown editor with live preview, 
+      Forgepad is a fast, native markdown editor with live preview, 
       syntax highlighting, and native Mermaid diagram rendering.
       Built with Rust and egui for excellent performance.
     </p>
@@ -39,21 +39,20 @@
     </ul>
   </description>
 
-  <url type="homepage">https://github.com/OlaProeis/Ferrite</url>
-  <url type="bugtracker">https://github.com/OlaProeis/Ferrite/issues</url>
-  <url type="vcs-browser">https://github.com/OlaProeis/Ferrite</url>
-  <url type="donation">https://github.com/sponsors/OlaProeis</url>
+  <url type="homepage">https://github.com/SeanShaffer88/Forgepad</url>
+  <url type="bugtracker">https://github.com/SeanShaffer88/Forgepad/issues</url>
+  <url type="vcs-browser">https://github.com/SeanShaffer88/Forgepad</url>
 
-  <launchable type="desktop-id">io.github.olaproeis.Ferrite.desktop</launchable>
+  <launchable type="desktop-id">io.github.seanshaffer88.Forgepad.desktop</launchable>
 
   <provides>
-    <binary>ferrite</binary>
+    <binary>forgepad</binary>
   </provides>
 
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/OlaProeis/Ferrite/v0.3.1/assets/screenshots/split-dark.png</image>
-      <caption>Ferrite in dark mode with split view showing markdown editing and live preview</caption>
+      <caption>Forgepad in dark mode with split view showing markdown editing and live preview</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/OlaProeis/Ferrite/v0.3.1/assets/screenshots/raw-dark.png</image>
@@ -89,7 +88,7 @@
           <li>Native PDF export, print preview, and themed HTML export</li>
           <li>Executable fenced code blocks (Run/Stop, opt-in with consent)</li>
           <li>Rendered edit session: one-click WYSIWYG block switching for headings, paragraphs, lists, and tables</li>
-          <li>Split-view scroll sync (Sync / 2-way) and user-configurable Ferrite accent color</li>
+          <li>Split-view scroll sync (Sync / 2-way) and user-configurable Forgepad accent color</li>
           <li>Mermaid: insert toolbar, inline validation, flowchart routing/layout polish, state fork/join</li>
           <li>Full-workspace file index for Ctrl+P and Search in Files</li>
           <li>Hardened session recovery (path + disk-hash identity)</li>

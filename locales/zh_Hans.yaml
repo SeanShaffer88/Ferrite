@@ -1,10 +1,10 @@
-# Ferrite - Simplified Chinese (简体中文)
+# Forgepad - Simplified Chinese (简体中文)
 # This file contains all user-facing strings for internationalization.
 # Naming convention: category.subcategory.key (e.g., menu.file.open)
 
 # Application metadata
 app:
-  name: "Ferrite"
+  name: "Forgepad"
 
 # Menu bar items
 menu:
@@ -124,7 +124,7 @@ settings:
   recently_changed: "最近更改"
   essentials: "常用设置"
   essentials_hint: "常用设置。使用搜索或上方的分类筛选查看全部设置。"
-  about_button_tooltip: "关于 Ferrite、更新与链接"
+  about_button_tooltip: "关于 Forgepad、更新与链接"
   default_view_hint: "新标签页的视图模式（现有标签页保留其已保存的视图模式）"
   font_size:
     small: "小"
@@ -248,9 +248,9 @@ settings:
     remember_files: "记住最近 %{count} 个文件"
     files_count: "%{count} 个文件"
     show_welcome: "空启动时显示欢迎页"
-    show_welcome_tooltip: "在没有打开文档时启动 Ferrite 则打开欢迎标签页。"
-    allow_multiple_instances: "允许同时运行多个 Ferrite 窗口/实例"
-    allow_multiple_instances_tooltip: "启用后，每次启动都会打开新的 Ferrite 窗口，而不是将文件转发给已运行的实例。命令行 --new-instance 可对单次启动生效。"
+    show_welcome_tooltip: "在没有打开文档时启动 Forgepad 则打开欢迎标签页。"
+    allow_multiple_instances: "允许同时运行多个 Forgepad 窗口/实例"
+    allow_multiple_instances_tooltip: "启用后，每次启动都会打开新的 Forgepad 窗口，而不是将文件转发给已运行的实例。命令行 --new-instance 可对单次启动生效。"
   appearance:
     title: "界面"
     language: "语言"
@@ -259,9 +259,9 @@ settings:
     syntax_theme_hint: 代码语法高亮显示颜色主题
     syntax_theme_auto: 自动（匹配应用主题）
     system_title_bar: "使用系统标题栏"
-    system_title_bar_hint: "使用原生窗口标题栏，而不是 Ferrite 自定义窗口边框。"
-    system_title_bar_restart: "重新启动 Ferrite 以使此更改生效。"
-    system_title_bar_windows_tooltip: "Windows 不支持此选项。由于渲染限制，Windows 上使用 Ferrite 自定义窗口边框。"
+    system_title_bar_hint: "使用原生窗口标题栏，而不是 Forgepad 自定义窗口边框。"
+    system_title_bar_restart: "重新启动 Forgepad 以使此更改生效。"
+    system_title_bar_windows_tooltip: "Windows 不支持此选项。由于渲染限制，Windows 上使用 Forgepad 自定义窗口边框。"
   keyboard:
     title: "键盘"
     reset_all: "重置全部快捷键"
@@ -448,7 +448,7 @@ about:
   # License section
   license: "许可"
   license_type: "MIT 许可协议"
-  copyright: "© 2026 Ferrite Contributors"
+  copyright: "© 2026 Forgepad Contributors"
   version: "版本 %{version}"
 
 # Keyboard shortcuts
@@ -694,7 +694,7 @@ recovery:
     time_label: "最后修改：%{time}"
   session:
     title: "恢复会话"
-    crash_detected: "Ferrite 检测到您之前的会话未正确关闭。"
+    crash_detected: "Forgepad 检测到您之前的会话未正确关闭。"
     restore_question: "您想恢复之前的会话吗？"
     restore: "恢复会话"
     start_fresh: "重新开始"

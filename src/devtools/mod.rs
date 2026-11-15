@@ -4,17 +4,23 @@
 //! modules call into this tree. Every feature has a toggle in
 //! [`DevtoolsSettings`].
 
+pub mod breadcrumb;
 pub mod cli_input;
 pub mod cli_target;
+pub mod codeblocks;
 pub mod convert;
 pub mod diff;
 pub mod frontmatter;
+pub mod history;
+pub mod linechanges;
 pub mod links;
 pub mod locate;
 pub mod query;
 pub mod schema;
 pub mod schemas;
+pub mod scratch;
 pub mod templates;
+pub mod transform;
 pub mod value;
 
 use serde::{Deserialize, Serialize};
@@ -34,6 +40,14 @@ pub struct DevtoolsSettings {
     pub git_editor_ruler: Option<u32>,
     /// Check relative links and `#anchors` in Markdown documents.
     pub link_check: bool,
+    /// Syntax-check fenced JSON/YAML/TOML code blocks in Markdown.
+    pub code_block_lint: bool,
+    /// Gutter change bars against the last git commit.
+    pub git_gutter: bool,
+    /// Local snapshots kept per file on save (0 turns version history off).
+    pub history_max: u32,
+    /// Show the JSON/YAML/TOML path at the caret in the status bar.
+    pub breadcrumb: bool,
 }
 
 impl Default for DevtoolsSettings {
@@ -44,6 +58,10 @@ impl Default for DevtoolsSettings {
             schema_mappings: Vec::new(),
             git_editor_ruler: Some(72),
             link_check: true,
+            code_block_lint: true,
+            git_gutter: true,
+            history_max: 20,
+            breadcrumb: true,
         }
     }
 }

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Renamed
+- **Ferrite is now Forgepad** — a fork of [Ferrite](https://github.com/OlaProeis/Ferrite) by Ola Proeis (MIT). Binary `forgepad`, Cargo package `forgepad`, app ID `forgepad` / `io.github.seanshaffer88.Forgepad` / `com.seanshaffer88.forgepad`, repository `SeanShaffer88/Forgepad`. New MSI `UpgradeCode` and Inno Setup `AppId`, so Forgepad installs alongside Ferrite instead of replacing it.
+- **Settings move automatically** — on first launch Forgepad copies the `ferrite` config folder to `forgepad`; the old folder is kept. `FORGEPAD_DATA_DIR` replaces `FERRITE_DATA_DIR` (still honoured).
+- **Update check** now follows Forgepad releases, not upstream Ferrite.
+- Per-workspace `.ferrite/` folders, internal type names and entries below this line keep the Ferrite name.
+
+### Added
+- **Transform Selection…** (Ctrl+Shift+Alt+X) — Sort/dedupe/reverse/trim lines, case conversion (snake, camel, kebab, title), Base64 / URL / JSON-string encode and decode, insert UUID or timestamp.
+- **Path at the caret** — The status bar shows the JSONPath of the caret in JSON, YAML and TOML files (`$.jobs.build.steps[2].run`); click to copy.
+- **Version history** — Each save keeps a local snapshot (20 per file by default; the pre-edit original is kept too). **Show File History** (Ctrl+Shift+Alt+V) compares any snapshot with the current text or restores it as an undoable edit. Works outside git. Settings → Editor → *Version history*.
+
+### Fixed (open upstream Ferrite issues)
+- **Panics no longer close the app in release builds** ([Ferrite #199](https://github.com/OlaProeis/Ferrite/issues/199)) — The release profile now unwinds, so the existing `catch_unwind` guards (Mermaid, fonts) work and a panic in a background worker no longer takes down every open tab.
+- **Window restored off-screen after unplugging a monitor** ([Ferrite #188](https://github.com/OlaProeis/Ferrite/issues/188)) — On Windows a saved position that no connected monitor covers is ignored at startup; on all platforms a window that reports no monitor in its first frames is moved back to the main screen.
+- **Linux arm64 builds** ([Ferrite #190](https://github.com/OlaProeis/Ferrite/issues/190)) — `forgepad-linux-arm64.tar.gz` (glibc 2.35+) in test and release builds.
+- **Add Cursor Above / Below** ([Ferrite #187](https://github.com/OlaProeis/Ferrite/issues/187), partly) — Ctrl+Alt+Up / Ctrl+Alt+Down, next to the existing Ctrl+click and Select Next Occurrence. Column (box) selection is still open.
+
 ### Added
 
 #### Developer tools — config/data editor (phase 1)
@@ -25,6 +42,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Developer tools — docs workbench (phase 3)
 - **Link checking** — Broken relative links and `#anchors` in Markdown show as warnings in the Problems panel; **Check Links in Workspace** (Ctrl+Shift+Alt+L) writes a report for the whole folder. Offline; web links are skipped. See [`devtools.md`](docs/devtools.md#docs-workbench).
 - **Frontmatter validation** — YAML frontmatter checked against a schema named in the frontmatter or mapped with `devtools.schema_mappings`.
+- **Change bars** — Gutter shows lines added / changed / deleted since the last commit in Raw and Split view (`devtools.git_gutter`).
+- **Developer tools in Settings** — All developer-tools switches are under Settings → Editor (search "developer").
+- **Code-block lint** — Fenced `json` / `yaml` / `toml` blocks in Markdown are syntax-checked (`devtools.code_block_lint`).
 - **Templates** — New README, Keep a Changelog file, and numbered MADR decision records (Ctrl+Shift+Alt+R / C / A).
 
 ### Changed

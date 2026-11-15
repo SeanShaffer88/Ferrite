@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <!--
-  Ferrite MSI Installer
+  Forgepad MSI Installer
   Built with WiX Toolset via cargo-wix
 
   To build: cargo wix
   To customize: edit this file and run cargo wix again
 
   Feature tree (user can toggle during install):
-    [x] Ferrite Editor          (required)
+    [x] Forgepad Editor          (required)
         [x] Start Menu Shortcut (default on)
         [ ] Desktop Shortcut    (default off)
     [x] File Associations       (default on, per-extension toggles)
@@ -18,9 +18,9 @@
 
     <Product
         Id='*'
-        Name='Ferrite'
-        UpgradeCode='F3BB1E73-ED17-4000-A000-000000000001'
-        Manufacturer='OlaProeis'
+        Name='Forgepad'
+        UpgradeCode='15D5FBDB-D481-4337-B3F1-469E973D384B'
+        Manufacturer='SeanShaffer88'
         Language='1033'
         Codepage='1252'
         Version='0.3.1.0'>
@@ -28,8 +28,8 @@
         <Package
             Id='*'
             Keywords='Installer'
-            Description='Ferrite - A fast, lightweight text editor for Markdown, JSON, and more'
-            Manufacturer='OlaProeis'
+            Description='Forgepad - A fast, lightweight text editor for Markdown, JSON, and more'
+            Manufacturer='SeanShaffer88'
             InstallerVersion='450'
             Languages='1033'
             Compressed='yes'
@@ -41,22 +41,22 @@
             DowngradeErrorMessage='A newer version of [ProductName] is already installed. Setup will now exit.'/>
 
         <Media Id='1' Cabinet='media1.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1'/>
-        <Property Id='DiskPrompt' Value='Ferrite Installation'/>
+        <Property Id='DiskPrompt' Value='Forgepad Installation'/>
 
         <!-- ================================================================
              Directory Structure
              ================================================================ -->
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <Directory Id='ProgramFiles64Folder' Name='PFiles'>
-                <Directory Id='APPLICATIONFOLDER' Name='Ferrite'>
+                <Directory Id='APPLICATIONFOLDER' Name='Forgepad'>
 
                     <!-- Main executable -->
-                    <Component Id='ferrite.exe' Guid='*'>
+                    <Component Id='forgepad.exe' Guid='*'>
                         <File
-                            Id='ferrite.exe'
-                            Name='ferrite.exe'
+                            Id='forgepad.exe'
+                            Name='forgepad.exe'
                             DiskId='1'
-                            Source='target\release\ferrite.exe'
+                            Source='target\release\forgepad.exe'
                             KeyPath='yes'/>
                     </Component>
 
@@ -65,7 +65,7 @@
                          ================================================ -->
                     <Component Id='PathEntry' Guid='*'>
                         <Environment
-                            Id='FerritePath'
+                            Id='ForgepadPath'
                             Name='PATH'
                             Value='[APPLICATIONFOLDER]'
                             Permanent='no'
@@ -74,7 +74,7 @@
                             System='yes'/>
                         <RegistryValue
                             Root='HKLM'
-                            Key='Software\OlaProeis\Ferrite'
+                            Key='Software\SeanShaffer88\Forgepad'
                             Name='PathAdded'
                             Type='integer'
                             Value='1'
@@ -89,93 +89,93 @@
 
                     <!-- Markdown (.md, .markdown) -->
                     <Component Id='FileAssocMarkdown' Guid='*'>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.md' Type='string' Value='Markdown Document'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.md\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]ferrite.exe,0'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.md\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]ferrite.exe&quot; &quot;%1&quot;'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\.md\OpenWithProgids' Name='Ferrite.md' Type='string' Value='' KeyPath='yes'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\.markdown\OpenWithProgids' Name='Ferrite.md' Type='string' Value=''/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.md' Type='string' Value='Markdown Document'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.md\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]forgepad.exe,0'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.md\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]forgepad.exe&quot; &quot;%1&quot;'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\.md\OpenWithProgids' Name='Forgepad.md' Type='string' Value='' KeyPath='yes'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\.markdown\OpenWithProgids' Name='Forgepad.md' Type='string' Value=''/>
                     </Component>
 
                     <!-- Plain Text (.txt) -->
                     <Component Id='FileAssocText' Guid='*'>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.txt' Type='string' Value='Text Document'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.txt\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]ferrite.exe,0'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.txt\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]ferrite.exe&quot; &quot;%1&quot;'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\.txt\OpenWithProgids' Name='Ferrite.txt' Type='string' Value='' KeyPath='yes'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.txt' Type='string' Value='Text Document'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.txt\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]forgepad.exe,0'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.txt\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]forgepad.exe&quot; &quot;%1&quot;'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\.txt\OpenWithProgids' Name='Forgepad.txt' Type='string' Value='' KeyPath='yes'/>
                     </Component>
 
                     <!-- JSON (.json) -->
                     <Component Id='FileAssocJson' Guid='*'>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.json' Type='string' Value='JSON Document'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.json\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]ferrite.exe,0'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.json\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]ferrite.exe&quot; &quot;%1&quot;'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\.json\OpenWithProgids' Name='Ferrite.json' Type='string' Value='' KeyPath='yes'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.json' Type='string' Value='JSON Document'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.json\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]forgepad.exe,0'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.json\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]forgepad.exe&quot; &quot;%1&quot;'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\.json\OpenWithProgids' Name='Forgepad.json' Type='string' Value='' KeyPath='yes'/>
                     </Component>
 
                     <!-- YAML (.yaml, .yml) -->
                     <Component Id='FileAssocYaml' Guid='*'>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.yaml' Type='string' Value='YAML Document'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.yaml\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]ferrite.exe,0'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.yaml\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]ferrite.exe&quot; &quot;%1&quot;'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\.yaml\OpenWithProgids' Name='Ferrite.yaml' Type='string' Value='' KeyPath='yes'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\.yml\OpenWithProgids' Name='Ferrite.yaml' Type='string' Value=''/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.yaml' Type='string' Value='YAML Document'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.yaml\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]forgepad.exe,0'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.yaml\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]forgepad.exe&quot; &quot;%1&quot;'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\.yaml\OpenWithProgids' Name='Forgepad.yaml' Type='string' Value='' KeyPath='yes'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\.yml\OpenWithProgids' Name='Forgepad.yaml' Type='string' Value=''/>
                     </Component>
 
                     <!-- TOML (.toml) -->
                     <Component Id='FileAssocToml' Guid='*'>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.toml' Type='string' Value='TOML Document'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.toml\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]ferrite.exe,0'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.toml\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]ferrite.exe&quot; &quot;%1&quot;'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\.toml\OpenWithProgids' Name='Ferrite.toml' Type='string' Value='' KeyPath='yes'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.toml' Type='string' Value='TOML Document'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.toml\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]forgepad.exe,0'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.toml\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]forgepad.exe&quot; &quot;%1&quot;'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\.toml\OpenWithProgids' Name='Forgepad.toml' Type='string' Value='' KeyPath='yes'/>
                     </Component>
 
                     <!-- CSV (.csv, .tsv) -->
                     <Component Id='FileAssocCsv' Guid='*'>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.csv' Type='string' Value='CSV Document'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.csv\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]ferrite.exe,0'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Ferrite.csv\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]ferrite.exe&quot; &quot;%1&quot;'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\.csv\OpenWithProgids' Name='Ferrite.csv' Type='string' Value='' KeyPath='yes'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\.tsv\OpenWithProgids' Name='Ferrite.csv' Type='string' Value=''/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.csv' Type='string' Value='CSV Document'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.csv\DefaultIcon' Type='string' Value='[APPLICATIONFOLDER]forgepad.exe,0'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Forgepad.csv\shell\open\command' Type='string' Value='&quot;[APPLICATIONFOLDER]forgepad.exe&quot; &quot;%1&quot;'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\.csv\OpenWithProgids' Name='Forgepad.csv' Type='string' Value='' KeyPath='yes'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\.tsv\OpenWithProgids' Name='Forgepad.csv' Type='string' Value=''/>
                     </Component>
 
                     <!-- ================================================
                          Windows Default Apps Registration
-                         Makes Ferrite appear in Settings > Default Apps
+                         Makes Forgepad appear in Settings > Default Apps
                          ================================================ -->
                     <Component Id='DefaultAppsRegistration' Guid='*'>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities' Name='ApplicationDescription' Type='string' Value='A fast, lightweight text editor for Markdown, JSON, and more'/>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities' Name='ApplicationName' Type='string' Value='Ferrite'/>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities\FileAssociations' Name='.md' Type='string' Value='Ferrite.md'/>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities\FileAssociations' Name='.markdown' Type='string' Value='Ferrite.md'/>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities\FileAssociations' Name='.txt' Type='string' Value='Ferrite.txt'/>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities\FileAssociations' Name='.json' Type='string' Value='Ferrite.json'/>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities\FileAssociations' Name='.yaml' Type='string' Value='Ferrite.yaml'/>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities\FileAssociations' Name='.yml' Type='string' Value='Ferrite.yaml'/>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities\FileAssociations' Name='.toml' Type='string' Value='Ferrite.toml'/>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities\FileAssociations' Name='.csv' Type='string' Value='Ferrite.csv'/>
-                        <RegistryValue Root='HKLM' Key='Software\OlaProeis\Ferrite\Capabilities\FileAssociations' Name='.tsv' Type='string' Value='Ferrite.csv'/>
-                        <RegistryValue Root='HKLM' Key='Software\RegisteredApplications' Name='Ferrite' Type='string' Value='Software\OlaProeis\Ferrite\Capabilities' KeyPath='yes'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities' Name='ApplicationDescription' Type='string' Value='A fast, lightweight text editor for Markdown, JSON, and more'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities' Name='ApplicationName' Type='string' Value='Forgepad'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities\FileAssociations' Name='.md' Type='string' Value='Forgepad.md'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities\FileAssociations' Name='.markdown' Type='string' Value='Forgepad.md'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities\FileAssociations' Name='.txt' Type='string' Value='Forgepad.txt'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities\FileAssociations' Name='.json' Type='string' Value='Forgepad.json'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities\FileAssociations' Name='.yaml' Type='string' Value='Forgepad.yaml'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities\FileAssociations' Name='.yml' Type='string' Value='Forgepad.yaml'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities\FileAssociations' Name='.toml' Type='string' Value='Forgepad.toml'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities\FileAssociations' Name='.csv' Type='string' Value='Forgepad.csv'/>
+                        <RegistryValue Root='HKLM' Key='Software\SeanShaffer88\Forgepad\Capabilities\FileAssociations' Name='.tsv' Type='string' Value='Forgepad.csv'/>
+                        <RegistryValue Root='HKLM' Key='Software\RegisteredApplications' Name='Forgepad' Type='string' Value='Software\SeanShaffer88\Forgepad\Capabilities' KeyPath='yes'/>
                     </Component>
 
                     <!-- ================================================
                          Explorer Context Menu (optional)
                          ================================================ -->
 
-                    <!-- "Open with Ferrite" on any file -->
+                    <!-- "Open with Forgepad" on any file -->
                     <Component Id='ContextMenuFiles' Guid='*'>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\*\shell\OpenWithFerrite' Type='string' Value='Open with Ferrite'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\*\shell\OpenWithFerrite' Name='Icon' Type='string' Value='[APPLICATIONFOLDER]ferrite.exe,0'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\*\shell\OpenWithFerrite\command' Type='string' Value='&quot;[APPLICATIONFOLDER]ferrite.exe&quot; &quot;%1&quot;' KeyPath='yes'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\*\shell\OpenWithForgepad' Type='string' Value='Open with Forgepad'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\*\shell\OpenWithForgepad' Name='Icon' Type='string' Value='[APPLICATIONFOLDER]forgepad.exe,0'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\*\shell\OpenWithForgepad\command' Type='string' Value='&quot;[APPLICATIONFOLDER]forgepad.exe&quot; &quot;%1&quot;' KeyPath='yes'/>
                     </Component>
 
-                    <!-- "Open Folder with Ferrite" on directories + background -->
+                    <!-- "Open Folder with Forgepad" on directories + background -->
                     <Component Id='ContextMenuFolders' Guid='*'>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\shell\OpenWithFerrite' Type='string' Value='Open Folder with Ferrite'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\shell\OpenWithFerrite' Name='Icon' Type='string' Value='[APPLICATIONFOLDER]ferrite.exe,0'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\shell\OpenWithFerrite\command' Type='string' Value='&quot;[APPLICATIONFOLDER]ferrite.exe&quot; &quot;%1&quot;'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\Background\shell\OpenWithFerrite' Type='string' Value='Open Folder with Ferrite'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\Background\shell\OpenWithFerrite' Name='Icon' Type='string' Value='[APPLICATIONFOLDER]ferrite.exe,0'/>
-                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\Background\shell\OpenWithFerrite\command' Type='string' Value='&quot;[APPLICATIONFOLDER]ferrite.exe&quot; &quot;%V&quot;' KeyPath='yes'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\shell\OpenWithForgepad' Type='string' Value='Open Folder with Forgepad'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\shell\OpenWithForgepad' Name='Icon' Type='string' Value='[APPLICATIONFOLDER]forgepad.exe,0'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\shell\OpenWithForgepad\command' Type='string' Value='&quot;[APPLICATIONFOLDER]forgepad.exe&quot; &quot;%1&quot;'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\Background\shell\OpenWithForgepad' Type='string' Value='Open Folder with Forgepad'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\Background\shell\OpenWithForgepad' Name='Icon' Type='string' Value='[APPLICATIONFOLDER]forgepad.exe,0'/>
+                        <RegistryValue Root='HKLM' Key='Software\Classes\Directory\Background\shell\OpenWithForgepad\command' Type='string' Value='&quot;[APPLICATIONFOLDER]forgepad.exe&quot; &quot;%V&quot;' KeyPath='yes'/>
                     </Component>
 
                 </Directory>
@@ -183,19 +183,19 @@
 
             <!-- Start Menu Shortcuts -->
             <Directory Id='ProgramMenuFolder' Name='Programs'>
-                <Directory Id='ApplicationProgramsFolder' Name='Ferrite'>
+                <Directory Id='ApplicationProgramsFolder' Name='Forgepad'>
                     <Component Id='ApplicationShortcut' Guid='*'>
                         <Shortcut
                             Id='ApplicationStartMenuShortcut'
-                            Name='Ferrite'
+                            Name='Forgepad'
                             Description='A fast, lightweight text editor'
-                            Target='[APPLICATIONFOLDER]ferrite.exe'
+                            Target='[APPLICATIONFOLDER]forgepad.exe'
                             WorkingDirectory='APPLICATIONFOLDER'
                             Icon='ProductICO'/>
                         <RemoveFolder Id='CleanUpShortCut' Directory='ApplicationProgramsFolder' On='uninstall'/>
                         <RegistryValue
                             Root='HKCU'
-                            Key='Software\OlaProeis\Ferrite'
+                            Key='Software\SeanShaffer88\Forgepad'
                             Name='installed'
                             Type='integer'
                             Value='1'
@@ -209,14 +209,14 @@
                 <Component Id='DesktopShortcut' Guid='*'>
                     <Shortcut
                         Id='DesktopShortcutLink'
-                        Name='Ferrite'
+                        Name='Forgepad'
                         Description='A fast, lightweight text editor'
-                        Target='[APPLICATIONFOLDER]ferrite.exe'
+                        Target='[APPLICATIONFOLDER]forgepad.exe'
                         WorkingDirectory='APPLICATIONFOLDER'
                         Icon='ProductICO'/>
                     <RegistryValue
                         Root='HKCU'
-                        Key='Software\OlaProeis\Ferrite'
+                        Key='Software\SeanShaffer88\Forgepad'
                         Name='DesktopShortcut'
                         Type='integer'
                         Value='1'
@@ -235,19 +235,19 @@
         <!-- Core application (required, cannot be deselected) -->
         <Feature
             Id='Complete'
-            Title='Ferrite Editor'
-            Description='Core Ferrite text editor application.'
+            Title='Forgepad Editor'
+            Description='Core Forgepad text editor application.'
             Level='1'
             ConfigurableDirectory='APPLICATIONFOLDER'
             AllowAdvertise='no'
             Absent='disallow'>
 
-            <ComponentRef Id='ferrite.exe'/>
+            <ComponentRef Id='forgepad.exe'/>
 
             <Feature
                 Id='StartMenuShortcut'
                 Title='Start Menu Shortcut'
-                Description='Add Ferrite shortcut to the Start Menu.'
+                Description='Add Forgepad shortcut to the Start Menu.'
                 Level='1'
                 AllowAdvertise='no'>
                 <ComponentRef Id='ApplicationShortcut'/>
@@ -256,7 +256,7 @@
             <Feature
                 Id='DesktopShortcutFeature'
                 Title='Desktop Shortcut'
-                Description='Add Ferrite shortcut to the Desktop.'
+                Description='Add Forgepad shortcut to the Desktop.'
                 Level='2'
                 AllowAdvertise='no'>
                 <ComponentRef Id='DesktopShortcut'/>
@@ -267,33 +267,33 @@
         <Feature
             Id='FileAssociations'
             Title='File Associations'
-            Description='Register Ferrite in the "Open With" menu and Windows Default Apps settings for supported file types.'
+            Description='Register Forgepad in the "Open With" menu and Windows Default Apps settings for supported file types.'
             Level='1'
             AllowAdvertise='no'>
 
             <ComponentRef Id='DefaultAppsRegistration'/>
 
-            <Feature Id='FileAssocMarkdownFeature' Title='Markdown (.md, .markdown)' Description='Associate Markdown files with Ferrite.' Level='1' AllowAdvertise='no'>
+            <Feature Id='FileAssocMarkdownFeature' Title='Markdown (.md, .markdown)' Description='Associate Markdown files with Forgepad.' Level='1' AllowAdvertise='no'>
                 <ComponentRef Id='FileAssocMarkdown'/>
             </Feature>
 
-            <Feature Id='FileAssocTextFeature' Title='Plain Text (.txt)' Description='Associate plain text files with Ferrite.' Level='1' AllowAdvertise='no'>
+            <Feature Id='FileAssocTextFeature' Title='Plain Text (.txt)' Description='Associate plain text files with Forgepad.' Level='1' AllowAdvertise='no'>
                 <ComponentRef Id='FileAssocText'/>
             </Feature>
 
-            <Feature Id='FileAssocJsonFeature' Title='JSON (.json)' Description='Associate JSON files with Ferrite.' Level='1' AllowAdvertise='no'>
+            <Feature Id='FileAssocJsonFeature' Title='JSON (.json)' Description='Associate JSON files with Forgepad.' Level='1' AllowAdvertise='no'>
                 <ComponentRef Id='FileAssocJson'/>
             </Feature>
 
-            <Feature Id='FileAssocYamlFeature' Title='YAML (.yaml, .yml)' Description='Associate YAML files with Ferrite.' Level='1' AllowAdvertise='no'>
+            <Feature Id='FileAssocYamlFeature' Title='YAML (.yaml, .yml)' Description='Associate YAML files with Forgepad.' Level='1' AllowAdvertise='no'>
                 <ComponentRef Id='FileAssocYaml'/>
             </Feature>
 
-            <Feature Id='FileAssocTomlFeature' Title='TOML (.toml)' Description='Associate TOML files with Ferrite.' Level='1' AllowAdvertise='no'>
+            <Feature Id='FileAssocTomlFeature' Title='TOML (.toml)' Description='Associate TOML files with Forgepad.' Level='1' AllowAdvertise='no'>
                 <ComponentRef Id='FileAssocToml'/>
             </Feature>
 
-            <Feature Id='FileAssocCsvFeature' Title='CSV (.csv, .tsv)' Description='Associate CSV and TSV files with Ferrite.' Level='1' AllowAdvertise='no'>
+            <Feature Id='FileAssocCsvFeature' Title='CSV (.csv, .tsv)' Description='Associate CSV and TSV files with Forgepad.' Level='1' AllowAdvertise='no'>
                 <ComponentRef Id='FileAssocCsv'/>
             </Feature>
         </Feature>
@@ -302,15 +302,15 @@
         <Feature
             Id='ContextMenu'
             Title='Explorer Context Menu'
-            Description='Add "Open with Ferrite" to the Windows Explorer right-click menu.'
+            Description='Add "Open with Forgepad" to the Windows Explorer right-click menu.'
             Level='2'
             AllowAdvertise='no'>
 
-            <Feature Id='ContextMenuFilesFeature' Title='Open with Ferrite (files)' Description='Right-click any file to open it with Ferrite.' Level='2' AllowAdvertise='no'>
+            <Feature Id='ContextMenuFilesFeature' Title='Open with Forgepad (files)' Description='Right-click any file to open it with Forgepad.' Level='2' AllowAdvertise='no'>
                 <ComponentRef Id='ContextMenuFiles'/>
             </Feature>
 
-            <Feature Id='ContextMenuFoldersFeature' Title='Open Folder with Ferrite (directories)' Description='Right-click a folder to open it as a Ferrite workspace.' Level='2' AllowAdvertise='no'>
+            <Feature Id='ContextMenuFoldersFeature' Title='Open Folder with Forgepad (directories)' Description='Right-click a folder to open it as a Forgepad workspace.' Level='2' AllowAdvertise='no'>
                 <ComponentRef Id='ContextMenuFolders'/>
             </Feature>
         </Feature>
@@ -319,7 +319,7 @@
         <Feature
             Id='AddToPath'
             Title='Add to System PATH'
-            Description='Add Ferrite to the system PATH so you can run "ferrite" from any terminal.'
+            Description='Add Forgepad to the system PATH so you can run "forgepad" from any terminal.'
             Level='2'
             AllowAdvertise='no'>
             <ComponentRef Id='PathEntry'/>
@@ -333,13 +333,13 @@
 
         <Icon Id='ProductICO' SourceFile='assets\icons\windows\app.ico'/>
         <Property Id='ARPPRODUCTICON' Value='ProductICO'/>
-        <Property Id='ARPHELPLINK' Value='https://github.com/OlaProeis/Ferrite'/>
+        <Property Id='ARPHELPLINK' Value='https://github.com/SeanShaffer88/Forgepad'/>
 
         <!-- Launch after install: checkbox on the exit dialog (checked by default) -->
-        <Property Id='WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT' Value='Launch Ferrite'/>
+        <Property Id='WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT' Value='Launch Forgepad'/>
         <Property Id='WIXUI_EXITDIALOGOPTIONALCHECKBOX' Value='1'/>
 
-        <CustomAction Id='LaunchApplication' FileKey='ferrite.exe' ExeCommand='' Return='asyncNoWait'/>
+        <CustomAction Id='LaunchApplication' FileKey='forgepad.exe' ExeCommand='' Return='asyncNoWait'/>
 
         <!-- ================================================================
              Installer UI
@@ -355,7 +355,7 @@
             <Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='CustomizeDlg' Order='5'>1</Publish>
             <Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='WelcomeDlg' Order='5'>1</Publish>
 
-            <!-- Launch Ferrite when user clicks Finish with checkbox checked -->
+            <!-- Launch Forgepad when user clicks Finish with checkbox checked -->
             <Publish Dialog='ExitDialog' Control='Finish' Event='DoAction' Value='LaunchApplication'>
                 WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed
             </Publish>

@@ -17,7 +17,9 @@ use std::sync::Mutex;
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Application name used for the config directory
-const APP_NAME: &str = "ferrite";
+const APP_NAME: &str = "forgepad";
+/// Config folder name used before the rename to Forgepad; migrated on first run.
+const LEGACY_APP_NAME: &str = "ferrite";
 
 /// Configuration file name
 const CONFIG_FILE_NAME: &str = "config.json";
@@ -65,7 +67,9 @@ const PORTABLE_DIR_NAME: &str = "portable";
 
 /// Environment variable for overriding the data directory.
 /// Used by PortableApps.com launcher and custom portable setups.
-pub(crate) const DATA_DIR_ENV_VAR: &str = "FERRITE_DATA_DIR";
+pub(crate) const DATA_DIR_ENV_VAR: &str = "FORGEPAD_DATA_DIR";
+/// Older name of [`DATA_DIR_ENV_VAR`], still honoured.
+const LEGACY_DATA_DIR_ENV_VAR: &str = "FERRITE_DATA_DIR";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Portable Mode Detection
@@ -84,8 +88,11 @@ pub(crate) const DATA_DIR_ENV_VAR: &str = "FERRITE_DATA_DIR";
 /// In portable mode, all configuration and data is stored in the resolved
 /// folder instead of the system's AppData/config directory.
 fn get_portable_dir() -> Option<PathBuf> {
-    // Priority 1: FERRITE_DATA_DIR env var (PortableApps.com / custom setups)
-    if let Ok(dir) = std::env::var(DATA_DIR_ENV_VAR) {
+    // Priority 1: FORGEPAD_DATA_DIR (or legacy FERRITE_DATA_DIR) env var
+    // (PortableApps.com / custom setups)
+    if let Ok(dir) =
+        std::env::var(DATA_DIR_ENV_VAR).or_else(|_| std::env::var(LEGACY_DATA_DIR_ENV_VAR))
+    {
         if !dir.is_empty() {
             let path = PathBuf::from(&dir);
             if path.is_dir() {
@@ -152,9 +159,45 @@ pub fn get_config_dir() -> Result<PathBuf> {
     }
 
     // Fall back to system config directory
-    dirs::config_dir()
-        .map(|base| base.join(APP_NAME))
-        .ok_or(Error::ConfigDirNotFound)
+    let base = dirs::config_dir().ok_or(Error::ConfigDirNotFound)?;
+    let dir = base.join(APP_NAME);
+    migrate_legacy_config_dir(&base.join(LEGACY_APP_NAME), &dir);
+    Ok(dir)
+}
+
+/// Copy the pre-rename `ferrite` config folder to the new location once, the
+/// first time Forgepad runs. The old folder is left in place.
+fn migrate_legacy_config_dir(legacy: &Path, dir: &Path) {
+    static ONCE: std::sync::Once = std::sync::Once::new();
+    ONCE.call_once(|| {
+        if dir.exists() || !legacy.is_dir() {
+            return;
+        }
+        match copy_dir_recursive(legacy, dir) {
+            Ok(()) => info!(
+                "Migrated settings from {} to {}",
+                legacy.display(),
+                dir.display()
+            ),
+            Err(e) => warn!("Could not migrate settings from {}: {e}", legacy.display()),
+        }
+    });
+}
+
+fn copy_dir_recursive(from: &Path, to: &Path) -> std::io::Result<()> {
+    std::fs::create_dir_all(to)?;
+    for entry in std::fs::read_dir(from)? {
+        let entry = entry?;
+        let ty = entry.file_type()?;
+        let target = to.join(entry.file_name());
+        if ty.is_dir() {
+            copy_dir_recursive(&entry.path(), &target)?;
+        } else if ty.is_file() {
+            std::fs::copy(entry.path(), &target)?;
+        }
+        // Symlinks and other entries are skipped.
+    }
+    Ok(())
 }
 
 /// Get the full path to the configuration file.
@@ -1004,7 +1047,7 @@ mod tests {
 
     #[test]
     fn test_app_name_constant() {
-        assert_eq!(APP_NAME, "ferrite");
+        assert_eq!(APP_NAME, "forgepad");
     }
 
     #[test]

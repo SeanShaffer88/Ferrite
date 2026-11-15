@@ -65,6 +65,24 @@ impl FerriteApp {
         }
     }
 
+    /// Add a cursor on the line above the topmost cursor, or below the
+    /// bottommost one, at the same column (clamped to the line length).
+    pub(crate) fn handle_add_cursor_vertical(&mut self, up: bool) {
+        let Some(tab) = self.state.active_tab_mut() else {
+            return;
+        };
+        let heads: Vec<usize> = tab.cursors.selections().iter().map(|s| s.head).collect();
+        let from = if up {
+            heads.iter().copied().min()
+        } else {
+            heads.iter().copied().max()
+        };
+        let Some(from) = from else { return };
+        if let Some(pos) = vertical_neighbor(&tab.content, from, up) {
+            tab.add_cursor(pos);
+        }
+    }
+
     /// Handle Ctrl+D: Select next occurrence of current word/selection.
     ///
     /// VS Code-style behavior:
@@ -220,4 +238,25 @@ impl FerriteApp {
             }
         }
     }
+}
+
+/// Char index on the line above/below `pos` at the same column, clamped to
+/// that line's length (`\r` excluded). `None` at the first/last line.
+fn vertical_neighbor(text: &str, pos: usize, up: bool) -> Option<usize> {
+    // Char offset where each line starts.
+    let mut starts = vec![0usize];
+    for (i, c) in text.chars().enumerate() {
+        if c == '\n' {
+            starts.push(i + 1);
+        }
+    }
+    let total = text.chars().count();
+    let line = starts.partition_point(|&s| s <= pos).saturating_sub(1);
+    let col = pos - starts[line];
+    let target = if up { line.checked_sub(1)? } else { line + 1 };
+    let start = *starts.get(target)?;
+    let end = starts.get(target + 1).map(|n| n - 1).unwrap_or(total);
+    let line_text: String = text.chars().skip(start).take(end - start).collect();
+    let len = line_text.trim_end_matches('\r').chars().count();
+    Some(start + col.min(len))
 }

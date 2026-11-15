@@ -20,7 +20,7 @@ pub(super) fn render_about_link(
     _ctx: &mut SettingsCtx<'_>,
 ) -> bool {
     ui.horizontal(|ui| {
-        ui.label(RichText::new("Ferrite").strong());
+        ui.label(RichText::new("Forgepad").strong());
         ui.label(
             RichText::new(format!("v{}", update::current_version()))
                 .monospace()
@@ -91,7 +91,7 @@ fn about_contents(panel: &mut SettingsPanel, ui: &mut Ui, ctx: &egui::Context) {
 
     // Application info
     ui.horizontal(|ui| {
-        ui.label(RichText::new("Ferrite").strong().size(16.0));
+        ui.label(RichText::new("Forgepad").strong().size(16.0));
         ui.label(
             RichText::new(format!("v{}", update::current_version()))
                 .monospace()
@@ -220,16 +220,22 @@ fn about_contents(panel: &mut SettingsPanel, ui: &mut Ui, ctx: &egui::Context) {
         .link(t!("settings.about.all_releases").to_string())
         .clicked()
     {
-        let _ = open::that("https://github.com/OlaProeis/Ferrite/releases");
+        let _ = open::that("https://github.com/SeanShaffer88/Forgepad/releases");
     }
     if ui
         .link(format!("🐛 {}", t!("settings.about.report_issue")))
         .clicked()
     {
-        let _ = open::that("https://github.com/OlaProeis/Ferrite/issues");
+        let _ = open::that("https://github.com/SeanShaffer88/Forgepad/issues");
     }
     if ui
         .link(format!("📖 {}", t!("settings.about.source_code")))
+        .clicked()
+    {
+        let _ = open::that("https://github.com/SeanShaffer88/Forgepad");
+    }
+    if ui
+        .link(t!("settings.about.based_on_ferrite").to_string())
         .clicked()
     {
         let _ = open::that("https://github.com/OlaProeis/Ferrite");

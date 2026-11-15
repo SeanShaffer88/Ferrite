@@ -107,6 +107,38 @@ pub fn calculate_gutter_width(
 }
 
 /// Renders a fold indicator in the gutter.
+/// Git change bar: green = added, blue = modified, red wedge = lines deleted above.
+pub fn render_change_bar(
+    painter: &egui::Painter,
+    x: f32,
+    y: f32,
+    line_height: f32,
+    change: crate::devtools::linechanges::LineChange,
+) {
+    use crate::devtools::linechanges::LineChange;
+    const W: f32 = 3.0;
+    match change {
+        LineChange::Added | LineChange::Modified => {
+            let color = if change == LineChange::Added {
+                Color32::from_rgb(0x3f, 0xb9, 0x50)
+            } else {
+                Color32::from_rgb(0x38, 0x8b, 0xfd)
+            };
+            let r = Rect::from_min_size(Pos2::new(x, y), Vec2::new(W, line_height));
+            painter.rect_filled(r, 0.0, color);
+        }
+        LineChange::DeletedAbove => {
+            let red = Color32::from_rgb(0xf8, 0x51, 0x49);
+            let pts = vec![
+                Pos2::new(x, y - 3.0),
+                Pos2::new(x + W + 3.0, y),
+                Pos2::new(x, y + 3.0),
+            ];
+            painter.add(egui::Shape::convex_polygon(pts, red, Stroke::NONE));
+        }
+    }
+}
+
 ///
 /// Shows ▶ for collapsed folds, ▼ for expanded folds.
 pub fn render_fold_indicator(

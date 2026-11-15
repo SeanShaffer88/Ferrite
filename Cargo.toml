@@ -1,12 +1,12 @@
 [package]
-name = "ferrite"
+name = "forgepad"
 version = "0.3.1"
 edition = "2021"
 rust-version = "1.92"
 description = "A fast, lightweight text editor for Markdown, JSON, and more"
-repository = "https://github.com/OlaProeis/Ferrite"
+repository = "https://github.com/SeanShaffer88/Forgepad"
 license = "MIT"
-authors = ["OlaProeis"]
+authors = ["SeanShaffer88", "OlaProeis"]
 keywords = ["markdown", "editor", "text-editor", "egui"]
 categories = ["text-editors", "gui"]
 
@@ -170,7 +170,7 @@ embed-resource = "2.4"
 [profile.release]
 lto = "thin"          # Link-time optimization (thin is faster, less aggressive)
 codegen-units = 1     # Single codegen unit for better optimization
-panic = "abort"       # No unwinding, smaller binary
+panic = "unwind"      # Unwind so catch_unwind guards (Mermaid, fonts) and worker-thread panics don't close the app (upstream #199)
 opt-level = 3         # Optimize for speed (not size - "z" can trigger AV heuristics)
 # strip = "symbols"   # DISABLED: Stripping symbols can trigger AV false positives
 
@@ -183,11 +183,11 @@ opt-level = 2         # Optimize dependencies in dev builds
 # Build with: cargo deb
 # ============================================================================
 [package.metadata.deb]
-name = "ferrite-editor"
+name = "forgepad"
 maintainer = "OlaProeis <olaproeis@users.noreply.github.com>"
 copyright = "2024-2026, OlaProeis"
 license-file = ["LICENSE", "0"]
-extended-description = """Ferrite is a fast, lightweight text editor built with Rust and egui.
+extended-description = """Forgepad is a fast, lightweight text editor built with Rust and egui.
 Features include:
 - Markdown editing with live preview
 - Split view (raw + rendered side-by-side)
@@ -202,20 +202,20 @@ priority = "optional"
 depends = "$auto"
 assets = [
     # Binary
-    ["target/release/ferrite", "usr/bin/ferrite", "755"],
+    ["target/release/forgepad", "usr/bin/forgepad", "755"],
     # Desktop entry
-    ["assets/icons/linux/ferrite.desktop", "usr/share/applications/ferrite.desktop", "644"],
+    ["assets/icons/linux/forgepad.desktop", "usr/share/applications/forgepad.desktop", "644"],
     # Icons at various sizes
-    ["assets/icons/icon_16.png", "usr/share/icons/hicolor/16x16/apps/ferrite.png", "644"],
-    ["assets/icons/icon_32.png", "usr/share/icons/hicolor/32x32/apps/ferrite.png", "644"],
-    ["assets/icons/icon_48.png", "usr/share/icons/hicolor/48x48/apps/ferrite.png", "644"],
-    ["assets/icons/icon_64.png", "usr/share/icons/hicolor/64x64/apps/ferrite.png", "644"],
-    ["assets/icons/icon_128.png", "usr/share/icons/hicolor/128x128/apps/ferrite.png", "644"],
-    ["assets/icons/icon_256.png", "usr/share/icons/hicolor/256x256/apps/ferrite.png", "644"],
-    ["assets/icons/icon_512.png", "usr/share/icons/hicolor/512x512/apps/ferrite.png", "644"],
+    ["assets/icons/icon_16.png", "usr/share/icons/hicolor/16x16/apps/forgepad.png", "644"],
+    ["assets/icons/icon_32.png", "usr/share/icons/hicolor/32x32/apps/forgepad.png", "644"],
+    ["assets/icons/icon_48.png", "usr/share/icons/hicolor/48x48/apps/forgepad.png", "644"],
+    ["assets/icons/icon_64.png", "usr/share/icons/hicolor/64x64/apps/forgepad.png", "644"],
+    ["assets/icons/icon_128.png", "usr/share/icons/hicolor/128x128/apps/forgepad.png", "644"],
+    ["assets/icons/icon_256.png", "usr/share/icons/hicolor/256x256/apps/forgepad.png", "644"],
+    ["assets/icons/icon_512.png", "usr/share/icons/hicolor/512x512/apps/forgepad.png", "644"],
     # Documentation
-    ["README.md", "usr/share/doc/ferrite-editor/README.md", "644"],
-    ["LICENSE", "usr/share/doc/ferrite-editor/LICENSE", "644"],
+    ["README.md", "usr/share/doc/forgepad/README.md", "644"],
+    ["LICENSE", "usr/share/doc/forgepad/LICENSE", "644"],
 ]
 
 # ============================================================================
@@ -223,26 +223,26 @@ assets = [
 # Build with: cargo generate-rpm
 # ============================================================================
 [package.metadata.generate-rpm]
-name = "ferrite-editor"
+name = "forgepad"
 license = "MIT"
 summary = "A fast, lightweight text editor for Markdown, JSON, and more"
-url = "https://github.com/OlaProeis/Ferrite"
+url = "https://github.com/SeanShaffer88/Forgepad"
 assets = [
     # Binary
-    { source = "target/release/ferrite", dest = "/usr/bin/ferrite", mode = "755" },
+    { source = "target/release/forgepad", dest = "/usr/bin/forgepad", mode = "755" },
     # Desktop entry
-    { source = "assets/icons/linux/ferrite.desktop", dest = "/usr/share/applications/ferrite.desktop", mode = "644" },
+    { source = "assets/icons/linux/forgepad.desktop", dest = "/usr/share/applications/forgepad.desktop", mode = "644" },
     # Icons at various sizes
-    { source = "assets/icons/icon_16.png", dest = "/usr/share/icons/hicolor/16x16/apps/ferrite.png", mode = "644" },
-    { source = "assets/icons/icon_32.png", dest = "/usr/share/icons/hicolor/32x32/apps/ferrite.png", mode = "644" },
-    { source = "assets/icons/icon_48.png", dest = "/usr/share/icons/hicolor/48x48/apps/ferrite.png", mode = "644" },
-    { source = "assets/icons/icon_64.png", dest = "/usr/share/icons/hicolor/64x64/apps/ferrite.png", mode = "644" },
-    { source = "assets/icons/icon_128.png", dest = "/usr/share/icons/hicolor/128x128/apps/ferrite.png", mode = "644" },
-    { source = "assets/icons/icon_256.png", dest = "/usr/share/icons/hicolor/256x256/apps/ferrite.png", mode = "644" },
-    { source = "assets/icons/icon_512.png", dest = "/usr/share/icons/hicolor/512x512/apps/ferrite.png", mode = "644" },
+    { source = "assets/icons/icon_16.png", dest = "/usr/share/icons/hicolor/16x16/apps/forgepad.png", mode = "644" },
+    { source = "assets/icons/icon_32.png", dest = "/usr/share/icons/hicolor/32x32/apps/forgepad.png", mode = "644" },
+    { source = "assets/icons/icon_48.png", dest = "/usr/share/icons/hicolor/48x48/apps/forgepad.png", mode = "644" },
+    { source = "assets/icons/icon_64.png", dest = "/usr/share/icons/hicolor/64x64/apps/forgepad.png", mode = "644" },
+    { source = "assets/icons/icon_128.png", dest = "/usr/share/icons/hicolor/128x128/apps/forgepad.png", mode = "644" },
+    { source = "assets/icons/icon_256.png", dest = "/usr/share/icons/hicolor/256x256/apps/forgepad.png", mode = "644" },
+    { source = "assets/icons/icon_512.png", dest = "/usr/share/icons/hicolor/512x512/apps/forgepad.png", mode = "644" },
     # Documentation
-    { source = "README.md", dest = "/usr/share/doc/ferrite-editor/README.md", mode = "644", doc = true },
-    { source = "LICENSE", dest = "/usr/share/doc/ferrite-editor/LICENSE", mode = "644", doc = true },
+    { source = "README.md", dest = "/usr/share/doc/forgepad/README.md", mode = "644", doc = true },
+    { source = "LICENSE", dest = "/usr/share/doc/forgepad/LICENSE", mode = "644", doc = true },
 ]
 
 # ============================================================================
@@ -250,7 +250,7 @@ assets = [
 # Build with: cargo wix
 # ============================================================================
 [package.metadata.wix]
-name = "Ferrite"
+name = "Forgepad"
 manufacturer = "OlaProeis"
 product-icon = "assets/icons/windows/app.ico"
 license = false
@@ -261,11 +261,11 @@ eula = false
 # Build with: cargo bundle --release
 # ============================================================================
 [package.metadata.bundle]
-name = "Ferrite"
-identifier = "com.olaproeis.ferrite"
-icon = ["assets/icons/macos/Ferrite.icns"]
+name = "Forgepad"
+identifier = "com.seanshaffer88.forgepad"
+icon = ["assets/icons/macos/Forgepad.icns"]
 short_description = "A fast, lightweight text editor"
-long_description = """Ferrite is a fast, lightweight text editor built with Rust and egui.
+long_description = """Forgepad is a fast, lightweight text editor built with Rust and egui.
 Features include Markdown editing with live preview, JSON/YAML/TOML tree viewer,
 Git integration, and syntax highlighting."""
 category = "public.app-category.developer-tools"

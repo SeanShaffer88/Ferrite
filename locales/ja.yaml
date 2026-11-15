@@ -1,10 +1,10 @@
-# Ferrite - Japanese (日本語)
+# Forgepad - Japanese (日本語)
 # This file contains all user-facing strings for internationalization.
 # Naming convention: category.subcategory.key (e.g., menu.file.open)
 
 # Application metadata
 app:
-  name: "Ferrite"
+  name: "Forgepad"
 
 # Menu bar items
 menu:
@@ -114,7 +114,7 @@ dialog:
   code_execution_consent:
     title: このドキュメントからコードを実行することを許可しますか？
     body_intro: 
-      フェンス付きスニペットを実行すると、ユーザー権限を使用してコンピュータ上で実際のサブプロセスが開始されます。Ferriteはランナーをサンドボックス化したり、ネットワークアクセスをフィルタリングしたりしません。
+      フェンス付きスニペットを実行すると、ユーザー権限を使用してコンピュータ上で実際のサブプロセスが開始されます。Forgepadはランナーをサンドボックス化したり、ネットワークアクセスをフィルタリングしたりしません。
     body_settings_echo: 
       「設定」→「エディタ」→「コードの実行」と同様の注意点があります。サンドボックス機能はありませんので、信頼できるドキュメントでのみ使用してください。
     enable_and_run: 有効化して実行
@@ -161,7 +161,7 @@ settings:
   recently_changed: "最近変更した設定"
   essentials: "基本設定"
   essentials_hint: "よく使う設定です。すべての設定を見るには、検索または上のカテゴリーフィルターを使用してください。"
-  about_button_tooltip: "Ferrite について・更新・リンク"
+  about_button_tooltip: "Forgepad について・更新・リンク"
   default_view_hint: "新しいタブの表示モード (既存のタブは表示モードを維持します)"
   font_size:
     small: "小"
@@ -314,8 +314,8 @@ settings:
     files_count: "%{count} 個のファイル"
     show_welcome: "空の起動時にウェルカムを表示"
     show_welcome_tooltip: "ドキュメントが開いていない状態で起動したときにウェルカムタブを開きます。"
-    allow_multiple_instances: "複数の Ferrite ウィンドウ/インスタンスを許可"
-    allow_multiple_instances_tooltip: "有効にすると、実行中のインスタンスへファイルを転送せず、起動のたびに新しい Ferrite ウィンドウを開きます。--new-instance フラグも同じ動作を1回の起動に適用します。"
+    allow_multiple_instances: "複数の Forgepad ウィンドウ/インスタンスを許可"
+    allow_multiple_instances_tooltip: "有効にすると、実行中のインスタンスへファイルを転送せず、起動のたびに新しい Forgepad ウィンドウを開きます。--new-instance フラグも同じ動作を1回の起動に適用します。"
   appearance:
     title: "外観"
     language: "言語"
@@ -323,14 +323,14 @@ settings:
     syntax_theme: "構文テーマ"
     syntax_theme_hint: "コードの構文強調表示用のカラーテーマ"
     syntax_theme_auto: "自動 (アプリのテーマに合わせる)"
-    accent_color: Ferrite アクセント
+    accent_color: Forgepad アクセント
     accent_color_hint: 見出し 
       (H1～H6）、選択時の色、タブ、およびハイライト表示されたコントロール。ハイパーリンクは標準の青色のままです。
     accent_reset: 色をリセット
     system_title_bar: "システムのタイトルバーを使用"
-    system_title_bar_hint: "Ferrite のカスタム枠の代わりに、ネイティブのウィンドウタイトルバーを表示します。"
-    system_title_bar_restart: "この変更を反映するには Ferrite を再起動してください。"
-    system_title_bar_windows_tooltip: "Windows ではサポートされていません。描画の制約により、Windows では Ferrite のカスタムウィンドウ枠を使用します。"
+    system_title_bar_hint: "Forgepad のカスタム枠の代わりに、ネイティブのウィンドウタイトルバーを表示します。"
+    system_title_bar_restart: "この変更を反映するには Forgepad を再起動してください。"
+    system_title_bar_windows_tooltip: "Windows ではサポートされていません。描画の制約により、Windows では Forgepad のカスタムウィンドウ枠を使用します。"
   keyboard:
     title: "キーボード"
     reset_all: "すべてのショートカットをリセット"
@@ -343,7 +343,7 @@ settings:
     conflict_with: "競合 :"
     click_to_change: "クリックしてショートカットを変更"
   about:
-    title: "Ferrite について"
+    title: "Forgepad について"
     description: "Markdown,JSON などに対応した高速で軽量なテキスト エディタ"
     updates: "アップデート"
     check_for_updates: "更新の確認"
@@ -492,9 +492,9 @@ search:
 
 # About dialog
 about:
-  title: "Ferrite について / ヘルプ"
+  title: "Forgepad について / ヘルプ"
   tab:
-    about: "Ferrite について"
+    about: "Forgepad について"
     shortcuts: "ショートカット"
     mermaid: "Mermaid"
   description: "Markdown、JSON などに対応した高速で軽量なテキストエディタです。"
@@ -518,7 +518,7 @@ about:
   # License section
   license: "ライセンス"
   license_type: "MIT ライセンス"
-  copyright: "© 2026 Ferrite Contributors"
+  copyright: "© 2026 Forgepad Contributors"
   version: "バージョン %{version}"
 
 # Keyboard shortcuts
@@ -620,7 +620,7 @@ shortcuts:
     toggle_fold: "折りたたみの切り替え"
     # Other
     open_settings: "設定を開く"
-    open_about: "Ferrite について / ヘルプ"
+    open_about: "Forgepad について / ヘルプ"
     export_html: "HTML をエクスポート"
     export_pdf: "PDF へエクスポート"
     print_preview: "印刷プレビュー"
@@ -655,7 +655,7 @@ shortcuts:
     zoom_out: "縮小"
     reset_zoom: "ズームをリセット"
     settings: "設定"
-    about: "Ferrite について / ヘルプ"
+    about: "Forgepad について / ヘルプ"
   # Formatting shortcuts (for help panel)
   format:
     bold: "太字"
@@ -791,7 +791,7 @@ recovery:
     time_label: "最終更新 : %{time}"
   session:
     title: "セッションの復元"
-    crash_detected: "Ferrite は、前回のセッションが正常に終了していなかったことを検出しました。"
+    crash_detected: "Forgepad は、前回のセッションが正常に終了していなかったことを検出しました。"
     restore_question: "前回のセッションを復元しますか?"
     restore: "セッションを復元"
     start_fresh: "新しく開始"
@@ -950,7 +950,7 @@ tooltip:
   fullscreen_enter: "全画面表示 (F10)"
   settings: "設定 (Ctrl+,)"
   recent_items: "最近使ったファイルとフォルダーを表示\nShift+クリックでバックグラウンドで開く"
-  about_help: "Ferrite について / ヘルプ (F1)"
+  about_help: "Forgepad について / ヘルプ (F1)"
   git_branch: "現在の Git ブランチ"
   new_tab: "新しいタブ"
 
@@ -980,7 +980,7 @@ welcome:
   label:
     theme: "テーマ"
     language: "言語"
-    accent_color: Ferrite アクセントカラー
+    accent_color: Forgepad アクセントカラー
   line_width_hint: "テキスト行の幅を制限します。Zenモード (F11) でテキストを中央揃えにする場合の値を設定します。"
 
 # Terminal panel
@@ -1038,7 +1038,7 @@ terminal:
     macros: "マクロ"
   filter:
     terminal_layout: "ターミナルのレイアウト"
-    ferrite_workspace: "Ferrite ワークスペース"
+    ferrite_workspace: "Forgepad ワークスペース"
   error:
     shell_not_found: "シェルがインストールされ、パスが正しいことを確認してください"
     pty_failed: "PTYの割り当てに失敗しました。他のターミナルを閉じるか、アプリを再起動してください"

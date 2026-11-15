@@ -1,82 +1,21 @@
-# Ferrite
+# Forgepad
 
 **English** | [简体中文](README.zh-CN.md)
 
 <div align="center">
 
-[![Website](https://img.shields.io/badge/website-getferrite.dev-blue?style=flat-square)](https://getferrite.dev)
-[![Latest Release](https://img.shields.io/github/v/release/OlaProeis/Ferrite?style=flat-square)](https://github.com/OlaProeis/Ferrite/releases)
-[![License](https://img.shields.io/github/license/OlaProeis/Ferrite?style=flat-square)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/OlaProeis/Ferrite?style=flat-square)](https://github.com/OlaProeis/Ferrite/stargazers)
-[![GitHub Issues](https://img.shields.io/github/issues/OlaProeis/Ferrite?style=flat-square)](https://github.com/OlaProeis/Ferrite/issues)
-[![Translation Status](https://hosted.weblate.org/widget/ferrite/ferrite-ui/svg-badge.svg)](https://hosted.weblate.org/engage/ferrite/)
-
-**[getferrite.dev](https://getferrite.dev)** — Official website with downloads, features, and documentation
+[![Latest Release](https://img.shields.io/github/v/release/SeanShaffer88/Forgepad?include_prereleases&style=flat-square)](https://github.com/SeanShaffer88/Forgepad/releases)
+[![License](https://img.shields.io/github/license/SeanShaffer88/Forgepad?style=flat-square)](LICENSE)
 
 </div>
 
-A fast, lightweight text editor for Markdown, JSON, YAML, and TOML files. Built with Rust and egui for a native, responsive experience.
+A fast, lightweight text editor for Markdown, JSON, YAML, and TOML files — with developer tools for config files, docs, and use as `$EDITOR`. Built with Rust and egui for a native, responsive experience.
 
-> ⚠️ **Platform Note:** Ferrite is developed and tested on **Windows** and **Linux**. macOS support is experimental. If you encounter issues, please [report them](https://github.com/OlaProeis/Ferrite/issues).
+> **Forgepad is a fork of [Ferrite](https://github.com/OlaProeis/Ferrite) by Ola Proeis** (MIT). It adds schema validation, a JSONPath query bar, structured diff, `$EDITOR` / `--wait` support, Markdown link checking and more — see [For Developers](#for-developers-unreleased). Thanks to Ola Proeis and the Ferrite contributors for the editor this builds on.
 
-<details>
-<summary><strong>🛡️ Code Signing & Antivirus</strong></summary>
+> ⚠️ **Platform Note:** Forgepad is developed and tested on **Windows**. Linux and macOS builds are produced by CI but less tested. Please [report issues](https://github.com/SeanShaffer88/Forgepad/issues).
 
-Starting with v0.2.6.1, **all Windows releases are digitally signed** with a certificate from [SignPath Foundation](https://signpath.org). This means:
-
-- **Windows SmartScreen** recognizes the publisher — no more "Unknown publisher" warnings
-- **Antivirus false positives** are significantly reduced thanks to the trusted code signature
-- **Integrity verification** — you can verify that the binary hasn't been tampered with
-
-### Previous False Positives
-Older unsigned builds may still trigger antivirus detections. This was caused by:
-- **Live Pipeline feature**: Uses `cmd.exe /C` on Windows for shell commands, which ML-based detection can misidentify
-- **Rust compilation patterns**: Rust binaries can trigger heuristic detections due to unique characteristics
-
-We've addressed this through code signing, build profile adjustments (disabled symbol stripping, speed optimization), and reporting to Microsoft's Security Intelligence portal.
-
-### If You're Still Affected
-If Windows Defender quarantines Ferrite:
-1. **Upgrade**: Download the latest signed release from [GitHub Releases](https://github.com/OlaProeis/Ferrite/releases)
-2. **Verify the signature**: Right-click `ferrite.exe` → Properties → Digital Signatures → should show "SignPath Foundation"
-3. **Check VirusTotal**: Upload the file to [VirusTotal](https://www.virustotal.com) — signed builds should show clean results
-
-Ferrite does **NOT** access passwords, browser data, or make unsolicited network connections. The only network access is the manual "Check for Updates" button (Settings → About), which contacts the GitHub Releases API when you click it. The application only accesses files you explicitly open.
-
-</details>
-
-<details>
-<summary><strong>🍎 macOS Installation & Gatekeeper</strong></summary>
-
-**GitHub Release** `.dmg` / `.tar.gz` builds are packaged as `Ferrite.app` but are **not** signed with an Apple Developer ID and are **not** notarized (CI limitation). **Gatekeeper**, especially on **macOS 15.x (Sequoia / 15.6+)**, may block or warn on first launch—see [GitHub #130](https://github.com/OlaProeis/Ferrite/issues/130) and the workarounds below.
-
-📖 **Full troubleshooting:** [docs/install/macos.md](docs/install/macos.md)
-
-### Option 1: Homebrew (often smoothest)
-
-```bash
-brew tap olaproeis/ferrite
-brew install --cask ferrite
-```
-
-Homebrew typically avoids quarantine friction compared to raw GitHub downloads.
-
-### Option 2: DMG / tar.gz from GitHub Releases + workaround
-
-1. Download from [Releases](https://github.com/OlaProeis/Ferrite/releases):
-   - **Apple Silicon:** `ferrite-macos-arm64.dmg` or `.tar.gz`
-   - **Intel:** `ferrite-macos-x64.dmg` or `.tar.gz`
-2. Copy `Ferrite.app` to **Applications** (or another folder you prefer).
-3. **First launch — pick one:**
-   - **Terminal (most reliable):** `xattr -dr com.apple.quarantine /Applications/Ferrite.app` — use the real path if the app is not under `/Applications`.
-   - **Finder:** Control-click `Ferrite.app` → **Open** → **Open** (may **not** work on every macOS 15.x configuration).
-   - **System Settings → Privacy & Security:** after a blocked launch, use **Open Anyway** if shown.
-
-### Why this happens
-
-Apple expects apps distributed outside the Mac App Store to be signed with a **Developer ID** certificate and **notarized**. Ferrite is open source—you can [audit the code](https://github.com/OlaProeis/Ferrite) and [build from source](docs/building.md)—but paid enrollment and CI wiring are still pending for GitHub-hosted macOS builds.
-
-</details>
+> **Unsigned builds:** Forgepad binaries are not code-signed. Windows SmartScreen and macOS Gatekeeper will warn on first launch; see [Installation](#installation).
 
 ## 🤖 AI-Assisted Development
 
@@ -101,7 +40,7 @@ This project is 100% AI-generated code. All Rust code, documentation, and config
 📖 **Full details:** [AI Development Workflow](docs/ai-workflow/ai-development-workflow.md)
 
 ### Open Process
-The actual prompts and documents used to build Ferrite are public:
+The actual prompts and documents used to build Forgepad are public:
 
 | Document | Purpose |
 |----------|---------|
@@ -115,13 +54,13 @@ This transparency is intentional — I want others to learn from (and improve up
 
 ## Screenshots
 
-![Ferrite Demo](assets/screenshots/demo.gif)
+![Forgepad Demo](assets/screenshots/demo.gif)
 
 | Raw Editor | Split View | Zen Mode |
 |------------|------------|----------|
 | ![Raw Editor](assets/screenshots/raw-dark.png) | ![Split View](assets/screenshots/split-dark.png) | ![Zen Mode](assets/screenshots/zen-dark.png) |
 
-> ✨ **v0.3.1 (latest, November 11, 2026):** Inline **YouTube video embeds**. **Multi-window**. Mermaid second wave (git graph rewrite, diagram popup, fit-to-pane, `autonumber`, `linkStyle interpolate basis`). **CSV cell editing**. **GitHub HTML subset** and HTML entities. **GFM table alignment**. **Preview lock**. **Search-first Settings** with corruption-safe `config.json`. **Spellcheck**. Separate **Rendered** and **terminal** fonts. **Tab / Shift+Tab indent**. **Emoji** fallback. **Clipboard image paste**. **Reload from Disk**. **CRLF preserved** on edit and save. **Arrow keys** and **Find** in the rendered preview. **macOS Finder Open With**. Typing-run undo. Linux QA close-out (four rounds). Late fixes: encoding save/switch no longer drops or mangles text ([#197](https://github.com/OlaProeis/Ferrite/issues/197), [#198](https://github.com/OlaProeis/Ferrite/issues/198)), CSV cell commits keep mid-file Raw edits ([#196](https://github.com/OlaProeis/Ferrite/issues/196)), rendered list items show nested blocks and keep wrapped lines. LSP stays deferred to v0.3.2+. Linux YouTube Error 153 is deferred to v0.3.2. See [CHANGELOG.md](CHANGELOG.md) § [0.3.1](CHANGELOG.md#031---2026-11-11) and [ROADMAP.md](ROADMAP.md).
+> ✨ **Based on Ferrite v0.3.1 (November 11, 2026):** Inline **YouTube video embeds**. **Multi-window**. Mermaid second wave (git graph rewrite, diagram popup, fit-to-pane, `autonumber`, `linkStyle interpolate basis`). **CSV cell editing**. **GitHub HTML subset** and HTML entities. **GFM table alignment**. **Preview lock**. **Search-first Settings** with corruption-safe `config.json`. **Spellcheck**. Separate **Rendered** and **terminal** fonts. **Tab / Shift+Tab indent**. **Emoji** fallback. **Clipboard image paste**. **Reload from Disk**. **CRLF preserved** on edit and save. **Arrow keys** and **Find** in the rendered preview. **macOS Finder Open With**. Typing-run undo. Linux QA close-out (four rounds). Late fixes: encoding save/switch no longer drops or mangles text ([#197](https://github.com/OlaProeis/Ferrite/issues/197), [#198](https://github.com/OlaProeis/Ferrite/issues/198)), CSV cell commits keep mid-file Raw edits ([#196](https://github.com/OlaProeis/Ferrite/issues/196)), rendered list items show nested blocks and keep wrapped lines. LSP stays deferred to v0.3.2+. Linux YouTube Error 153 is deferred to v0.3.2. See [CHANGELOG.md](CHANGELOG.md) § [0.3.1](CHANGELOG.md#031---2026-11-11) and [ROADMAP.md](ROADMAP.md).
 
 > 📦 **v0.3.0:** **eframe / egui 0.34.2** platform refresh. **PDF + themed HTML export**. **Executable code blocks** (`▶ Run`). **Rendered edit session**. **Split-view scroll sync**. **User accent color**. **Mermaid** insert toolbar and flowchart polish. **Phosphor icons**. **Session recovery**. **Quick note workflow**. See [CHANGELOG.md](CHANGELOG.md) § 0.3.0.
 
@@ -201,7 +140,7 @@ Native rendering of 11 diagram types directly in the preview:
 - **Session Persistence** - Restore open tabs, cursor positions, and scroll offsets on restart; hardened crash recovery with identity checks and disk-conflict banner
 - **Tab Context Menu** *(v0.3.1)* - Right-click a tab for New Tab, Close Tab, Copy Path, and Reveal in file manager; hover shows the full path
 - **Open Links from the Preview** *(v0.3.1)* - Ctrl/Cmd+click or middle-click a link in the rendered view: web links open in the browser, local files and folders in the file manager
-- **Single Instance** - Files opened from the file manager join the running window; *(v0.3.1)* Settings → Files can allow multiple instances, and `ferrite --new-instance` always starts a separate process
+- **Single Instance** - Files opened from the file manager join the running window; *(v0.3.1)* Settings → Files can allow multiple instances, and `forgepad --new-instance` always starts a separate process
 
 ### Terminal Workspace
 - **Integrated Terminal** - Multiple instances with shell selection (PowerShell, CMD, WSL, bash)
@@ -214,7 +153,7 @@ Native rendering of 11 diagram types directly in the preview:
 - **AI-Ready** - Visual "breathing" indicator when terminal is waiting for input (perfect for AI agents)
 
 ### Additional Features
-- **Light & Dark Themes** - Beautiful themes with runtime switching; **custom Ferrite accent color** (Settings / Welcome) for headings, selection, tabs, and chrome
+- **Light & Dark Themes** - Beautiful themes with runtime switching; **custom Forgepad accent color** (Settings / Welcome) for headings, selection, tabs, and chrome
 - **Search-First Settings** *(v0.3.1)* - Instantly search every setting (including keyboard shortcuts) with category filter chips; default view shows recently changed settings and essentials; a changed setting is written within about half a second
 - **Corruption-Safe Settings** *(v0.3.1)* - One invalid value resets only that setting; an unreadable `config.json` is kept as `config.json.corrupt-<timestamp>` instead of being overwritten; saves are atomic with a `.bak` of the previous file
 - **Markdown Cheat Sheet** *(v0.3.1)* - Ribbon **MD** button opens a compact syntax and shortcut reference
@@ -232,186 +171,40 @@ Native rendering of 11 diagram types directly in the preview:
 - **Schema Validation** - JSON, YAML and TOML checked against a JSON Schema as you type, fully offline: from `$schema` / `# yaml-language-server` / `#:schema`, your own glob mappings, or bundled schemas for `package.json`, `tsconfig.json`, `Cargo.toml`, `pyproject.toml`, GitHub workflows and Compose files. Problems panel with click-to-line
 - **Query Bar** - JSONPath queries in the tree viewer; click a match to jump to it
 - **Format & Convert** - Format, sort keys, minify; convert JSON ⇄ YAML ⇄ TOML with a warning when comments or nulls are lost
-- **Structured Diff** - Compare with the last commit or `ferrite --diff a b`, by value: key order and formatting don't count
+- **Structured Diff** - Compare with the last commit or `forgepad --diff a b`, by value: key order and formatting don't count
 - **Docs Workbench** - Live checks for broken relative links and `#anchors` in Markdown, a workspace link report, frontmatter schema validation, and README / changelog / ADR templates
-- **Use as `$EDITOR`** - `ferrite file:line:col`, `--goto`, stdin via `-`, and `--wait` for `git commit`, `crontab -e` and friends; commit messages get a 72-column guide
+- **Use as `$EDITOR`** - `forgepad file:line:col`, `--goto`, stdin via `-`, and `--wait` for `git commit`, `crontab -e` and friends; commit messages get a 72-column guide
 
 Guide: [docs/devtools.md](docs/devtools.md) · CLI: [docs/cli.md](docs/cli.md) · Credits: [docs/devtools-credits.md](docs/devtools-credits.md)
 
 ## Installation
 
-### Pre-built Binaries
+### Pre-built binaries
 
-Download the latest release for your platform from [GitHub Releases](https://github.com/OlaProeis/Ferrite/releases).
+Download from **[GitHub Releases](https://github.com/SeanShaffer88/Forgepad/releases)**. Test builds (`test-v…`) are unsigned pre-releases:
 
-| Platform | Download | Notes |
-|----------|----------|-------|
-| **Windows** | `ferrite-windows-x64.msi` | Recommended - full installer with Start Menu |
-| Windows | `ferrite-portable-windows-x64.zip` | Portable - extract anywhere, run from USB |
-| **Linux (Debian/Ubuntu)** | `ferrite-editor_amd64.deb` | For Debian, Ubuntu, Mint, Pop!_OS |
-| **Linux (Fedora/RHEL)** | `ferrite-editor.x86_64.rpm` | For Fedora, RHEL, CentOS, Rocky |
-| Linux | `ferrite-linux-x64.tar.gz` | Universal - works on any distro |
-| **macOS (Apple Silicon)** | `ferrite-macos-arm64.dmg` | Recommended - drag to Applications (M1/M2/M3) |
-| macOS (Apple Silicon) | `ferrite-macos-arm64.tar.gz` | Alternative - contains Ferrite.app bundle |
-| **macOS (Intel)** | `ferrite-macos-x64.dmg` | Recommended - drag to Applications |
-| macOS (Intel) | `ferrite-macos-x64.tar.gz` | Alternative - contains Ferrite.app bundle |
+| Platform | File | How to run |
+|---|---|---|
+| Windows x64 | `forgepad-windows-x64-unsigned.zip` | Unzip, run `forgepad.exe`. SmartScreen: **More info → Run anyway**. Create a `portable` folder next to the exe to keep settings beside it. |
+| Linux x64 | `forgepad-linux-x64.tar.gz` | `tar -xzf forgepad-linux-x64.tar.gz && ./forgepad` (needs GTK 3, WebKitGTK 4.1, libsoup 3) |
+| Linux arm64 | `forgepad-linux-arm64.tar.gz` | Same as x64; glibc 2.35+ |
+| macOS Apple Silicon | `forgepad-macos-arm64-unsigned.tar.gz` | `tar -xzf …`, then `xattr -d com.apple.quarantine forgepad && ./forgepad` |
 
-<details>
-<summary><strong>Windows Installation</strong></summary>
+Every release includes `SHA256SUMS.txt`; check a download with `sha256sum -c SHA256SUMS.txt` (Linux/macOS) or compare `Get-FileHash .\forgepad-windows-x64-unsigned.zip` (PowerShell).
 
-#### MSI Installer (Recommended)
+Official releases (`v…` tags) build MSI, Inno Setup, PortableApps, `.deb`, `.rpm` and `.dmg` packages through `release.yml`; Windows signing there needs SignPath secrets that this repository does not have yet.
 
-Download `ferrite-windows-x64.msi` and run it. This will:
-- Install Ferrite to `C:\Program Files\Ferrite`
-- Add Start Menu shortcut with icon
-- Enable easy uninstall via Windows Settings
-- Store settings in `%APPDATA%\ferrite\`
+macOS troubleshooting: [docs/install/macos.md](docs/install/macos.md).
 
-#### Portable (ZIP)
-
-Download `ferrite-portable-windows-x64.zip` and extract anywhere. The zip includes:
-- `ferrite.exe` - the application
-- `portable/` - folder for all your settings
-- `README.txt` - quick start guide
-
-**True portable mode:** All configuration, sessions, and data are stored in the `portable` folder next to the executable. Nothing is written to `%APPDATA%` or the Windows registry. Perfect for USB drives or trying Ferrite without installation.
-
-</details>
-
-<details>
-<summary><strong>Linux Installation</strong></summary>
-
-#### Debian/Ubuntu/Mint (.deb)
+### Nix / NixOS
 
 ```bash
-# Download the .deb file, then install with:
-sudo apt install ./ferrite-editor_amd64.deb
-
-# Or using dpkg:
-sudo dpkg -i ferrite-editor_amd64.deb
+nix run github:SeanShaffer88/Forgepad
 ```
 
-#### Fedora/RHEL/CentOS (.rpm)
+### Upgrading from Ferrite
 
-```bash
-# Download the .rpm file, then install with:
-sudo dnf install ./ferrite-editor.x86_64.rpm
-
-# Or using rpm:
-sudo rpm -i ferrite-editor.x86_64.rpm
-```
-
-Both .deb and .rpm packages will:
-- Install Ferrite to `/usr/bin/ferrite`
-- Add desktop entry (appears in your app menu)
-- Register file associations for `.md`, `.json`, `.yaml`, `.toml` files
-- Install icons for the system
-
-#### Arch Linux (AUR)
-
-[![Ferrite on AUR](https://img.shields.io/aur/version/ferrite?label=ferrite)](https://aur.archlinux.org/packages/ferrite/)
-[![Ferrite-bin on AUR](https://img.shields.io/aur/version/ferrite-bin?label=ferrite-bin)](https://aur.archlinux.org/packages/ferrite-bin/)
-
-Ferrite is available on the [AUR](https://wiki.archlinux.org/index.php/Arch_User_Repository):
-- [Ferrite](https://aur.archlinux.org/packages/ferrite/) (release package)
-- [Ferrite-bin](https://aur.archlinux.org/packages/ferrite-bin/) (binary package)
-
-```console
-# Release package
-yay -Sy ferrite
-
-# Binary package
-yay -Sy ferrite-bin
-```
-
-#### Nix / NixOS (official flake)
-
-```bash
-# Run Ferrite directly from GitHub (no install)
-nix run github:OlaProeis/Ferrite
-
-# Drop into a shell that exposes ferrite in PATH
-nix shell github:OlaProeis/Ferrite
-```
-
-From a local clone:
-
-```bash
-# Build package output
-nix build .#ferrite
-./result/bin/ferrite
-
-# Enter development shell (Rust toolchain + system deps)
-nix develop
-```
-
-#### Other Linux (tar.gz)
-
-```bash
-tar -xzf ferrite-linux-x64.tar.gz
-./ferrite
-```
-
-#### Known Issues
-
-**Emoji appear monochrome (not full colour)**
-
-Ferrite’s text engine (egui/epaint) rasterises outline fonts only; OS colour emoji fonts (Noto Color Emoji, Segoe UI Emoji) do not produce full-colour glyphs in the editor or preview. Emoji should still appear as monochrome symbols where an outline exists; some sequences (flags, ZWJ) may degrade. See [`docs/technical/platform/emoji-rendering-limitation.md`](docs/technical/platform/emoji-rendering-limitation.md).
-
-**Inline YouTube playback shows "Error 153" on Linux (deferred to v0.3.2)**
-
-On Linux the embedded player (WebKitGTK) is refused by YouTube with *Error 153: Video player configuration error*, and shows a black rectangle when offline. Windows playback is unaffected. Watch the video in your browser from the thumbnail. See [CHANGELOG.md](CHANGELOG.md) § [0.3.1](CHANGELOG.md#031---2026-11-11) → Deferred.
-
-**Keyboard not working on Ubuntu 24.04 LTS (GNOME/Wayland)**
-
-Keyboard input does not work when Ferrite is launched under GNOME on Wayland (Ubuntu 24.04 LTS and similar).
-As a workaround, launch Ferrite with `WAYLAND_DISPLAY` unset to force X11 mode:
-
-```bash
-env -u WAYLAND_DISPLAY ferrite
-```
-
-To make this permanent for your desktop launcher, create a user-level desktop entry override:
-
-```bash
-mkdir -p ~/.local/share/applications
-cp /usr/share/applications/ferrite-editor.desktop ~/.local/share/applications/ferrite-editor.desktop
-```
-
-Then edit `~/.local/share/applications/ferrite-editor.desktop` and change the `Exec` line to:
-
-```ini
-Exec=env -u WAYLAND_DISPLAY ferrite %F
-```
-
-</details>
-
-<details>
-<summary><strong>macOS Installation</strong></summary>
-
-#### DMG Installer (Recommended)
-
-Download the `.dmg` for your Mac:
-- **Apple Silicon** (M1/M2/M3/M4): `ferrite-macos-arm64.dmg`
-- **Intel**: `ferrite-macos-x64.dmg`
-
-Open the DMG and drag `Ferrite.app` to the **Applications** folder. Launch from Launchpad or Spotlight.
-
-#### From tar.gz (Alternative)
-
-```bash
-# Apple Silicon
-tar -xzf ferrite-macos-arm64.tar.gz
-cp -R Ferrite.app /Applications/
-
-# Intel
-tar -xzf ferrite-macos-x64.tar.gz
-cp -R Ferrite.app /Applications/
-```
-
-> **Gatekeeper (GitHub downloads):** Unsigned / non-notarized CI builds may be blocked on **macOS 15.x**. See **[docs/install/macos.md](docs/install/macos.md)** — quickest fix: `xattr -dr com.apple.quarantine /Applications/Ferrite.app` (adjust path). Tracked: [#130](https://github.com/OlaProeis/Ferrite/issues/130).
-
-</details>
+Forgepad uses its own settings folder (`forgepad` instead of `ferrite` under your config directory). On first launch it copies your Ferrite settings across; the Ferrite folder is left untouched, so both apps can be installed side by side.
 
 <details>
 <summary><strong>Build from Source</strong></summary>
@@ -451,25 +244,25 @@ xcode-select --install
 
 ```bash
 # Clone the repository
-git clone https://github.com/OlaProeis/Ferrite.git
-cd Ferrite
+git clone https://github.com/SeanShaffer88/Forgepad.git
+cd Forgepad
 
 # Build release version (optimized)
 cargo build --release
 
 # The binary will be at:
-# Windows: target/release/ferrite.exe
-# Linux/macOS: target/release/ferrite
+# Windows: target/release/forgepad.exe
+# Linux/macOS: target/release/forgepad
 
 # macOS: Create .app bundle (optional)
 cargo install cargo-bundle
 cargo bundle --release
-# Bundle will be at: target/release/bundle/osx/Ferrite.app
+# Bundle will be at: target/release/bundle/osx/Forgepad.app
 ```
 
-> **macOS "Open With":** As of v0.3.1, double-click and Finder "Open With" open files in Ferrite tabs (best-effort workaround for [eframe/winit limitations](https://github.com/rust-windowing/winit/issues/1751)). If it fails on your setup, use the Terminal escape hatch `open -a Ferrite path/to/file.md` or File > Open within the app — see [docs/install/macos.md](docs/install/macos.md).
+> **macOS "Open With":** As of v0.3.1, double-click and Finder "Open With" open files in Forgepad tabs (best-effort workaround for [eframe/winit limitations](https://github.com/rust-windowing/winit/issues/1751)). If it fails on your setup, use the Terminal escape hatch `open -a Forgepad path/to/file.md` or File > Open within the app — see [docs/install/macos.md](docs/install/macos.md).
 
-> **Development Builds:** Building from the `main` branch gives you the latest features before they're officially released. These builds are untested and may contain bugs. For stable versions, download from [GitHub Releases](https://github.com/OlaProeis/Ferrite/releases).
+> **Development Builds:** Building from the `main` branch gives you the latest features before they're officially released. These builds are untested and may contain bugs. For tested builds, download from [GitHub Releases](https://github.com/SeanShaffer88/Forgepad/releases).
 
 </details>
 
@@ -477,10 +270,10 @@ cargo bundle --release
 
 ```bash
 # Open a file
-ferrite path/to/file.md
+forgepad path/to/file.md
 
 # Open a folder as workspace
-ferrite path/to/folder/
+forgepad path/to/folder/
 ```
 
 <details>
@@ -491,19 +284,19 @@ ferrite path/to/folder/
 cargo run --release
 
 # Or run the binary directly
-./target/release/ferrite
+./target/release/forgepad
 
 # Open multiple files as tabs
-./target/release/ferrite file1.md file2.md
+./target/release/forgepad file1.md file2.md
 
-# Start a separate process even if Ferrite is already running (v0.3.1)
-./target/release/ferrite --new-instance
+# Start a separate process even if Forgepad is already running (v0.3.1)
+./target/release/forgepad --new-instance
 
 # Show version
-./target/release/ferrite --version
+./target/release/forgepad --version
 
 # Show help
-./target/release/ferrite --help
+./target/release/forgepad --help
 ```
 
 See [docs/cli.md](docs/cli.md) for full CLI documentation.
@@ -512,7 +305,7 @@ See [docs/cli.md](docs/cli.md) for full CLI documentation.
 
 ### View Modes
 
-Ferrite supports three view modes for Markdown files:
+Forgepad supports three view modes for Markdown files:
 
 - **Raw** - Plain text editing with syntax highlighting
 - **Rendered** - WYSIWYG editing with rendered markdown
@@ -616,12 +409,12 @@ Access settings via `Ctrl+,` or the gear icon. The Settings tab is search-first:
 
 Settings are stored in platform-specific locations:
 
-- **Windows:** `%APPDATA%\ferrite\`
-- **Windows Portable:** `portable\` folder next to `ferrite.exe`
-- **Linux:** `~/.config/ferrite/`
-- **macOS:** `~/Library/Application Support/ferrite/`
+- **Windows:** `%APPDATA%\forgepad\`
+- **Windows Portable:** `portable\` folder next to `forgepad.exe`
+- **Linux:** `~/.config/forgepad/`
+- **macOS:** `~/Library/Application Support/forgepad/`
 
-**Portable Mode (Windows):** If a `portable` folder exists next to the executable, Ferrite automatically uses it for all configuration instead of `%APPDATA%`. This makes Ferrite fully self-contained - perfect for USB drives.
+**Portable Mode (Windows):** If a `portable` folder exists next to the executable, Forgepad automatically uses it for all configuration instead of `%APPDATA%`. This makes Forgepad fully self-contained - perfect for USB drives.
 
 Workspace settings are stored in `.ferrite/` within the workspace folder.
 
@@ -645,7 +438,9 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 
 ### Help Translate
 
-Ferrite is being translated into multiple languages with help from the community.
+Forgepad is being translated into multiple languages with help from the community.
+
+Translations are shared with upstream Ferrite:
 
 [![Translation Status](https://hosted.weblate.org/widget/ferrite/ferrite-ui/multi-auto.svg)](https://hosted.weblate.org/engage/ferrite/)
 
@@ -656,8 +451,8 @@ Ferrite is being translated into multiple languages with help from the community
 
 ```bash
 # Fork and clone
-git clone https://github.com/YOUR_USERNAME/Ferrite.git
-cd Ferrite
+git clone https://github.com/YOUR_USERNAME/Forgepad.git
+cd Forgepad
 
 # Create a feature branch
 git checkout -b feature/your-feature
@@ -751,10 +546,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <table>
   <tr>
     <td>
-      <a href="https://signpath.io/?utm_source=foundation&utm_medium=github&utm_campaign=ferrite" target="_blank"><img src="https://signpath.org/assets/favicon-50x50.png" alt="SignPath" width="50" height="50" /></a>
+      <a href="https://signpath.io/?utm_source=foundation&utm_medium=github&utm_campaign=forgepad" target="_blank"><img src="https://signpath.org/assets/favicon-50x50.png" alt="SignPath" width="50" height="50" /></a>
     </td>
     <td>
-      Free code signing on Windows provided by <a href="https://signpath.io/?utm_source=foundation&utm_medium=github&utm_campaign=ferrite">SignPath.io</a>, certificate by <a href="https://signpath.org/?utm_source=foundation&utm_medium=github&utm_campaign=ferrite">SignPath Foundation</a>
+      Free code signing on Windows provided by <a href="https://signpath.io/?utm_source=foundation&utm_medium=github&utm_campaign=forgepad">SignPath.io</a>, certificate by <a href="https://signpath.org/?utm_source=foundation&utm_medium=github&utm_campaign=forgepad">SignPath Foundation</a>
     </td>
   </tr>
   <tr>
@@ -769,4 +564,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-<sub>If you find Ferrite useful, consider [supporting its development](https://github.com/sponsors/OlaProeis).</sub>
+<sub>Forgepad builds on Ferrite — consider [supporting Ferrite's development](https://github.com/sponsors/OlaProeis).</sub>

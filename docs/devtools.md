@@ -1,10 +1,10 @@
 # Developer tools
 
 Tools for the config and data files developers edit every day, plus the
-command-line behaviour needed to use Ferrite as `$EDITOR`. Everything works
+command-line behaviour needed to use Forgepad as `$EDITOR`. Everything works
 offline. Credits and licenses: [`devtools-credits.md`](devtools-credits.md).
 
-All settings live under `"devtools"` in `config.json`:
+The on/off switches and the commit-message column are also in **Settings → Editor** (search "developer"). All settings live under `"devtools"` in `config.json`:
 
 ```json
 "devtools": {
@@ -12,7 +12,8 @@ All settings live under `"devtools"` in `config.json`:
   "query_bar": true,
   "schema_mappings": [["**/deploy/*.yaml", "schemas/deploy.json"]],
   "git_editor_ruler": 72,
-  "link_check": true
+  "link_check": true,
+  "code_block_lint": true
 }
 ```
 
@@ -54,6 +55,14 @@ problem count in the status bar. Each row shows line:column, the message and
 its source (`schema` or `lint`). Click a row to jump to it. Close it with ✕,
 or Esc while the mouse is over the panel. Turn the feature off with `devtools.schema_validation: false`.
 
+## Path at the caret
+
+In JSON, YAML and TOML files the status bar shows where the caret is, as a
+JSONPath — for example `$.jobs.build.steps[2].run` in a GitHub workflow or
+`$.dependencies.serde` in `Cargo.toml`. Click it to copy the path, ready to
+paste into the query bar, `jq`, or a code review comment. It works while the
+file has syntax errors. Off: `devtools.breadcrumb: false`.
+
 ## Query bar
 
 In the tree viewer of a JSON, YAML or TOML file, type a
@@ -89,6 +98,18 @@ trip, the notification says what was lost: YAML/TOML comments, `null` values
 
 Edits made by Format, Sort Keys and Minify can be undone.
 
+## Transform Selection
+
+**Transform Selection…** (Ctrl+Shift+Alt+X) opens a small picker; type to
+filter and press Enter. Every transform is a normal edit (Ctrl+Z undoes it).
+
+| Group | Transforms |
+|---|---|
+| Lines | Sort A→Z, sort Z→A, remove duplicates, reverse, trim trailing whitespace — on the selection, or the whole document when nothing is selected |
+| Case | UPPERCASE, lowercase, Title Case, snake_case, camelCase, kebab-case (splits on punctuation and camelCase humps) |
+| Encode | Base64 encode/decode (standard or URL-safe input), URL encode/decode, JSON string escape/unescape |
+| Insert | UUID (v4), ISO 8601 timestamp, Unix time — at the caret |
+
 ## Compare
 
 **Compare with Last Commit** (Ctrl+Shift+Alt+H) diffs the current buffer,
@@ -97,17 +118,46 @@ compared by value: key order and formatting do not count, and the report
 lists each added, removed and changed path. Other files get a line diff. The
 report opens as a new tab.
 
-From the terminal: `ferrite --diff old.json new.json` (see below).
+From the terminal: `forgepad --diff old.json new.json` (see below).
+
+### Version history
+
+Every time you save, Forgepad keeps a snapshot of the file in its own config
+folder (`<config>/forgepad/history/`), never next to your files. The first
+save also keeps the file as it was before you started, so you can always get
+back to the original. Saves within two minutes of each other replace the newest
+snapshot, so auto-save doesn't crowd out real versions.
+
+**Show File History** (Ctrl+Shift+Alt+V) lists snapshots, newest first:
+
+- **Compare** opens a diff between the snapshot and the current text (by value
+  for JSON/YAML/TOML).
+- **Restore** puts the snapshot into the editor as a normal edit — undo with
+  Ctrl+Z, and nothing is written until you save.
+- **Clear history for this file** deletes its snapshots.
+
+20 snapshots are kept per file by default (Settings → Editor, 0 turns history
+off). Files over 5 MB are not snapshotted. This works for any file, in a git
+repository or not.
+
+### Change bars
+
+In Raw and Split view, the gutter shows how each line differs from the last
+commit (git `HEAD`): a **green** bar for added lines, **blue** for changed
+lines, and a **red** mark where lines were deleted. Bars update as you type
+and pick up commits made outside Forgepad within a few seconds. Files over
+2 MB are skipped. Turn off with `devtools.git_gutter: false` or in
+Settings → Editor.
 
 ## Command line
 
 ```text
-ferrite file.rs:40          open at line 40
-ferrite file.rs:40:5        line 40, column 5
-ferrite --goto file.rs:40   same, explicit
-ferrite -                   read standard input into a new tab
-ferrite --wait file         return only when the tab is closed
-ferrite --diff a b          compare two files
+forgepad file.rs:40          open at line 40
+forgepad file.rs:40:5        line 40, column 5
+forgepad --goto file.rs:40   same, explicit
+forgepad -                   read standard input into a new tab
+forgepad --wait file         return only when the tab is closed
+forgepad --diff a b          compare two files
 ```
 
 - `path:line[:col]` only splits off numbers ≥ 1, so `x.rs:abc`, `x.rs:0` and
@@ -115,18 +165,18 @@ ferrite --diff a b          compare two files
   literally named `x:12` exists, it is opened as-is.
 - A line past the end goes to the last line; a column past the line end goes
   to the end of the line.
-- If Ferrite is already running, the file opens in that window, at the given
+- If Forgepad is already running, the file opens in that window, at the given
   position.
 - `-` reads up to 64 MB of standard input (invalid UTF-8 is replaced) into a
-  temporary file and opens it.
+  file in Forgepad's per-user cache folder and opens it.
 
 Full reference: [`cli.md`](cli.md).
 
-## Use Ferrite as `$EDITOR`
+## Use Forgepad as `$EDITOR`
 
 `--wait` (`-w`) makes the command block until you close the tab(s) it opened,
 which is what git, crontab and similar tools need. Closing the tab, the
-window, or quitting Ferrite all count as closing. If Ferrite crashes or is
+window, or quitting Forgepad all count as closing. If Forgepad crashes or is
 killed first, the waiting command exits with code **1**, so git aborts the
 commit instead of using a half-written message.
 
@@ -138,34 +188,34 @@ reopened by session restore.
 **Git (all platforms):**
 
 ```bash
-git config --global core.editor "ferrite --wait"
+git config --global core.editor "forgepad --wait"
 ```
 
 **bash / zsh** (`~/.bashrc` or `~/.zshrc`):
 
 ```bash
-export EDITOR="ferrite --wait"
+export EDITOR="forgepad --wait"
 export VISUAL="$EDITOR"
 ```
 
 **PowerShell** (`$PROFILE`):
 
 ```powershell
-$env:EDITOR = "ferrite --wait"
+$env:EDITOR = "forgepad --wait"
 ```
 
-**crontab:** with `EDITOR` set as above, `crontab -e` opens in Ferrite.
+**crontab:** with `EDITOR` set as above, `crontab -e` opens in Forgepad.
 
-**Where the binary is:** if `ferrite` is not on `PATH`, use the full path:
+**Where the binary is:** if `forgepad` is not on `PATH`, use the full path:
 
 | OS | Typical path |
 |---|---|
-| Windows (MSI) | `C:\Program Files\Ferrite\ferrite.exe` |
-| macOS (DMG) | `/Applications/Ferrite.app/Contents/MacOS/ferrite` |
-| Linux (.deb / .rpm) | `/usr/bin/ferrite` |
+| Windows (MSI) | `C:\Program Files\Forgepad\forgepad.exe` |
+| macOS (DMG) | `/Applications/Forgepad.app/Contents/MacOS/forgepad` |
+| Linux (.deb / .rpm) | `/usr/bin/forgepad` |
 
 On Windows, quote paths with spaces for git:
-`git config --global core.editor "'C:/Program Files/Ferrite/ferrite.exe' --wait"`.
+`git config --global core.editor "'C:/Program Files/Forgepad/forgepad.exe' --wait"`.
 
 ## Docs workbench
 
@@ -189,6 +239,13 @@ the open workspace folder (skipping hidden folders, `target` and
 listing each broken link by file and line.
 
 Turn it off with `devtools.link_check: false`.
+
+### Code-block lint
+
+Fenced code blocks marked `json`, `yaml`/`yml` or `toml` are syntax-checked;
+errors appear as warnings on the line inside the block where parsing stopped.
+`jsonc` and `json5` blocks are skipped (they allow comments). Turn it off with
+`devtools.code_block_lint: false`.
 
 ### Frontmatter validation
 
@@ -228,4 +285,7 @@ Existing files are never overwritten.
 - `devtools.query_bar: false` — no query box in the tree viewer.
 - `devtools.git_editor_ruler: null` — no column guide.
 - `devtools.link_check: false` — no link warnings in Markdown.
+- `devtools.code_block_lint: false` — no code-block syntax warnings.
+- `devtools.git_gutter: false` — no change bars.
+- `devtools.history_max: 0` — no version history.
 - The command-line features cost nothing unless you use them.

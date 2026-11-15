@@ -1,5 +1,5 @@
 {
-  description = "Ferrite - a fast, lightweight text editor";
+  description = "Forgepad - a fast, lightweight text editor";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -46,8 +46,8 @@
             QuartzCore
           ];
 
-          ferrite = pkgs.rustPlatform.buildRustPackage {
-            pname = "ferrite";
+          forgepad = pkgs.rustPlatform.buildRustPackage {
+            pname = "forgepad";
             version = cargoToml.package.version;
 
             src = ./.;
@@ -63,22 +63,22 @@
 
             meta = with lib; {
               description = "A fast, lightweight text editor for Markdown, JSON, and more";
-              homepage = "https://github.com/OlaProeis/Ferrite";
+              homepage = "https://github.com/SeanShaffer88/Forgepad";
               license = licenses.mit;
-              mainProgram = "ferrite";
+              mainProgram = "forgepad";
               platforms = platforms.linux ++ platforms.darwin;
             };
           };
         in
         {
           packages = {
-            default = ferrite;
-            ferrite = ferrite;
+            default = forgepad;
+            forgepad = forgepad;
           };
 
           apps.default = {
             type = "app";
-            program = "${ferrite}/bin/ferrite";
+            program = "${forgepad}/bin/forgepad";
           };
 
           devShells.default = pkgs.mkShell {
@@ -94,12 +94,12 @@
             ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin darwinFrameworks;
 
             shellHook = ''
-              echo "Ferrite Nix dev shell ready."
+              echo "Forgepad Nix dev shell ready."
               echo "Run cargo commands normally, e.g. cargo build --release"
             '';
           };
 
-          checks.default = ferrite;
+          checks.default = forgepad;
         }
       );
 }

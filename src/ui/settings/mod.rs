@@ -9,6 +9,7 @@
 
 mod about;
 mod appearance;
+mod devtools;
 mod editor;
 mod files;
 mod keyboard;

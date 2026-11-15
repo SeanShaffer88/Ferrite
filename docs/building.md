@@ -1,6 +1,6 @@
-# Building Ferrite
+# Building Forgepad
 
-This guide covers building Ferrite from source for Windows, Linux, and macOS.
+This guide covers building Forgepad from source for Windows, Linux, and macOS.
 
 ## Prerequisites 
 
@@ -69,8 +69,8 @@ xcode-select --install
 
 ```bash
 # Clone the repository
-git clone https://github.com/OlaProeis/Ferrite.git
-cd Ferrite
+git clone https://github.com/SeanShaffer88/Forgepad.git
+cd Forgepad
 
 # Debug build (faster compilation, slower runtime)
 cargo build
@@ -89,42 +89,42 @@ cargo run
 cargo run --release
 
 # Or run the binary directly
-./target/release/ferrite      # Linux/macOS
-./target/release/ferrite.exe  # Windows
+./target/release/forgepad      # Linux/macOS
+./target/release/forgepad.exe  # Windows
 ```
 
 ---
 
 ## Nix / NixOS Workflow
 
-Ferrite now ships with an official `flake.nix` for reproducible build and dev flows.
+Forgepad now ships with an official `flake.nix` for reproducible build and dev flows.
 
 ```bash
 # Run from upstream without installing
-nix run github:OlaProeis/Ferrite
+nix run github:SeanShaffer88/Forgepad
 
 # Enter the project dev shell (Rust toolchain + platform deps)
 nix develop
 
 # Build package output from local checkout
-nix build .#ferrite
-./result/bin/ferrite
+nix build .#forgepad
+./result/bin/forgepad
 ```
 
 ### Declarative usage on NixOS/Home Manager
 
 ```nix
 {
-  inputs.ferrite.url = "github:OlaProeis/Ferrite";
+  inputs.forgepad.url = "github:SeanShaffer88/Forgepad";
 
-  outputs = { self, nixpkgs, ferrite, ... }: {
+  outputs = { self, nixpkgs, forgepad, ... }: {
     # NixOS example
     nixosConfigurations.my-host = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         ({ pkgs, ... }: {
           environment.systemPackages = [
-            ferrite.packages.${pkgs.system}.ferrite
+            forgepad.packages.${pkgs.system}.forgepad
           ];
         })
       ];
@@ -178,7 +178,7 @@ The simplest distribution method—just the executable:
 
 ```bash
 cargo build --release
-# Binary at: target/release/ferrite.exe
+# Binary at: target/release/forgepad.exe
 ```
 
 The Windows executable includes the embedded application icon (via `build.rs`).
@@ -195,7 +195,7 @@ cargo wix init
 # Build MSI installer
 cargo wix
 
-# Output: target/wix/ferrite-0.1.0-x86_64.msi
+# Output: target/wix/forgepad-0.1.0-x86_64.msi
 ```
 
 **Note**: WiX Toolset 3.11+ must be installed and in PATH.
@@ -206,7 +206,7 @@ cargo wix
 
 ```bash
 cargo build --release
-# Binary at: target/release/ferrite
+# Binary at: target/release/forgepad
 ```
 
 #### .deb Package (Debian/Ubuntu)
@@ -218,10 +218,10 @@ cargo install cargo-deb
 # Build .deb package
 cargo deb
 
-# Output: target/debian/ferrite_0.1.0_amd64.deb
+# Output: target/debian/forgepad_0.1.0_amd64.deb
 
 # Install
-sudo dpkg -i target/debian/ferrite_*.deb
+sudo dpkg -i target/debian/forgepad_*.deb
 ```
 
 #### AppImage
@@ -234,34 +234,34 @@ wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appima
 chmod +x appimagetool-x86_64.AppImage
 
 # Create AppDir structure
-mkdir -p Ferrite.AppDir/usr/bin
-mkdir -p Ferrite.AppDir/usr/share/applications
-mkdir -p Ferrite.AppDir/usr/share/icons/hicolor/256x256/apps
+mkdir -p Forgepad.AppDir/usr/bin
+mkdir -p Forgepad.AppDir/usr/share/applications
+mkdir -p Forgepad.AppDir/usr/share/icons/hicolor/256x256/apps
 
 # Copy files
-cp target/release/ferrite Ferrite.AppDir/usr/bin/
-cp assets/icons/linux/ferrite.desktop Ferrite.AppDir/
-cp assets/icons/linux/ferrite.desktop Ferrite.AppDir/usr/share/applications/
-cp assets/icons/linux/ferrite_256.png Ferrite.AppDir/usr/share/icons/hicolor/256x256/apps/ferrite.png
-cp assets/icons/linux/ferrite_256.png Ferrite.AppDir/ferrite.png
+cp target/release/forgepad Forgepad.AppDir/usr/bin/
+cp assets/icons/linux/forgepad.desktop Forgepad.AppDir/
+cp assets/icons/linux/forgepad.desktop Forgepad.AppDir/usr/share/applications/
+cp assets/icons/linux/forgepad_256.png Forgepad.AppDir/usr/share/icons/hicolor/256x256/apps/forgepad.png
+cp assets/icons/linux/forgepad_256.png Forgepad.AppDir/forgepad.png
 
 # Create AppRun
-cat > Ferrite.AppDir/AppRun << 'EOF'
+cat > Forgepad.AppDir/AppRun << 'EOF'
 #!/bin/bash
 SELF=$(readlink -f "$0")
 HERE=${SELF%/*}
 export PATH="${HERE}/usr/bin:${PATH}"
-exec "${HERE}/usr/bin/ferrite" "$@"
+exec "${HERE}/usr/bin/forgepad" "$@"
 EOF
-chmod +x Ferrite.AppDir/AppRun
+chmod +x Forgepad.AppDir/AppRun
 
 # Build AppImage
-./appimagetool-x86_64.AppImage Ferrite.AppDir Ferrite-x86_64.AppImage
+./appimagetool-x86_64.AppImage Forgepad.AppDir Forgepad-x86_64.AppImage
 ```
 
 ### macOS
 
-If you distribute or sideload a locally built `Ferrite.app`, Gatekeeper behavior matches other unsigned bundles. **GitHub Release** macOS artifacts are also unsigned in CI—see **[macOS install & Gatekeeper](./install/macos.md)** for user-facing workarounds ([#130](https://github.com/OlaProeis/Ferrite/issues/130)).
+If you distribute or sideload a locally built `Forgepad.app`, Gatekeeper behavior matches other unsigned bundles. **GitHub Release** macOS artifacts are also unsigned in CI—see **[macOS install & Gatekeeper](./install/macos.md)** for user-facing workarounds ([#130](https://github.com/OlaProeis/Ferrite/issues/130)).
 
 #### Application Bundle (.app)
 
@@ -270,30 +270,30 @@ If you distribute or sideload a locally built `Ferrite.app`, Gatekeeper behavior
 cargo build --release
 
 # Create .app bundle structure
-mkdir -p Ferrite.app/Contents/MacOS
-mkdir -p Ferrite.app/Contents/Resources
+mkdir -p Forgepad.app/Contents/MacOS
+mkdir -p Forgepad.app/Contents/Resources
 
 # Copy binary
-cp target/release/ferrite Ferrite.app/Contents/MacOS/
+cp target/release/forgepad Forgepad.app/Contents/MacOS/
 
 # Create Info.plist
-cat > Ferrite.app/Contents/Info.plist << 'EOF'
+cat > Forgepad.app/Contents/Info.plist << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>Ferrite</string>
+    <string>Forgepad</string>
     <key>CFBundleDisplayName</key>
-    <string>Ferrite</string>
+    <string>Forgepad</string>
     <key>CFBundleIdentifier</key>
-    <string>com.olaproeis.ferrite</string>
+    <string>com.seanshaffer88.forgepad</string>
     <key>CFBundleVersion</key>
     <string>0.1.0</string>
     <key>CFBundleShortVersionString</key>
     <string>0.1.0</string>
     <key>CFBundleExecutable</key>
-    <string>ferrite</string>
+    <string>forgepad</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundlePackageType</key>
@@ -340,11 +340,11 @@ cp assets/icons/icon_256.png AppIcon.iconset/icon_128x128@2x.png
 cp assets/icons/icon_256.png AppIcon.iconset/icon_256x256.png
 cp assets/icons/icon_512.png AppIcon.iconset/icon_256x256@2x.png
 cp assets/icons/icon_512.png AppIcon.iconset/icon_512x512.png
-iconutil -c icns AppIcon.iconset -o Ferrite.app/Contents/Resources/AppIcon.icns
+iconutil -c icns AppIcon.iconset -o Forgepad.app/Contents/Resources/AppIcon.icns
 rm -rf AppIcon.iconset
 
 # Option 2: Using png2icns (cross-platform)
-# png2icns Ferrite.app/Contents/Resources/AppIcon.icns assets/icons/icon_*.png
+# png2icns Forgepad.app/Contents/Resources/AppIcon.icns assets/icons/icon_*.png
 ```
 
 #### DMG Disk Image
@@ -355,16 +355,16 @@ brew install create-dmg
 
 # Create DMG
 create-dmg \
-    --volname "Ferrite" \
-    --volicon "Ferrite.app/Contents/Resources/AppIcon.icns" \
+    --volname "Forgepad" \
+    --volicon "Forgepad.app/Contents/Resources/AppIcon.icns" \
     --window-pos 200 120 \
     --window-size 600 400 \
     --icon-size 100 \
-    --icon "Ferrite.app" 150 185 \
-    --hide-extension "Ferrite.app" \
+    --icon "Forgepad.app" 150 185 \
+    --hide-extension "Forgepad.app" \
     --app-drop-link 450 185 \
-    "Ferrite-0.1.0.dmg" \
-    "Ferrite.app"
+    "Forgepad-0.1.0.dmg" \
+    "Forgepad.app"
 ```
 
 ---
@@ -425,7 +425,7 @@ Code signing prevents Windows SmartScreen warnings:
 
 ```powershell
 # Using signtool (from Windows SDK)
-signtool sign /f certificate.pfx /p password /tr http://timestamp.digicert.com /td sha256 target/release/ferrite.exe
+signtool sign /f certificate.pfx /p password /tr http://timestamp.digicert.com /td sha256 target/release/forgepad.exe
 ```
 
 **Required**: An EV (Extended Validation) code signing certificate.
@@ -436,16 +436,16 @@ Unsigned apps will be blocked by Gatekeeper:
 
 ```bash
 # Sign with Developer ID
-codesign --force --deep --sign "Developer ID Application: Your Name (TEAMID)" Ferrite.app
+codesign --force --deep --sign "Developer ID Application: Your Name (TEAMID)" Forgepad.app
 
 # Verify signature
-codesign --verify --verbose Ferrite.app
+codesign --verify --verbose Forgepad.app
 
 # Notarize (required for Gatekeeper)
-xcrun notarytool submit Ferrite-0.1.0.dmg --apple-id "your@email.com" --team-id "TEAMID" --password "app-specific-password"
+xcrun notarytool submit Forgepad-0.1.0.dmg --apple-id "your@email.com" --team-id "TEAMID" --password "app-specific-password"
 
 # Staple notarization
-xcrun stapler staple Ferrite-0.1.0.dmg
+xcrun stapler staple Forgepad-0.1.0.dmg
 ```
 
 ### Linux (Optional)
@@ -453,7 +453,7 @@ xcrun stapler staple Ferrite-0.1.0.dmg
 RPM packages can be signed with GPG:
 
 ```bash
-rpm --addsign ferrite-0.1.0.x86_64.rpm
+rpm --addsign forgepad-0.1.0.x86_64.rpm
 ```
 
 ---
@@ -509,7 +509,7 @@ sudo pacman -S fontconfig
 
 Ensure you have a valid Developer ID certificate in Keychain Access.
 
-### macOS: Gatekeeper blocks Ferrite (15.x / Sequoia)
+### macOS: Gatekeeper blocks Forgepad (15.x / Sequoia)
 
 CI-built GitHub releases are not Developer ID signed. Users should follow **[docs/install/macos.md](./install/macos.md)** (quarantine removal or Open Anyway). Track [#130](https://github.com/OlaProeis/Ferrite/issues/130).
 
@@ -567,15 +567,15 @@ cargo fmt && cargo clippy
 cargo build --release --features debug
 
 # Use perf (Linux)
-perf record ./target/release/ferrite
+perf record ./target/release/forgepad
 perf report
 
 # Use Instruments (macOS)
-instruments -t "Time Profiler" ./target/release/ferrite
+instruments -t "Time Profiler" ./target/release/forgepad
 ```
 
 ---
 
 ## License
 
-Ferrite is licensed under the MIT License. See [LICENSE](../LICENSE) for details.
+Forgepad is licensed under the MIT License. See [LICENSE](../LICENSE) for details.
