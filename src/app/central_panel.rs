@@ -4043,6 +4043,8 @@ impl FerriteApp {
                 // Move-line is handled via pre-render consumption; palette just records it
             }
             ShortcutCommand::SelectNextOccurrence => self.handle_select_next_occurrence(),
+            ShortcutCommand::AddCursorAbove => self.handle_add_cursor_vertical(true),
+            ShortcutCommand::AddCursorBelow => self.handle_add_cursor_vertical(false),
             // Search
             ShortcutCommand::Find => self.handle_open_find(false),
             ShortcutCommand::FindReplace => self.handle_open_find(true),

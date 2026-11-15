@@ -57,6 +57,28 @@ jobs:
           name: linux
           path: forgepad-linux-x64.tar.gz
 
+  build-linux-arm64:
+    name: Build Linux (arm64)
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libsoup-3.0-dev libxcb-shape0-dev libxcb-xfixes0-dev libfontconfig1-dev
+      - uses: dtolnay/rust-toolchain@1.92.0
+      - name: Build release
+        run: cargo build --release --locked
+      - name: Package
+        run: |
+          mkdir release
+          cp target/release/forgepad release/
+          tar -czvf forgepad-linux-arm64.tar.gz -C release .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64
+          path: forgepad-linux-arm64.tar.gz
+
   build-macos:
     name: Build macOS (Apple Silicon, unsigned)
     runs-on: macos-latest
@@ -77,7 +99,7 @@ jobs:
 
   release:
     name: Publish pre-release
-    needs: [build-windows, build-linux, build-macos]
+    needs: [build-windows, build-linux, build-linux-arm64, build-macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -97,6 +119,6 @@ jobs:
             because the binaries are not signed.
 
             - Windows: unzip and run `forgepad.exe`.
-            - Linux: `tar -xzf forgepad-linux-x64.tar.gz && ./forgepad`
+            - Linux: `tar -xzf forgepad-linux-x64.tar.gz && ./forgepad` (arm64: `forgepad-linux-arm64.tar.gz`, glibc 2.35+)
             - macOS: `tar -xzf forgepad-macos-arm64-unsigned.tar.gz && xattr -d com.apple.quarantine forgepad && ./forgepad`
           files: dist/*

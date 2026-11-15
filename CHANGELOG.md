@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Update check** now follows Forgepad releases, not upstream Ferrite.
 - Per-workspace `.ferrite/` folders, internal type names and entries below this line keep the Ferrite name.
 
+### Fixed (open upstream Ferrite issues)
+- **Panics no longer close the app in release builds** ([Ferrite #199](https://github.com/OlaProeis/Ferrite/issues/199)) — The release profile now unwinds, so the existing `catch_unwind` guards (Mermaid, fonts) work and a panic in a background worker no longer takes down every open tab.
+- **Window restored off-screen after unplugging a monitor** ([Ferrite #188](https://github.com/OlaProeis/Ferrite/issues/188)) — On Windows a saved position that no connected monitor covers is ignored at startup; on all platforms a window that reports no monitor in its first frames is moved back to the main screen.
+- **Linux arm64 builds** ([Ferrite #190](https://github.com/OlaProeis/Ferrite/issues/190)) — `forgepad-linux-arm64.tar.gz` (glibc 2.35+) in test and release builds.
+- **Add Cursor Above / Below** ([Ferrite #187](https://github.com/OlaProeis/Ferrite/issues/187), partly) — Ctrl+Alt+Up / Ctrl+Alt+Down, next to the existing Ctrl+click and Select Next Occurrence. Column (box) selection is still open.
+
 ### Added
 
 #### Developer tools — config/data editor (phase 1)

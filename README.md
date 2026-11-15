@@ -187,6 +187,7 @@ Download from **[GitHub Releases](https://github.com/SeanShaffer88/Forgepad/rele
 |---|---|---|
 | Windows x64 | `forgepad-windows-x64-unsigned.zip` | Unzip, run `forgepad.exe`. SmartScreen: **More info → Run anyway**. Create a `portable` folder next to the exe to keep settings beside it. |
 | Linux x64 | `forgepad-linux-x64.tar.gz` | `tar -xzf forgepad-linux-x64.tar.gz && ./forgepad` (needs GTK 3, WebKitGTK 4.1, libsoup 3) |
+| Linux arm64 | `forgepad-linux-arm64.tar.gz` | Same as x64; glibc 2.35+ |
 | macOS Apple Silicon | `forgepad-macos-arm64-unsigned.tar.gz` | `tar -xzf …`, then `xattr -d com.apple.quarantine forgepad && ./forgepad` |
 
 Official releases (`v…` tags) build MSI, Inno Setup, PortableApps, `.deb`, `.rpm` and `.dmg` packages through `release.yml`; Windows signing there needs SignPath secrets that this repository does not have yet.
@@ -413,7 +414,7 @@ Settings are stored in platform-specific locations:
 
 **Portable Mode (Windows):** If a `portable` folder exists next to the executable, Forgepad automatically uses it for all configuration instead of `%APPDATA%`. This makes Forgepad fully self-contained - perfect for USB drives.
 
-Workspace settings are stored in `.forgepad/` within the workspace folder.
+Workspace settings are stored in `.ferrite/` within the workspace folder.
 
 ### Settings Panel
 

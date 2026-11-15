@@ -155,6 +155,14 @@ impl FerriteApp {
                 ShortcutCommand::CheckWorkspaceLinks,
                 KeyboardAction::Devtools(ShortcutCommand::CheckWorkspaceLinks)
             );
+            check_shortcut!(
+                ShortcutCommand::AddCursorAbove,
+                KeyboardAction::Devtools(ShortcutCommand::AddCursorAbove)
+            );
+            check_shortcut!(
+                ShortcutCommand::AddCursorBelow,
+                KeyboardAction::Devtools(ShortcutCommand::AddCursorBelow)
+            );
             check_shortcut!(ShortcutCommand::ZoomIn, KeyboardAction::ZoomIn);
             check_shortcut!(ShortcutCommand::ZoomOut, KeyboardAction::ZoomOut);
             check_shortcut!(ShortcutCommand::ResetZoom, KeyboardAction::ResetZoom);

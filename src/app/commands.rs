@@ -132,5 +132,7 @@ fn icon_for_command(cmd: ShortcutCommand) -> &'static str {
         ShortcutCommand::NewChangelog => LIST,
         ShortcutCommand::NewAdr => FILE_PLUS,
         ShortcutCommand::CheckWorkspaceLinks => LINK,
+        ShortcutCommand::AddCursorAbove => CARET_UP,
+        ShortcutCommand::AddCursorBelow => CARET_DOWN,
     }
 }

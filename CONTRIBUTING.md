@@ -93,7 +93,7 @@ When `cargo build` reports `dead_code`, triage before silencing:
 
 1. **Remove** — Stale helpers, legacy modal `show()` methods superseded by special tabs, and other unreachable code with no callers.
 2. **Wire** — If the symbol is part of an incomplete feature (e.g. a shortcut variant with no `check_shortcut!` mapping), connect it or delete the dead path.
-3. **`#[allow(dead_code)]`** — Use only for intentional public API (ForgepadEditor, `TextBuffer`, terminal VTE helpers, dialog result helpers). Prefer item- or `impl`-level allows with a one-line rationale; avoid crate-level allows except `#[cfg(test)]` helpers.
+3. **`#[allow(dead_code)]`** — Use only for intentional public API (FerriteEditor, `TextBuffer`, terminal VTE helpers, dialog result helpers). Prefer item- or `impl`-level allows with a one-line rationale; avoid crate-level allows except `#[cfg(test)]` helpers.
 
 Do not run bulk deletion tools; review each warning. See `docs/technical/build-warnings-0.2.7.md` for the v0.2.7 warning inventory context.
 
@@ -217,7 +217,7 @@ refactor(theme): extract color constants to module
 src/
 ├── main.rs              # Entry point, eframe setup, memory allocators
 ├── app/                 # Main application (refactored from single app.rs)
-│   ├── mod.rs           # ForgepadApp struct, update loop coordination
+│   ├── mod.rs           # FerriteApp struct, update loop coordination
 │   ├── keyboard.rs      # Keyboard shortcut handling
 │   ├── input_handling.rs # Input processing
 │   ├── file_ops.rs      # File operations (open, save, close)
@@ -246,7 +246,7 @@ src/
 ├── editor/              # Text editor components
 │   ├── widget.rs        # EditorWidget wrapper
 │   ├── forgepad/         # Custom rope-based editor (high-performance)
-│   │   ├── editor.rs    # Main ForgepadEditor widget
+│   │   ├── editor.rs    # Main FerriteEditor widget
 │   │   ├── buffer.rs    # TextBuffer (rope via ropey)
 │   │   ├── cursor.rs    # Cursor management
 │   │   ├── selection.rs # Selection handling

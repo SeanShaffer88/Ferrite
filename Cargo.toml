@@ -170,7 +170,7 @@ embed-resource = "2.4"
 [profile.release]
 lto = "thin"          # Link-time optimization (thin is faster, less aggressive)
 codegen-units = 1     # Single codegen unit for better optimization
-panic = "abort"       # No unwinding, smaller binary
+panic = "unwind"      # Unwind so catch_unwind guards (Mermaid, fonts) and worker-thread panics don't close the app (upstream #199)
 opt-level = 3         # Optimize for speed (not size - "z" can trigger AV heuristics)
 # strip = "symbols"   # DISABLED: Stripping symbols can trigger AV false positives
 

@@ -163,7 +163,7 @@
     </release>
     <release version="0.2.6" date="2026-01-26">
       <description>
-        <p>Major release: Custom text editor (ForgepadEditor) replacing egui's TextEdit</p>
+        <p>Major release: Custom text editor (FerriteEditor) replacing egui's TextEdit</p>
         <ul>
           <li>Virtual scrolling enables 100MB+ file editing</li>
           <li>Memory optimization: 80MB file uses ~80MB RAM (was 460MB+)</li>

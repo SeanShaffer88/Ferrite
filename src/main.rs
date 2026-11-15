@@ -228,6 +228,33 @@ fn build_cli_targets(cli: &Cli) -> Result<Vec<devtools::cli_target::OpenTarget>,
     Ok(targets)
 }
 
+/// Whether a saved window position still overlaps a connected monitor.
+///
+/// Windows checks the title-bar strip with `MonitorFromRect`. Other platforms
+/// return `true` here and rely on the first-frames check in the app, which
+/// moves the window back if it ends up on no monitor.
+fn saved_position_visible(x: f32, y: f32, width: f32) -> bool {
+    #[cfg(windows)]
+    {
+        use windows::Win32::Foundation::RECT;
+        use windows::Win32::Graphics::Gdi::{MonitorFromRect, MONITOR_DEFAULTTONULL};
+        let strip = RECT {
+            left: x as i32,
+            top: y as i32,
+            right: (x + width.max(100.0)) as i32,
+            bottom: (y + 40.0) as i32,
+        };
+        // SAFETY: `strip` is a valid RECT for the duration of the call.
+        let monitor = unsafe { MonitorFromRect(&strip, MONITOR_DEFAULTTONULL) };
+        !monitor.0.is_null()
+    }
+    #[cfg(not(windows))]
+    {
+        let _ = (x, y, width);
+        true
+    }
+}
+
 /// Parse a log level string into a LogLevel enum.
 fn parse_log_level(s: &str) -> Result<LogLevel, String> {
     match s.to_lowercase().as_str() {
@@ -387,11 +414,13 @@ fn main() -> eframe::Result<()> {
         viewport = viewport.with_icon(icon);
     }
 
-    // Apply position if saved
-    let viewport = if let (Some(x), Some(y)) = (window_size.x, window_size.y) {
-        viewport.with_position([x, y])
-    } else {
-        viewport
+    // Apply position if saved, unless it is on a monitor that is no longer
+    // connected (upstream Ferrite #188); then the OS picks the position.
+    let viewport = match (window_size.x, window_size.y) {
+        (Some(x), Some(y)) if saved_position_visible(x, y, window_size.width) => {
+            viewport.with_position([x, y])
+        }
+        _ => viewport,
     };
 
     // Apply maximized state

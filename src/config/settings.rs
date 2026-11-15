@@ -662,6 +662,8 @@ pub enum ShortcutCommand {
     NewChangelog,
     NewAdr,
     CheckWorkspaceLinks,
+    AddCursorAbove,
+    AddCursorBelow,
 }
 
 impl ShortcutCommand {
@@ -754,6 +756,8 @@ impl ShortcutCommand {
             NewChangelog,
             NewAdr,
             CheckWorkspaceLinks,
+            AddCursorAbove,
+            AddCursorBelow,
         ]
     }
 
@@ -846,6 +850,8 @@ impl ShortcutCommand {
             ShortcutCommand::NewChangelog => "New Changelog from Template",
             ShortcutCommand::NewAdr => "New Architecture Decision Record",
             ShortcutCommand::CheckWorkspaceLinks => "Check Links in Workspace",
+            ShortcutCommand::AddCursorAbove => "Add Cursor Above",
+            ShortcutCommand::AddCursorBelow => "Add Cursor Below",
         }
     }
 
@@ -889,7 +895,9 @@ impl ShortcutCommand {
             | ShortcutCommand::DuplicateLine
             | ShortcutCommand::MoveLineUp
             | ShortcutCommand::MoveLineDown
-            | ShortcutCommand::SelectNextOccurrence => "Edit",
+            | ShortcutCommand::SelectNextOccurrence
+            | ShortcutCommand::AddCursorAbove
+            | ShortcutCommand::AddCursorBelow => "Edit",
 
             ShortcutCommand::Find
             | ShortcutCommand::FindReplace
@@ -983,6 +991,8 @@ impl ShortcutCommand {
             ShortcutCommand::DuplicateLine => KeyBinding::new(M::ctrl_shift(), D),
             ShortcutCommand::MoveLineUp => KeyBinding::new(M::alt(), ArrowUp),
             ShortcutCommand::MoveLineDown => KeyBinding::new(M::alt(), ArrowDown),
+            ShortcutCommand::AddCursorAbove => KeyBinding::new(M::ctrl_alt(), ArrowUp),
+            ShortcutCommand::AddCursorBelow => KeyBinding::new(M::ctrl_alt(), ArrowDown),
             ShortcutCommand::SelectNextOccurrence => KeyBinding::new(M::ctrl_shift(), G),
             // Search
             ShortcutCommand::Find => KeyBinding::new(M::ctrl(), F),

@@ -185,6 +185,8 @@ pub struct FerriteApp {
     wait_groups: Vec<devtools::WaitGroup>,
     /// Gutter change bars against git HEAD for the active tab.
     git_gutter: devtools::GitGutter,
+    /// Frames left to check that a restored window is on a connected monitor.
+    offscreen_check_frames: u8,
     /// Running "Check Links in Workspace" job: report file or error.
     link_report_rx: Option<std::sync::mpsc::Receiver<Result<std::path::PathBuf, String>>>,
     /// Terminal panel state
@@ -609,6 +611,7 @@ impl FerriteApp {
             problems_panel: crate::ui::ProblemsPanel::new(),
             wait_groups: Vec::new(),
             git_gutter: Default::default(),
+            offscreen_check_frames: 30,
             link_report_rx: None,
             terminal_panel_state,
             productivity_panel,
@@ -3111,6 +3114,21 @@ impl eframe::App for FerriteApp {
                 if geometry.maximized {
                     ctx.send_viewport_cmd(egui::ViewportCommand::Maximized(true));
                 }
+            }
+        }
+
+        // A restored position on an unplugged monitor leaves the window on no
+        // monitor at all (upstream Ferrite #188): move it back to the main screen.
+        if self.offscreen_check_frames > 0 {
+            self.offscreen_check_frames -= 1;
+            let restored = self.state.settings.window_size.x.is_some();
+            let offscreen = ctx.input(|i| {
+                i.viewport().outer_rect.is_some() && i.viewport().monitor_size.is_none()
+            });
+            if restored && offscreen && self.offscreen_check_frames < 28 {
+                log::warn!("Window is not on any monitor; moving it to the main screen");
+                ctx.send_viewport_cmd(egui::ViewportCommand::OuterPosition(egui::pos2(64.0, 64.0)));
+                self.offscreen_check_frames = 0;
             }
         }
 
