@@ -432,6 +432,8 @@ pub struct EditorWidget<'a> {
     diagnostics: Vec<crate::lsp::state::DiagnosticEntry>,
     /// Column guide for git message files (only applied to those files).
     git_editor_ruler: Option<u32>,
+    /// Gutter change bars against git HEAD.
+    line_changes: Option<std::sync::Arc<Vec<Option<crate::devtools::linechanges::LineChange>>>>,
 }
 
 impl<'a> EditorWidget<'a> {
@@ -468,6 +470,7 @@ impl<'a> EditorWidget<'a> {
             workspace_root: None,
             diagnostics: Vec::new(),
             git_editor_ruler: None,
+            line_changes: None,
         }
     }
 
@@ -476,6 +479,16 @@ impl<'a> EditorWidget<'a> {
     #[must_use]
     pub fn git_editor_ruler(mut self, column: Option<u32>) -> Self {
         self.git_editor_ruler = column;
+        self
+    }
+
+    /// Gutter change bars against git HEAD (one entry per line).
+    #[must_use]
+    pub fn line_changes(
+        mut self,
+        changes: Option<std::sync::Arc<Vec<Option<crate::devtools::linechanges::LineChange>>>>,
+    ) -> Self {
+        self.line_changes = changes;
         self
     }
 
@@ -910,6 +923,7 @@ impl<'a> EditorWidget<'a> {
             .and_then(crate::devtools::cli_target::detect_git_editor_file)
             .is_some();
         editor.set_ruler_column(self.git_editor_ruler.filter(|_| is_git_message));
+        editor.set_line_changes(self.line_changes.take());
 
         // Calculate centering offset for Zen Mode
         // When zen_mode is enabled and we have a max width, center the content

@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Developer tools — docs workbench (phase 3)
 - **Link checking** — Broken relative links and `#anchors` in Markdown show as warnings in the Problems panel; **Check Links in Workspace** (Ctrl+Shift+Alt+L) writes a report for the whole folder. Offline; web links are skipped. See [`devtools.md`](docs/devtools.md#docs-workbench).
 - **Frontmatter validation** — YAML frontmatter checked against a schema named in the frontmatter or mapped with `devtools.schema_mappings`.
+- **Change bars** — Gutter shows lines added / changed / deleted since the last commit in Raw and Split view (`devtools.git_gutter`).
+- **Developer tools in Settings** — All developer-tools switches are under Settings → Editor (search "developer").
 - **Code-block lint** — Fenced `json` / `yaml` / `toml` blocks in Markdown are syntax-checked (`devtools.code_block_lint`).
 - **Templates** — New README, Keep a Changelog file, and numbered MADR decision records (Ctrl+Shift+Alt+R / C / A).
 

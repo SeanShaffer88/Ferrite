@@ -183,6 +183,8 @@ pub struct FerriteApp {
     problems_panel: crate::ui::ProblemsPanel,
     /// `--wait` callers blocked on open files.
     wait_groups: Vec<devtools::WaitGroup>,
+    /// Gutter change bars against git HEAD for the active tab.
+    git_gutter: devtools::GitGutter,
     /// Running "Check Links in Workspace" job: report file or error.
     link_report_rx: Option<std::sync::mpsc::Receiver<Result<std::path::PathBuf, String>>>,
     /// Terminal panel state
@@ -606,6 +608,7 @@ impl FerriteApp {
             terminal_panel,
             problems_panel: crate::ui::ProblemsPanel::new(),
             wait_groups: Vec::new(),
+            git_gutter: Default::default(),
             link_report_rx: None,
             terminal_panel_state,
             productivity_panel,
@@ -3118,6 +3121,7 @@ impl eframe::App for FerriteApp {
         self.handle_instance_paths(ctx);
         self.poll_wait_groups(ctx);
         self.poll_link_report(ctx);
+        self.update_git_gutter(ctx);
         if let Some(viewport_id) = self.pending_forwarded_open_viewport.take() {
             ctx.send_viewport_cmd_to(viewport_id, egui::ViewportCommand::Focus);
         }

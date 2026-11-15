@@ -212,6 +212,9 @@ pub struct FerriteEditor {
     pub(crate) content_offset_x: f32,
     /// Column guide drawn after this many characters (git message mode).
     pub(crate) ruler_column: Option<u32>,
+    /// Per-line change markers against git HEAD (gutter change bars).
+    pub(crate) line_changes:
+        Option<std::sync::Arc<Vec<Option<crate::devtools::linechanges::LineChange>>>>,
     // ─────────────────────────────────────────────────────────────────────────
     // Auto-Close Brackets
     // ─────────────────────────────────────────────────────────────────────────
@@ -319,6 +322,7 @@ impl FerriteEditor {
             // Content centering (Zen Mode)
             content_offset_x: 0.0,
             ruler_column: None,
+            line_changes: None,
             // Auto-close brackets (default off, configured via EditorWidget)
             auto_close_brackets: false,
             // Vim mode (default off, configured via EditorWidget)
@@ -405,6 +409,7 @@ impl FerriteEditor {
             // Content centering (Zen Mode)
             content_offset_x: 0.0,
             ruler_column: None,
+            line_changes: None,
             // Auto-close brackets (default off, configured via EditorWidget)
             auto_close_brackets: false,
             // Vim mode (default off, configured via EditorWidget)
@@ -2109,6 +2114,17 @@ impl FerriteEditor {
                 continue;
             }
 
+            // Git change bar at the very left edge of the gutter
+            if gutter_width > 0.0 {
+                if let Some(change) = self
+                    .line_changes
+                    .as_ref()
+                    .and_then(|c| c.get(line_idx).copied().flatten())
+                {
+                    gutter::render_change_bar(&painter, rect.min.x, y, line_height, change);
+                }
+            }
+
             // Render fold indicator if this line starts a fold region and setting is enabled
             // Fold indicators are rendered at the left edge of the gutter
             if self.show_fold_indicators {
@@ -3412,6 +3428,14 @@ impl FerriteEditor {
     /// Draw a vertical column guide after `column` characters (`None` = off).
     pub fn set_ruler_column(&mut self, column: Option<u32>) {
         self.ruler_column = column;
+    }
+
+    /// Change bars against git HEAD, one entry per buffer line (`None` = off).
+    pub fn set_line_changes(
+        &mut self,
+        changes: Option<std::sync::Arc<Vec<Option<crate::devtools::linechanges::LineChange>>>>,
+    ) {
+        self.line_changes = changes;
     }
 
     /// Returns the preferred column for vertical movement.

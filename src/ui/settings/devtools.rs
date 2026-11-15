@@ -63,6 +63,19 @@ pub(super) fn render_code_block_lint(
     )
 }
 
+pub(super) fn render_git_gutter(
+    _panel: &mut SettingsPanel,
+    ui: &mut Ui,
+    ctx: &mut SettingsCtx<'_>,
+) -> bool {
+    toggle(
+        ui,
+        &mut ctx.settings.devtools.git_gutter,
+        "settings.devtools.git_gutter",
+        "settings.devtools.git_gutter_tooltip",
+    )
+}
+
 /// Column guide for git commit messages: on/off plus the column.
 pub(super) fn render_git_editor_ruler(
     _panel: &mut SettingsPanel,

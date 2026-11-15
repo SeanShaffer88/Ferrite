@@ -212,6 +212,8 @@ settings:
     code_block_lint_tooltip: "Warn when a fenced json, yaml or toml block has a syntax error."
     git_editor_ruler: "Column guide in git commit messages"
     git_editor_ruler_tooltip: "Draw a vertical guide in COMMIT_EDITMSG and other git message files."
+    git_gutter: "Show changes since the last commit in the gutter"
+    git_gutter_tooltip: "Green bar: added line. Blue bar: changed line. Red mark: lines deleted here. Compares with git HEAD."
   editor:
     title: "Editor"
     font_family: "Font"

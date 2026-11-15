@@ -931,6 +931,7 @@ impl FerriteApp {
                             let zen_max_column_width = self.state.settings.zen_max_column_width;
                             let max_line_width = self.state.settings.max_line_width;
                             let git_editor_ruler = self.state.settings.devtools.git_editor_ruler;
+                            let git_changes = self.git_gutter.changes.clone();
 
                             // Capture scroll offset before mutable borrow for scroll detection
                             let prev_scroll_offset = self.state
@@ -1222,6 +1223,7 @@ impl FerriteApp {
                                     .zen_mode(zen_mode, zen_max_column_width)
                                     .max_line_width(max_line_width) // Apply when not in Zen Mode
                                     .git_editor_ruler(git_editor_ruler)
+                                    .line_changes(git_changes)
                                     .transient_highlight(transient_hl)
                                     .highlight_matching_pairs(highlight_matching_pairs)
                                     .syntax_highlighting(
@@ -1574,6 +1576,7 @@ impl FerriteApp {
 
                                 // Get line width setting
                                 let max_line_width = self.state.settings.max_line_width;
+                                let git_changes = self.git_gutter.changes.clone();
 
                                 // Get paragraph indent setting (CJK typography)
                                 let paragraph_indent = self.state.settings.paragraph_indent;
@@ -1865,6 +1868,7 @@ impl FerriteApp {
 
                                     let editor_widget_id = egui::Id::new("split_editor_raw").with(tab.id);
                                     let mut editor = EditorWidget::new(tab)
+                                        .line_changes(git_changes.clone())
                                         .font_size(font_size)
                                         .font_family(font_family.clone())
                                         .word_wrap(word_wrap)

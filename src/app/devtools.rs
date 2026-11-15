@@ -18,6 +18,37 @@ use std::time::{Duration, Instant};
 /// (the file could not be opened at all).
 const WAIT_OPEN_GRACE: Duration = Duration::from_secs(5);
 
+type Changes = std::sync::Arc<Vec<Option<crate::devtools::linechanges::LineChange>>>;
+
+/// Gutter change bars for the active tab (diff against git HEAD).
+#[derive(Default)]
+pub(crate) struct GitGutter {
+    tab: Option<(usize, PathBuf)>,
+    head: Option<String>,
+    head_loaded: Option<Instant>,
+    version: Option<u64>,
+    computed: Option<Instant>,
+    pub(crate) changes: Option<Changes>,
+}
+
+/// How often HEAD is re-read (commits made outside Ferrite).
+const HEAD_REFRESH: Duration = Duration::from_secs(5);
+/// Minimum time between diffs while typing.
+const DIFF_INTERVAL: Duration = Duration::from_millis(300);
+
+fn load_head(path: &Path) -> Option<String> {
+    let repo = git2::Repository::discover(path).ok()?;
+    let root = repo.workdir()?.to_path_buf();
+    let canon = path.canonicalize().unwrap_or_else(|_| path.to_path_buf());
+    let root_canon = root.canonicalize().unwrap_or(root.clone());
+    let rel = canon
+        .strip_prefix(&root_canon)
+        .or_else(|_| path.strip_prefix(&root))
+        .ok()?
+        .to_path_buf();
+    crate::vcs::head_blob(&root, &rel).ok().flatten()
+}
+
 /// Files a `--wait` caller is blocked on.
 pub(crate) struct WaitGroup {
     paths: Vec<PathBuf>,
@@ -247,6 +278,58 @@ impl FerriteApp {
                 .devtools_toast(t!("devtools.convert.failed", error = "temp file").to_string());
         };
         self.open_os_paths_in_focused_window(ctx, vec![file], "compare");
+    }
+
+    /// Refresh gutter change bars for the active tab. Call once per frame.
+    pub(crate) fn update_git_gutter(&mut self, ctx: &egui::Context) {
+        let enabled = self.state.settings.devtools.git_gutter;
+        let active = self
+            .state
+            .active_tab()
+            .and_then(|t| t.path.clone().map(|p| (t.id, p, t.content_version())));
+        let (Some((id, path, version)), true) = (active, enabled) else {
+            self.git_gutter = GitGutter::default();
+            return;
+        };
+        let g = &mut self.git_gutter;
+        let now = Instant::now();
+        let same_tab = g.tab.as_ref() == Some(&(id, path.clone()));
+        if !same_tab
+            || g.head_loaded
+                .is_none_or(|t| now.duration_since(t) >= HEAD_REFRESH)
+        {
+            let head = load_head(&path);
+            if !same_tab || head != g.head {
+                g.version = None; // force a re-diff
+            }
+            g.head = head;
+            g.head_loaded = Some(now);
+            g.tab = Some((id, path));
+        }
+        if g.head.is_none() {
+            g.changes = None;
+            return;
+        }
+        if g.version == Some(version) {
+            return;
+        }
+        if g.computed
+            .is_some_and(|t| now.duration_since(t) < DIFF_INTERVAL)
+        {
+            ctx.request_repaint_after(DIFF_INTERVAL);
+            return;
+        }
+        let Some(content) = self.state.active_tab().map(|t| t.content.clone()) else {
+            return;
+        };
+        let g = &mut self.git_gutter;
+        if let Some(head) = &g.head {
+            g.changes = Some(std::sync::Arc::new(
+                crate::devtools::linechanges::line_changes(head, &content),
+            ));
+        }
+        g.version = Some(version);
+        g.computed = Some(now);
     }
 
     /// New untitled tab holding `text` (unsaved, so the user picks where to save).

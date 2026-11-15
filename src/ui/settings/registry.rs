@@ -723,4 +723,20 @@ static ENTRIES: &[SettingEntry] = &[
         featured: false,
         render: devtools::render_git_editor_ruler,
     },
+    SettingEntry {
+        id: "devtools.git_gutter",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.git_gutter").to_string(),
+        keywords: &[
+            "git",
+            "gutter",
+            "changes",
+            "diff",
+            "modified",
+            "added",
+            "developer",
+        ],
+        featured: false,
+        render: devtools::render_git_gutter,
+    },
 ];

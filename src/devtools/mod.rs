@@ -10,6 +10,7 @@ pub mod codeblocks;
 pub mod convert;
 pub mod diff;
 pub mod frontmatter;
+pub mod linechanges;
 pub mod links;
 pub mod locate;
 pub mod query;
@@ -38,6 +39,8 @@ pub struct DevtoolsSettings {
     pub link_check: bool,
     /// Syntax-check fenced JSON/YAML/TOML code blocks in Markdown.
     pub code_block_lint: bool,
+    /// Gutter change bars against the last git commit.
+    pub git_gutter: bool,
 }
 
 impl Default for DevtoolsSettings {
@@ -49,6 +52,7 @@ impl Default for DevtoolsSettings {
             git_editor_ruler: Some(72),
             link_check: true,
             code_block_lint: true,
+            git_gutter: true,
         }
     }
 }

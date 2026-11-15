@@ -100,6 +100,15 @@ report opens as a new tab.
 
 From the terminal: `ferrite --diff old.json new.json` (see below).
 
+### Change bars
+
+In Raw and Split view, the gutter shows how each line differs from the last
+commit (git `HEAD`): a **green** bar for added lines, **blue** for changed
+lines, and a **red** mark where lines were deleted. Bars update as you type
+and pick up commits made outside Ferrite within a few seconds. Files over
+2 MB are skipped. Turn off with `devtools.git_gutter: false` or in
+Settings → Editor.
+
 ## Command line
 
 ```text
@@ -237,4 +246,5 @@ Existing files are never overwritten.
 - `devtools.git_editor_ruler: null` — no column guide.
 - `devtools.link_check: false` — no link warnings in Markdown.
 - `devtools.code_block_lint: false` — no code-block syntax warnings.
+- `devtools.git_gutter: false` — no change bars.
 - The command-line features cost nothing unless you use them.

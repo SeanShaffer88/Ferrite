@@ -44,7 +44,13 @@ app. Every behaviour below is unverified at runtime.
   check that the reported line is inside the fence for multi-line YAML errors.
 - No bundled frontmatter schema.
 
+- Change bars (added later, also untested): check line alignment with word
+  wrap on, with folded regions, and that a commit made in a terminal updates
+  the bars within ~5 s. The diff runs on the UI thread (capped at 2 MB,
+  at most every 300 ms).
+
 ## Deferred from the spec
 
-- Git-aware preview (show uncommitted changes in the rendered view).
+- Change markers inside the rendered (WYSIWYG) view; Raw/Split have gutter
+  bars.
 - Code-block lint/run extension (needs a decision on what "lint" means).
