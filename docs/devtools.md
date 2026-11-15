@@ -4,7 +4,7 @@ Tools for the config and data files developers edit every day, plus the
 command-line behaviour needed to use Ferrite as `$EDITOR`. Everything works
 offline. Credits and licenses: [`devtools-credits.md`](devtools-credits.md).
 
-All settings live under `"devtools"` in `config.json`:
+The on/off switches and the commit-message column are also in **Settings → Editor** (search "developer"). All settings live under `"devtools"` in `config.json`:
 
 ```json
 "devtools": {

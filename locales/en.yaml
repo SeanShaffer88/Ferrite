@@ -201,6 +201,17 @@ settings:
     theme_light: "Light"
     theme_system: "System"
     restore_session: "Restore previous session on startup"
+  devtools:
+    schema_validation: "Check JSON, YAML and TOML against schemas"
+    schema_validation_tooltip: "Show syntax and schema problems in the Problems panel. Schemas come from the file, your mappings, or the bundled set. Never downloads."
+    query_bar: "Show the JSONPath query bar in the tree viewer"
+    query_bar_tooltip: "Run JSONPath queries over JSON, YAML and TOML documents."
+    link_check: "Check relative links in Markdown"
+    link_check_tooltip: "Warn about links to missing files and #anchors that don't exist. Web links are not checked."
+    code_block_lint: "Check JSON, YAML and TOML code blocks in Markdown"
+    code_block_lint_tooltip: "Warn when a fenced json, yaml or toml block has a syntax error."
+    git_editor_ruler: "Column guide in git commit messages"
+    git_editor_ruler_tooltip: "Draw a vertical guide in COMMIT_EDITMSG and other git message files."
   editor:
     title: "Editor"
     font_family: "Font"
