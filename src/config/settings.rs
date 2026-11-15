@@ -658,6 +658,10 @@ pub enum ShortcutCommand {
     ConvertToYaml,
     ConvertToToml,
     CompareWithHead,
+    NewReadme,
+    NewChangelog,
+    NewAdr,
+    CheckWorkspaceLinks,
 }
 
 impl ShortcutCommand {
@@ -746,6 +750,10 @@ impl ShortcutCommand {
             ConvertToYaml,
             ConvertToToml,
             CompareWithHead,
+            NewReadme,
+            NewChangelog,
+            NewAdr,
+            CheckWorkspaceLinks,
         ]
     }
 
@@ -834,6 +842,10 @@ impl ShortcutCommand {
             ShortcutCommand::ConvertToYaml => "Convert to YAML",
             ShortcutCommand::ConvertToToml => "Convert to TOML",
             ShortcutCommand::CompareWithHead => "Compare with Last Commit",
+            ShortcutCommand::NewReadme => "New README from Template",
+            ShortcutCommand::NewChangelog => "New Changelog from Template",
+            ShortcutCommand::NewAdr => "New Architecture Decision Record",
+            ShortcutCommand::CheckWorkspaceLinks => "Check Links in Workspace",
         }
     }
 
@@ -920,7 +932,11 @@ impl ShortcutCommand {
             | ShortcutCommand::ConvertToJson
             | ShortcutCommand::ConvertToYaml
             | ShortcutCommand::ConvertToToml
-            | ShortcutCommand::CompareWithHead => "Other",
+            | ShortcutCommand::CompareWithHead
+            | ShortcutCommand::NewReadme
+            | ShortcutCommand::NewChangelog
+            | ShortcutCommand::NewAdr
+            | ShortcutCommand::CheckWorkspaceLinks => "Other",
         }
     }
 
@@ -1013,6 +1029,10 @@ impl ShortcutCommand {
             ShortcutCommand::ConvertToYaml => KeyBinding::new(M::ctrl_shift_alt(), Y),
             ShortcutCommand::ConvertToToml => KeyBinding::new(M::ctrl_shift_alt(), T),
             ShortcutCommand::CompareWithHead => KeyBinding::new(M::ctrl_shift_alt(), H),
+            ShortcutCommand::NewReadme => KeyBinding::new(M::ctrl_shift_alt(), R),
+            ShortcutCommand::NewChangelog => KeyBinding::new(M::ctrl_shift_alt(), C),
+            ShortcutCommand::NewAdr => KeyBinding::new(M::ctrl_shift_alt(), A),
+            ShortcutCommand::CheckWorkspaceLinks => KeyBinding::new(M::ctrl_shift_alt(), L),
         }
     }
 }

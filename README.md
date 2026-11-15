@@ -233,6 +233,7 @@ Native rendering of 11 diagram types directly in the preview:
 - **Query Bar** - JSONPath queries in the tree viewer; click a match to jump to it
 - **Format & Convert** - Format, sort keys, minify; convert JSON ⇄ YAML ⇄ TOML with a warning when comments or nulls are lost
 - **Structured Diff** - Compare with the last commit or `ferrite --diff a b`, by value: key order and formatting don't count
+- **Docs Workbench** - Live checks for broken relative links and `#anchors` in Markdown, a workspace link report, frontmatter schema validation, and README / changelog / ADR templates
 - **Use as `$EDITOR`** - `ferrite file:line:col`, `--goto`, stdin via `-`, and `--wait` for `git commit`, `crontab -e` and friends; commit messages get a 72-column guide
 
 Guide: [docs/devtools.md](docs/devtools.md) · CLI: [docs/cli.md](docs/cli.md) · Credits: [docs/devtools-credits.md](docs/devtools-credits.md)

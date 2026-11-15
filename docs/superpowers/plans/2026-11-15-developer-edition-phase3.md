@@ -3,6 +3,8 @@
 **Goal:** Tools for the Markdown docs that live next to code: templates, a
 link checker, and frontmatter validation.
 
+**Status (2026-11-15):** T1–T5 built; build + clippy clean; not run or tested (see `docs/technical/devtools-audit-phase3.md`).
+
 **Spec:** `docs/superpowers/specs/2026-11-14-developer-edition-design.md`
 (Phase 3). Builds on Phase 1–2 (`2026-11-14-developer-edition.md`).
 

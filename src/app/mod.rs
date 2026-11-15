@@ -183,6 +183,8 @@ pub struct FerriteApp {
     problems_panel: crate::ui::ProblemsPanel,
     /// `--wait` callers blocked on open files.
     wait_groups: Vec<devtools::WaitGroup>,
+    /// Running "Check Links in Workspace" job: report file or error.
+    link_report_rx: Option<std::sync::mpsc::Receiver<Result<std::path::PathBuf, String>>>,
     /// Terminal panel state
     terminal_panel_state: TerminalPanelState,
     /// Productivity hub panel component
@@ -604,6 +606,7 @@ impl FerriteApp {
             terminal_panel,
             problems_panel: crate::ui::ProblemsPanel::new(),
             wait_groups: Vec::new(),
+            link_report_rx: None,
             terminal_panel_state,
             productivity_panel,
             #[cfg(debug_assertions)]
@@ -3112,6 +3115,7 @@ impl eframe::App for FerriteApp {
         // Poll for file paths from secondary instances (single-instance protocol)
         self.handle_instance_paths(ctx);
         self.poll_wait_groups(ctx);
+        self.poll_link_report(ctx);
         if let Some(viewport_id) = self.pending_forwarded_open_viewport.take() {
             ctx.send_viewport_cmd_to(viewport_id, egui::ViewportCommand::Focus);
         }

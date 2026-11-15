@@ -139,6 +139,22 @@ impl FerriteApp {
                 ShortcutCommand::CompareWithHead,
                 KeyboardAction::Devtools(ShortcutCommand::CompareWithHead)
             );
+            check_shortcut!(
+                ShortcutCommand::NewReadme,
+                KeyboardAction::Devtools(ShortcutCommand::NewReadme)
+            );
+            check_shortcut!(
+                ShortcutCommand::NewChangelog,
+                KeyboardAction::Devtools(ShortcutCommand::NewChangelog)
+            );
+            check_shortcut!(
+                ShortcutCommand::NewAdr,
+                KeyboardAction::Devtools(ShortcutCommand::NewAdr)
+            );
+            check_shortcut!(
+                ShortcutCommand::CheckWorkspaceLinks,
+                KeyboardAction::Devtools(ShortcutCommand::CheckWorkspaceLinks)
+            );
             check_shortcut!(ShortcutCommand::ZoomIn, KeyboardAction::ZoomIn);
             check_shortcut!(ShortcutCommand::ZoomOut, KeyboardAction::ZoomOut);
             check_shortcut!(ShortcutCommand::ResetZoom, KeyboardAction::ResetZoom);

@@ -11,7 +11,8 @@ All settings live under `"devtools"` in `config.json`:
   "schema_validation": true,
   "query_bar": true,
   "schema_mappings": [["**/deploy/*.yaml", "schemas/deploy.json"]],
-  "git_editor_ruler": 72
+  "git_editor_ruler": 72,
+  "link_check": true
 }
 ```
 
@@ -166,9 +167,65 @@ $env:EDITOR = "ferrite --wait"
 On Windows, quote paths with spaces for git:
 `git config --global core.editor "'C:/Program Files/Ferrite/ferrite.exe' --wait"`.
 
+## Docs workbench
+
+### Link checking
+
+Markdown tabs are checked for broken **relative** links while you edit;
+problems appear in the Problems panel as warnings (⚠ in the status bar).
+
+- `[x](guide.md)`, `![img](img/a.png)` — the file must exist, relative to the
+  document. `%20` and other escapes are decoded; `?query` is ignored.
+- `[x](#setup)` — a heading or `id="setup"` / `name="setup"` HTML anchor must
+  exist in this document. Heading anchors follow GitHub's rules (lowercase,
+  spaces → `-`, duplicates get `-1`, `-2`, …).
+- `[x](guide.md#setup)` — same, inside the other Markdown file.
+- Web links (`https:`, `mailto:`, …), `//host` and root-absolute `/path`
+  links are not checked. Nothing goes on the network.
+
+**Check Links in Workspace** (Ctrl+Shift+Alt+L) checks every Markdown file in
+the open workspace folder (skipping hidden folders, `target` and
+`node_modules`, up to 5 000 files) in the background and opens a report tab
+listing each broken link by file and line.
+
+Turn it off with `devtools.link_check: false`.
+
+### Frontmatter validation
+
+YAML frontmatter in Markdown files is checked like a YAML file. Name its
+schema with a comment inside the frontmatter:
+
+```markdown
+---
+# yaml-language-server: $schema=../schemas/post.json
+title: Hello
+tags: [rust]
+---
+```
+
+or map documents to a schema in settings:
+
+```json
+"schema_mappings": [["**/posts/*.md", "schemas/post.json"]]
+```
+
+Without a schema, only YAML syntax errors are reported. Line numbers point
+into the Markdown document. This follows `devtools.schema_validation`.
+
+### Templates
+
+| Command | Shortcut | Result |
+|---|---|---|
+| New README from Template | Ctrl+Shift+Alt+R | Untitled tab with a README skeleton named after the workspace folder |
+| New Changelog from Template | Ctrl+Shift+Alt+C | Untitled tab in [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format |
+| New Architecture Decision Record | Ctrl+Shift+Alt+A | In a workspace: creates the next `NNNN-new-decision.md` in `docs/adr` (or an existing `docs/decisions`, `doc/adr`, `adr`) and opens it. Otherwise an untitled tab. [MADR](https://adr.github.io/madr/) layout |
+
+Existing files are never overwritten.
+
 ## Turning things off
 
 - `devtools.schema_validation: false` — no checking, Problems panel stays empty.
 - `devtools.query_bar: false` — no query box in the tree viewer.
 - `devtools.git_editor_ruler: null` — no column guide.
+- `devtools.link_check: false` — no link warnings in Markdown.
 - The command-line features cost nothing unless you use them.

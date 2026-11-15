@@ -128,5 +128,9 @@ fn icon_for_command(cmd: ShortcutCommand) -> &'static str {
         | ShortcutCommand::ConvertToYaml
         | ShortcutCommand::ConvertToToml => CODE,
         ShortcutCommand::CompareWithHead => FILE_MAGNIFYING_GLASS,
+        ShortcutCommand::NewReadme => FILE_TEXT,
+        ShortcutCommand::NewChangelog => LIST,
+        ShortcutCommand::NewAdr => FILE_PLUS,
+        ShortcutCommand::CheckWorkspaceLinks => LINK,
     }
 }

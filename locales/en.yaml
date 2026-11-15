@@ -1253,6 +1253,13 @@ devtools:
     saved: "Saved %{path}"
     lost: "Not preserved: %{what}"
     minify_json_only: "Minify applies to JSON files only"
+  links:
+    started: "Checking links in the workspace…"
+    running: "A link check is already running"
+    no_workspace: "Open a folder as a workspace to check its links"
+    failed: "Link check failed: %{error}"
+  templates:
+    failed: "Could not create the file: %{error}"
   diff:
     title: "Compare"
     with_head: "Compare with last commit"

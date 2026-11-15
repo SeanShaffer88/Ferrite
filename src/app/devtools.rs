@@ -184,6 +184,21 @@ impl FerriteApp {
                 }
             }
             ShortcutCommand::CompareWithHead => self.compare_active_with_head(ctx),
+            ShortcutCommand::NewReadme => {
+                let name = self
+                    .state
+                    .workspace_root()
+                    .and_then(|r| r.file_name())
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("Project")
+                    .to_string();
+                self.open_untitled_with(crate::devtools::templates::readme(&name));
+            }
+            ShortcutCommand::NewChangelog => {
+                self.open_untitled_with(crate::devtools::templates::changelog());
+            }
+            ShortcutCommand::NewAdr => self.new_adr(ctx),
+            ShortcutCommand::CheckWorkspaceLinks => self.start_link_report(),
             _ => {}
         }
     }
@@ -236,6 +251,86 @@ impl FerriteApp {
                 .devtools_toast(t!("devtools.convert.failed", error = "temp file").to_string());
         }
         self.open_os_paths_in_focused_window(ctx, vec![file], "compare");
+    }
+
+    /// New untitled tab holding `text` (unsaved, so the user picks where to save).
+    fn open_untitled_with(&mut self, text: String) {
+        self.state.new_tab();
+        if let Some(tab) = self.state.active_tab_mut() {
+            tab.set_content(text);
+        }
+    }
+
+    /// In a workspace: create the next numbered ADR file and open it.
+    /// Without a workspace: an untitled ADR tab.
+    fn new_adr(&mut self, ctx: &egui::Context) {
+        use crate::devtools::templates::{adr, adr_dir, next_adr_path, today};
+        let title = "New decision";
+        let Some(root) = self.state.workspace_root().cloned() else {
+            return self.open_untitled_with(adr(1, title, &today()));
+        };
+        let dir = adr_dir(&root);
+        let (n, path) = next_adr_path(&dir);
+        let written = std::fs::create_dir_all(&dir)
+            .and_then(|_| std::fs::write(&path, adr(n, title, &today())));
+        match written {
+            Ok(()) => self.open_os_paths_in_focused_window(ctx, vec![path], "adr"),
+            Err(e) => self
+                .devtools_toast(t!("devtools.templates.failed", error = e.to_string()).to_string()),
+        }
+    }
+
+    /// Check every Markdown file in the workspace on a worker thread.
+    fn start_link_report(&mut self) {
+        if self.link_report_rx.is_some() {
+            return self.devtools_toast(t!("devtools.links.running").to_string());
+        }
+        let Some(root) = self.state.workspace_root().cloned() else {
+            return self.devtools_toast(t!("devtools.links.no_workspace").to_string());
+        };
+        let (tx, rx) = std::sync::mpsc::channel();
+        let spawned = std::thread::Builder::new()
+            .name("devtools-links".into())
+            .spawn(move || {
+                let report = crate::devtools::links::workspace_report(&root, 5_000);
+                let dir = std::env::temp_dir().join("ferrite-links");
+                let file = dir.join(format!("link-check-{}.md", std::process::id()));
+                let res = std::fs::create_dir_all(&dir)
+                    .and_then(|_| std::fs::write(&file, report))
+                    .map(|_| file)
+                    .map_err(|e| e.to_string());
+                let _ = tx.send(res);
+            });
+        match spawned {
+            Ok(_) => {
+                self.link_report_rx = Some(rx);
+                self.devtools_toast(t!("devtools.links.started").to_string());
+            }
+            Err(e) => {
+                self.devtools_toast(t!("devtools.links.failed", error = e.to_string()).to_string())
+            }
+        }
+    }
+
+    /// Open the workspace link report once its job finishes. Call every frame.
+    pub(crate) fn poll_link_report(&mut self, ctx: &egui::Context) {
+        let Some(rx) = &self.link_report_rx else {
+            return;
+        };
+        match rx.try_recv() {
+            Ok(Ok(file)) => {
+                self.link_report_rx = None;
+                self.open_os_paths_in_focused_window(ctx, vec![file], "link-check");
+            }
+            Ok(Err(e)) => {
+                self.link_report_rx = None;
+                self.devtools_toast(t!("devtools.links.failed", error = e).to_string());
+            }
+            Err(std::sync::mpsc::TryRecvError::Empty) => {
+                ctx.request_repaint_after(Duration::from_millis(200));
+            }
+            Err(std::sync::mpsc::TryRecvError::Disconnected) => self.link_report_rx = None,
+        }
     }
 
     /// Start tracking files a `--wait` caller is blocked on.
