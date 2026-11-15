@@ -1608,6 +1608,15 @@ pub struct Tab {
     last_auto_save_content_version: Option<u64>,
 }
 
+/// Git's message/todo files are plain text: never open them in the Markdown
+/// rendered or split view, whatever the default view mode is.
+fn view_mode_for_path(path: Option<&std::path::Path>, default: ViewMode) -> ViewMode {
+    match path.and_then(crate::devtools::cli_target::detect_git_editor_file) {
+        Some(_) => ViewMode::Raw,
+        None => default,
+    }
+}
+
 impl Tab {
     /// Clear programmatic scroll targets from split/mode sync (not app-level outline nav).
     pub fn clear_sync_pending_scroll(&mut self) {
@@ -1938,7 +1947,7 @@ impl Tab {
     ) -> Self {
         let mut tab = Self::with_file(id, path, content);
         tab.auto_save_enabled = auto_save_default;
-        tab.view_mode = default_view_mode;
+        tab.view_mode = view_mode_for_path(tab.path.as_deref(), default_view_mode);
         tab
     }
 
@@ -1959,7 +1968,7 @@ impl Tab {
     ) -> Self {
         let mut tab = Self::with_file_bytes(id, path, bytes);
         tab.auto_save_enabled = auto_save_default;
-        tab.view_mode = default_view_mode;
+        tab.view_mode = view_mode_for_path(tab.path.as_deref(), default_view_mode);
         tab
     }
 
@@ -2270,7 +2279,7 @@ impl Tab {
         self.had_bom = had_bom;
         self.line_ending = line_ending;
         self.auto_save_enabled = auto_save_default;
-        self.view_mode = default_view_mode;
+        self.view_mode = view_mode_for_path(self.path.as_deref(), default_view_mode);
         self.edit_history = if is_large_file {
             EditHistory::with_max_groups(LARGE_FILE_MAX_UNDO_GROUPS)
         } else {
@@ -9504,6 +9513,20 @@ mod tests {
                 .all(|t| !is_reserved_special_tab_display_title(&t.display_title)),
             "special tabs must not be written to session state"
         );
+    }
+
+    #[test]
+    fn test_git_editor_files_always_open_raw() {
+        use std::path::PathBuf;
+        let git = PathBuf::from("/tmp/repo/.git/COMMIT_EDITMSG");
+        let md = PathBuf::from("/tmp/repo/notes.md");
+        let t =
+            Tab::with_file_and_settings(1, git.clone(), "# c".into(), false, ViewMode::Rendered);
+        assert_eq!(t.view_mode, ViewMode::Raw);
+        let t = Tab::with_file_bytes_and_settings(2, git, b"# c".to_vec(), false, ViewMode::Split);
+        assert_eq!(t.view_mode, ViewMode::Raw);
+        let t = Tab::with_file_and_settings(3, md, "# h".into(), false, ViewMode::Rendered);
+        assert_eq!(t.view_mode, ViewMode::Rendered);
     }
 
     #[test]
