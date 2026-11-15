@@ -42,7 +42,8 @@ pub use file_index_progress::file_index_progress_ui;
 pub use file_tree::{FileTreeContextAction, FileTreePanel};
 pub use format_toolbar::{side_panel_toggle_strip, FormatToolbar};
 pub use frontmatter_panel::{
-    parse_frontmatter_fields, FrontmatterField, FrontmatterPanel, FrontmatterValue,
+    extract_frontmatter, parse_frontmatter_fields, FrontmatterField, FrontmatterPanel,
+    FrontmatterValue,
 };
 pub use icons::{get_app_icon, load_app_logo_texture};
 pub use mermaid_popup::MermaidPopupState;
@@ -51,7 +52,7 @@ pub use nav_buttons::{
 };
 pub use outline_panel::{OutlinePanel, OutlinePanelTab};
 pub use pipeline::{PipelinePanel, TabPipelineState};
-pub use problems_panel::{DocInput, ProblemsPanel};
+pub use problems_panel::{DocInput, DocKind, ProblemsPanel};
 pub use productivity_panel::ProductivityPanel;
 pub use query_bar::{pointer_to_tree_path, QueryBarState};
 pub use quick_switcher::QuickSwitcher;

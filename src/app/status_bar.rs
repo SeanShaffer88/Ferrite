@@ -555,13 +555,17 @@ impl FerriteApp {
                     }
 
                     // Developer tools: problem count badge (opens the Problems panel)
-                    if self.state.settings.devtools.schema_validation
+                    let dt = &self.state.settings.devtools;
+                    if (dt.schema_validation || dt.link_check)
                         && !self.problems_panel.problems().is_empty()
                     {
                         ui.separator();
                         let errors = self.problems_panel.error_count();
+                        let warnings = self.problems_panel.warning_count();
                         let label = if errors > 0 {
                             format!("✖ {errors}")
+                        } else if warnings > 0 {
+                            format!("⚠ {warnings}")
                         } else {
                             format!("ℹ {}", self.problems_panel.problems().len())
                         };

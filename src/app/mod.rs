@@ -2410,17 +2410,32 @@ impl FerriteApp {
 
         // Developer tools: Problems panel (schema / syntax checks for JSON, YAML, TOML)
         {
-            let enabled = self.state.settings.devtools.schema_validation && !zen_mode;
+            let dt = &self.state.settings.devtools;
+            let enabled = (dt.schema_validation || dt.link_check) && !zen_mode;
             let doc = self.state.active_tab().and_then(|tab| {
                 let path = tab.path.as_deref()?;
-                let ft = crate::markdown::tree_viewer::StructuredFileType::from_extension(
-                    path.extension()?.to_str()?,
-                )?;
+                let ext = path.extension()?.to_str()?.to_ascii_lowercase();
+                let kind =
+                    match crate::markdown::tree_viewer::StructuredFileType::from_extension(&ext) {
+                        Some(ft) if dt.schema_validation => crate::ui::DocKind::Structured(ft),
+                        Some(_) => return None,
+                        None if matches!(
+                            ext.as_str(),
+                            "md" | "markdown" | "mdown" | "mkd" | "mdx"
+                        ) =>
+                        {
+                            crate::ui::DocKind::Markdown {
+                                frontmatter: dt.schema_validation,
+                                links: dt.link_check,
+                            }
+                        }
+                        None => return None,
+                    };
                 Some(crate::ui::DocInput {
                     path: Some(path),
                     content: &tab.content,
-                    ft,
-                    mappings: &self.state.settings.devtools.schema_mappings,
+                    kind,
+                    mappings: &dt.schema_mappings,
                 })
             });
             if self

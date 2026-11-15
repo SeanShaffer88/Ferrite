@@ -8,10 +8,13 @@ pub mod cli_input;
 pub mod cli_target;
 pub mod convert;
 pub mod diff;
+pub mod frontmatter;
+pub mod links;
 pub mod locate;
 pub mod query;
 pub mod schema;
 pub mod schemas;
+pub mod templates;
 pub mod value;
 
 use serde::{Deserialize, Serialize};
@@ -29,6 +32,8 @@ pub struct DevtoolsSettings {
     pub schema_mappings: Vec<(String, String)>,
     /// Column guide for git commit/tag/merge messages (`None` = off).
     pub git_editor_ruler: Option<u32>,
+    /// Check relative links and `#anchors` in Markdown documents.
+    pub link_check: bool,
 }
 
 impl Default for DevtoolsSettings {
@@ -38,6 +43,7 @@ impl Default for DevtoolsSettings {
             query_bar: true,
             schema_mappings: Vec::new(),
             git_editor_ruler: Some(72),
+            link_check: true,
         }
     }
 }

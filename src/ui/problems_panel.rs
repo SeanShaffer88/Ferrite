@@ -23,8 +23,17 @@ const SAMPLE_LEN: usize = 64 * 1024;
 pub struct DocInput<'a> {
     pub path: Option<&'a Path>,
     pub content: &'a str,
-    pub ft: StructuredFileType,
+    pub kind: DocKind,
     pub mappings: &'a [(String, String)],
+}
+
+/// Which checks apply to the document.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DocKind {
+    /// JSON / YAML / TOML: syntax + schema.
+    Structured(StructuredFileType),
+    /// Markdown: frontmatter schema and/or relative links.
+    Markdown { frontmatter: bool, links: bool },
 }
 
 /// Result of showing the panel for one frame.
@@ -94,6 +103,14 @@ impl ProblemsPanel {
             .count()
     }
 
+    /// Count of problems at warning severity (e.g. broken links).
+    pub fn warning_count(&self) -> usize {
+        self.problems
+            .iter()
+            .filter(|p| p.severity == Severity::Warning)
+            .count()
+    }
+
     /// Accept a worker result. Returns false (and ignores it) if it is stale.
     pub fn accept(&mut self, generation: u64, problems: Vec<Problem>) -> bool {
         if generation != self.generation {
@@ -120,12 +137,25 @@ impl ProblemsPanel {
         self.rx = Some(rx);
         let path = doc.path.map(Path::to_path_buf);
         let content = doc.content.to_owned();
-        let ft = doc.ft;
+        let kind = doc.kind;
         let mappings = doc.mappings.to_vec();
         let spawned = std::thread::Builder::new()
             .name("devtools-validate".into())
             .spawn(move || {
-                let problems = check_document(path.as_deref(), &content, ft, &mappings);
+                let problems = match kind {
+                    DocKind::Structured(ft) => {
+                        check_document(path.as_deref(), &content, ft, &mappings)
+                    }
+                    DocKind::Markdown { frontmatter, links } => {
+                        crate::devtools::frontmatter::check_markdown(
+                            path.as_deref(),
+                            &content,
+                            &mappings,
+                            frontmatter,
+                            links,
+                        )
+                    }
+                };
                 let _ = tx.send((generation, problems));
             });
         if spawned.is_err() {
@@ -253,7 +283,7 @@ mod tests {
         DocInput {
             path: Some(Path::new("/w/a.json")),
             content,
-            ft: StructuredFileType::Json,
+            kind: DocKind::Structured(StructuredFileType::Json),
             mappings: &[],
         }
     }
