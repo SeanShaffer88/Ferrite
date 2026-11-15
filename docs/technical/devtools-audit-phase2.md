@@ -37,5 +37,7 @@ Branch `claude/developer-edition-design`. Plan:
 ## Known limits
 
 - A waiter whose file cannot be opened is released after 5 s with exit 0.
-- `--diff` and stdin write temporary files under the OS temp directory
-  (`ferrite-cli/`); they are not cleaned up automatically.
+- `--diff`, stdin and Compare reports are written to a per-user cache folder
+  (`<cache>/ferrite/generated/`, e.g. `~/.cache` on Linux, `%LOCALAPPDATA%` on
+  Windows) with unique, exclusively created names; they are not cleaned up
+  automatically.

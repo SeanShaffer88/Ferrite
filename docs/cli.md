@@ -107,8 +107,8 @@ already running, the position is forwarded to that window.
 
 ### `-` (standard input)
 
-Read standard input (up to 64 MB; invalid UTF-8 replaced) into a temporary
-file and open it.
+Read standard input (up to 64 MB; invalid UTF-8 replaced) into a new file in
+Ferrite's per-user cache folder and open it.
 
 ```bash
 git log -p | ferrite -

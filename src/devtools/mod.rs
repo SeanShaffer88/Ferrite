@@ -6,6 +6,7 @@
 
 pub mod cli_input;
 pub mod cli_target;
+pub mod codeblocks;
 pub mod convert;
 pub mod diff;
 pub mod frontmatter;
@@ -14,6 +15,7 @@ pub mod locate;
 pub mod query;
 pub mod schema;
 pub mod schemas;
+pub mod scratch;
 pub mod templates;
 pub mod value;
 
@@ -34,6 +36,8 @@ pub struct DevtoolsSettings {
     pub git_editor_ruler: Option<u32>,
     /// Check relative links and `#anchors` in Markdown documents.
     pub link_check: bool,
+    /// Syntax-check fenced JSON/YAML/TOML code blocks in Markdown.
+    pub code_block_lint: bool,
 }
 
 impl Default for DevtoolsSettings {
@@ -44,6 +48,7 @@ impl Default for DevtoolsSettings {
             schema_mappings: Vec::new(),
             git_editor_ruler: Some(72),
             link_check: true,
+            code_block_lint: true,
         }
     }
 }

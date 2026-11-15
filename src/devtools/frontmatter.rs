@@ -32,25 +32,33 @@ pub fn check_frontmatter(
         .collect()
 }
 
+/// Which Markdown checks to run.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct MarkdownChecks {
+    pub frontmatter: bool,
+    pub links: bool,
+    pub code_blocks: bool,
+}
+
 /// All checks for a Markdown tab, sorted by position.
 pub fn check_markdown(
     doc_path: Option<&Path>,
     content: &str,
     mappings: &[(String, String)],
-    frontmatter: bool,
-    links: bool,
+    checks: MarkdownChecks,
 ) -> Vec<Problem> {
-    let Some(path) = doc_path else {
-        // Untitled: relative links have no base directory.
-        return Vec::new();
-    };
-    let mut out = if frontmatter {
-        check_frontmatter(path, content, mappings)
-    } else {
-        Vec::new()
-    };
-    if links {
-        out.extend(check_links(path, content, &mut AnchorCache::default()));
+    let mut out = Vec::new();
+    if checks.code_blocks {
+        out.extend(super::codeblocks::check_code_blocks(content));
+    }
+    // Untitled documents have no base directory for schemas or relative links.
+    if let Some(path) = doc_path {
+        if checks.frontmatter {
+            out.extend(check_frontmatter(path, content, mappings));
+        }
+        if checks.links {
+            out.extend(check_links(path, content, &mut AnchorCache::default()));
+        }
     }
     out.sort_by_key(|p| (p.line, p.col));
     out

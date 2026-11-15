@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 /// Markdown file extensions whose anchors can be checked.
 const MD_EXTS: &[&str] = &["md", "markdown", "mdown", "mkd", "mdx"];
 
-fn options() -> Options {
+pub(crate) fn options() -> Options {
     let mut o = Options::default();
     o.extension.table = true;
     o.extension.strikethrough = true;
@@ -24,7 +24,7 @@ fn options() -> Options {
 
 /// Replace YAML frontmatter with blank lines so it is not parsed as Markdown
 /// and every later line keeps its number.
-fn blank_frontmatter(content: &str) -> std::borrow::Cow<'_, str> {
+pub(crate) fn blank_frontmatter(content: &str) -> std::borrow::Cow<'_, str> {
     match crate::ui::extract_frontmatter(content) {
         Some((_, end)) if end <= content.len() && content.is_char_boundary(end) => {
             let lines = content[..end].matches('\n').count();

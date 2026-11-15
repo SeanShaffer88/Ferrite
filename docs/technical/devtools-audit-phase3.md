@@ -38,7 +38,10 @@ app. Every behaviour below is unverified at runtime.
 - Root-absolute links (`/docs/x.md`) and links into other repos are skipped.
 - Anchors defined only by non-heading syntax other than `id=` / `name=`
   HTML attributes and footnotes are not recognised.
-- The workspace report is written to `<temp>/ferrite-links/` and not cleaned up.
+- The workspace report is written to `<cache>/ferrite/generated/links/` and not
+  cleaned up.
+- Code-block lint (added after the first phase 3 commit) is likewise untested:
+  check that the reported line is inside the fence for multi-line YAML errors.
 - No bundled frontmatter schema.
 
 ## Deferred from the spec

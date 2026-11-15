@@ -20,12 +20,14 @@ pub fn read_capped<R: Read>(reader: R, cap: usize) -> std::io::Result<(Vec<u8>, 
     Ok((buf, truncated))
 }
 
-/// Write `data` (UTF-8, lossy) to `dir/stdin-<pid>.txt`.
+/// Write `data` (UTF-8, lossy) to a new, uniquely named `stdin-*.txt` in `dir`.
 pub fn write_stdin_file(dir: &Path, data: &[u8]) -> std::io::Result<PathBuf> {
-    std::fs::create_dir_all(dir)?;
-    let path = dir.join(format!("stdin-{}.txt", std::process::id()));
-    std::fs::write(&path, String::from_utf8_lossy(data).as_bytes())?;
-    Ok(path)
+    super::scratch::write_new_in(
+        dir,
+        "stdin",
+        "txt",
+        String::from_utf8_lossy(data).as_bytes(),
+    )
 }
 
 fn structured(path: &Path) -> Option<StructuredFileType> {
@@ -54,10 +56,13 @@ pub fn build_diff_file(a: &Path, b: &Path, out_dir: &Path) -> Result<PathBuf, St
         }
         _ => render_text_diff(&na, &nb, &ta, &tb),
     };
-    std::fs::create_dir_all(out_dir).map_err(|e| e.to_string())?;
-    let out = out_dir.join(format!("diff-{na}-{nb}.diff"));
-    std::fs::write(&out, report).map_err(|e| e.to_string())?;
-    Ok(out)
+    super::scratch::write_new_in(
+        out_dir,
+        &format!("diff-{na}-{nb}"),
+        "diff",
+        report.as_bytes(),
+    )
+    .map_err(|e| e.to_string())
 }
 
 #[cfg(test)]

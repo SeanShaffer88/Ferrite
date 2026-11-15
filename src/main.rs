@@ -198,7 +198,7 @@ fn build_cli_targets(cli: &Cli) -> Result<Vec<devtools::cli_target::OpenTarget>,
     use devtools::cli_input::{build_diff_file, read_capped, write_stdin_file, STDIN_CAP};
     use devtools::cli_target::{parse_open_target, OpenTarget};
 
-    let temp = std::env::temp_dir().join("ferrite-cli");
+    let temp = devtools::scratch::dir("cli");
     let mut targets = Vec::new();
     for p in &cli.paths {
         let raw = p.to_string_lossy();

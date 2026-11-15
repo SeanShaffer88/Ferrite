@@ -2414,7 +2414,8 @@ impl FerriteApp {
         // Developer tools: Problems panel (schema / syntax checks for JSON, YAML, TOML)
         {
             let dt = &self.state.settings.devtools;
-            let enabled = (dt.schema_validation || dt.link_check) && !zen_mode;
+            let enabled =
+                (dt.schema_validation || dt.link_check || dt.code_block_lint) && !zen_mode;
             let doc = self.state.active_tab().and_then(|tab| {
                 let path = tab.path.as_deref()?;
                 let ext = path.extension()?.to_str()?.to_ascii_lowercase();
@@ -2430,6 +2431,7 @@ impl FerriteApp {
                             crate::ui::DocKind::Markdown {
                                 frontmatter: dt.schema_validation,
                                 links: dt.link_check,
+                                code_blocks: dt.code_block_lint,
                             }
                         }
                         None => return None,

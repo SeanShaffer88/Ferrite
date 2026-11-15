@@ -12,7 +12,8 @@ All settings live under `"devtools"` in `config.json`:
   "query_bar": true,
   "schema_mappings": [["**/deploy/*.yaml", "schemas/deploy.json"]],
   "git_editor_ruler": 72,
-  "link_check": true
+  "link_check": true,
+  "code_block_lint": true
 }
 ```
 
@@ -118,7 +119,7 @@ ferrite --diff a b          compare two files
 - If Ferrite is already running, the file opens in that window, at the given
   position.
 - `-` reads up to 64 MB of standard input (invalid UTF-8 is replaced) into a
-  temporary file and opens it.
+  file in Ferrite's per-user cache folder and opens it.
 
 Full reference: [`cli.md`](cli.md).
 
@@ -190,6 +191,13 @@ listing each broken link by file and line.
 
 Turn it off with `devtools.link_check: false`.
 
+### Code-block lint
+
+Fenced code blocks marked `json`, `yaml`/`yml` or `toml` are syntax-checked;
+errors appear as warnings on the line inside the block where parsing stopped.
+`jsonc` and `json5` blocks are skipped (they allow comments). Turn it off with
+`devtools.code_block_lint: false`.
+
 ### Frontmatter validation
 
 YAML frontmatter in Markdown files is checked like a YAML file. Name its
@@ -228,4 +236,5 @@ Existing files are never overwritten.
 - `devtools.query_bar: false` — no query box in the tree viewer.
 - `devtools.git_editor_ruler: null` — no column guide.
 - `devtools.link_check: false` — no link warnings in Markdown.
+- `devtools.code_block_lint: false` — no code-block syntax warnings.
 - The command-line features cost nothing unless you use them.

@@ -241,15 +241,11 @@ impl FerriteApp {
         });
         let report = structured
             .unwrap_or_else(|| render_text_diff(&format!("HEAD:{name}"), name, &head, &content));
-        let dir = std::env::temp_dir().join("ferrite-diff");
-        let file = dir.join(format!("{name}.diff"));
-        if std::fs::create_dir_all(&dir)
-            .and_then(|_| std::fs::write(&file, report))
-            .is_err()
-        {
+        let Ok(file) = crate::devtools::scratch::write_new("diff", name, "diff", report.as_bytes())
+        else {
             return self
                 .devtools_toast(t!("devtools.convert.failed", error = "temp file").to_string());
-        }
+        };
         self.open_os_paths_in_focused_window(ctx, vec![file], "compare");
     }
 
@@ -293,12 +289,13 @@ impl FerriteApp {
             .name("devtools-links".into())
             .spawn(move || {
                 let report = crate::devtools::links::workspace_report(&root, 5_000);
-                let dir = std::env::temp_dir().join("ferrite-links");
-                let file = dir.join(format!("link-check-{}.md", std::process::id()));
-                let res = std::fs::create_dir_all(&dir)
-                    .and_then(|_| std::fs::write(&file, report))
-                    .map(|_| file)
-                    .map_err(|e| e.to_string());
+                let res = crate::devtools::scratch::write_new(
+                    "links",
+                    "link-check",
+                    "md",
+                    report.as_bytes(),
+                )
+                .map_err(|e| e.to_string());
                 let _ = tx.send(res);
             });
         match spawned {

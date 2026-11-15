@@ -33,7 +33,11 @@ pub enum DocKind {
     /// JSON / YAML / TOML: syntax + schema.
     Structured(StructuredFileType),
     /// Markdown: frontmatter schema and/or relative links.
-    Markdown { frontmatter: bool, links: bool },
+    Markdown {
+        frontmatter: bool,
+        links: bool,
+        code_blocks: bool,
+    },
 }
 
 /// Result of showing the panel for one frame.
@@ -146,15 +150,20 @@ impl ProblemsPanel {
                     DocKind::Structured(ft) => {
                         check_document(path.as_deref(), &content, ft, &mappings)
                     }
-                    DocKind::Markdown { frontmatter, links } => {
-                        crate::devtools::frontmatter::check_markdown(
-                            path.as_deref(),
-                            &content,
-                            &mappings,
+                    DocKind::Markdown {
+                        frontmatter,
+                        links,
+                        code_blocks,
+                    } => crate::devtools::frontmatter::check_markdown(
+                        path.as_deref(),
+                        &content,
+                        &mappings,
+                        crate::devtools::frontmatter::MarkdownChecks {
                             frontmatter,
                             links,
-                        )
-                    }
+                            code_blocks,
+                        },
+                    ),
                 };
                 let _ = tx.send((generation, problems));
             });
