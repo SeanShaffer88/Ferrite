@@ -214,6 +214,8 @@ settings:
     git_editor_ruler_tooltip: "Draw a vertical guide in COMMIT_EDITMSG and other git message files."
     git_gutter: "Show changes since the last commit in the gutter"
     breadcrumb: "Show the JSON/YAML/TOML path at the caret in the status bar"
+    secret_scan: "Warn about API keys, tokens and private keys in open files"
+    secret_scan_tooltip: "Flags text that looks like an AWS, GitHub, Slack, Stripe, Google, OpenAI or Anthropic key, a private key block, a JWT, or a password inside a URL. Checked locally; nothing is sent anywhere."
     breadcrumb_tooltip: "For example $.jobs.build.steps[2].run. Click it to copy."
     history_max: "Version history: snapshots kept per file"
     history_max_tooltip: "A snapshot of each file is kept when you save (saves within 2 minutes replace the newest). 0 turns version history off. Snapshots are stored in Forgepad's config folder, not next to your files."

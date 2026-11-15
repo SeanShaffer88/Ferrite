@@ -2430,14 +2430,19 @@ impl FerriteApp {
         {
             let dt = &self.state.settings.devtools;
             let enabled =
-                (dt.schema_validation || dt.link_check || dt.code_block_lint) && !zen_mode;
+                (dt.schema_validation || dt.link_check || dt.code_block_lint || dt.secret_scan)
+                    && !zen_mode;
             let doc = self.state.active_tab().and_then(|tab| {
                 let path = tab.path.as_deref()?;
-                let ext = path.extension()?.to_str()?.to_ascii_lowercase();
+                let ext = path
+                    .extension()
+                    .and_then(|e| e.to_str())
+                    .unwrap_or("")
+                    .to_ascii_lowercase();
                 let kind =
                     match crate::markdown::tree_viewer::StructuredFileType::from_extension(&ext) {
                         Some(ft) if dt.schema_validation => crate::ui::DocKind::Structured(ft),
-                        Some(_) => return None,
+                        Some(_) => crate::ui::DocKind::Plain,
                         None if matches!(
                             ext.as_str(),
                             "md" | "markdown" | "mdown" | "mkd" | "mdx"
@@ -2449,13 +2454,17 @@ impl FerriteApp {
                                 code_blocks: dt.code_block_lint,
                             }
                         }
-                        None => return None,
+                        None => crate::ui::DocKind::Plain,
                     };
+                if kind == crate::ui::DocKind::Plain && !dt.secret_scan {
+                    return None;
+                }
                 Some(crate::ui::DocInput {
                     path: Some(path),
                     content: &tab.content,
                     kind,
                     mappings: &dt.schema_mappings,
+                    secrets: dt.secret_scan,
                 })
             });
             if self

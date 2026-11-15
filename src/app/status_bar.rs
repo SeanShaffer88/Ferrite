@@ -593,7 +593,10 @@ impl FerriteApp {
 
                     // Developer tools: problem count badge (opens the Problems panel)
                     let dt = &self.state.settings.devtools;
-                    if (dt.schema_validation || dt.link_check || dt.code_block_lint)
+                    if (dt.schema_validation
+                        || dt.link_check
+                        || dt.code_block_lint
+                        || dt.secret_scan)
                         && !self.problems_panel.problems().is_empty()
                     {
                         ui.separator();

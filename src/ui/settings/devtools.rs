@@ -76,6 +76,19 @@ pub(super) fn render_git_gutter(
     )
 }
 
+pub(super) fn render_secret_scan(
+    _panel: &mut SettingsPanel,
+    ui: &mut Ui,
+    ctx: &mut SettingsCtx<'_>,
+) -> bool {
+    toggle(
+        ui,
+        &mut ctx.settings.devtools.secret_scan,
+        "settings.devtools.secret_scan",
+        "settings.devtools.secret_scan_tooltip",
+    )
+}
+
 pub(super) fn render_breadcrumb(
     _panel: &mut SettingsPanel,
     ui: &mut Ui,

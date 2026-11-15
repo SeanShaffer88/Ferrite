@@ -772,4 +772,21 @@ static ENTRIES: &[SettingEntry] = &[
         featured: false,
         render: devtools::render_breadcrumb,
     },
+    SettingEntry {
+        id: "devtools.secret_scan",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.secret_scan").to_string(),
+        keywords: &[
+            "secret",
+            "credential",
+            "token",
+            "api key",
+            "password",
+            "leak",
+            "security",
+            "developer",
+        ],
+        featured: false,
+        render: devtools::render_secret_scan,
+    },
 ];

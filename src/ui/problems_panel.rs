@@ -25,6 +25,8 @@ pub struct DocInput<'a> {
     pub content: &'a str,
     pub kind: DocKind,
     pub mappings: &'a [(String, String)],
+    /// Also scan for credentials (any file type).
+    pub secrets: bool,
 }
 
 /// Which checks apply to the document.
@@ -38,6 +40,8 @@ pub enum DocKind {
         links: bool,
         code_blocks: bool,
     },
+    /// Any other text file (only the secret scan applies).
+    Plain,
 }
 
 /// Result of showing the panel for one frame.
@@ -142,11 +146,13 @@ impl ProblemsPanel {
         let path = doc.path.map(Path::to_path_buf);
         let content = doc.content.to_owned();
         let kind = doc.kind;
+        let secrets = doc.secrets;
         let mappings = doc.mappings.to_vec();
         let spawned = std::thread::Builder::new()
             .name("devtools-validate".into())
             .spawn(move || {
-                let problems = match kind {
+                let mut problems = match kind {
+                    DocKind::Plain => Vec::new(),
                     DocKind::Structured(ft) => {
                         check_document(path.as_deref(), &content, ft, &mappings)
                     }
@@ -165,6 +171,10 @@ impl ProblemsPanel {
                         },
                     ),
                 };
+                if secrets {
+                    problems.extend(crate::devtools::secrets::scan(&content));
+                    problems.sort_by_key(|p| (p.line, p.col));
+                }
                 let _ = tx.send((generation, problems));
             });
         if spawned.is_err() {
@@ -294,6 +304,7 @@ mod tests {
             content,
             kind: DocKind::Structured(StructuredFileType::Json),
             mappings: &[],
+            secrets: false,
         }
     }
 

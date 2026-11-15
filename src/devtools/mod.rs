@@ -19,6 +19,7 @@ pub mod query;
 pub mod schema;
 pub mod schemas;
 pub mod scratch;
+pub mod secrets;
 pub mod templates;
 pub mod transform;
 pub mod value;
@@ -48,6 +49,8 @@ pub struct DevtoolsSettings {
     pub history_max: u32,
     /// Show the JSON/YAML/TOML path at the caret in the status bar.
     pub breadcrumb: bool,
+    /// Warn about things that look like credentials in any open file.
+    pub secret_scan: bool,
 }
 
 impl Default for DevtoolsSettings {
@@ -62,6 +65,7 @@ impl Default for DevtoolsSettings {
             git_gutter: true,
             history_max: 20,
             breadcrumb: true,
+            secret_scan: true,
         }
     }
 }

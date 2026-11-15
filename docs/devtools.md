@@ -217,6 +217,17 @@ $env:EDITOR = "forgepad --wait"
 On Windows, quote paths with spaces for git:
 `git config --global core.editor "'C:/Program Files/Forgepad/forgepad.exe' --wait"`.
 
+## Secret scanner
+
+Every open text file is checked for things that look like credentials: AWS
+access keys, GitHub / GitLab / npm / PyPI tokens, Slack tokens and webhooks,
+Stripe live keys, Google, OpenAI and Anthropic API keys, Discord bot tokens,
+JSON Web Tokens, `-----BEGIN … PRIVATE KEY-----` blocks and passwords inside
+URLs (`postgres://user:pass@host`). Each hit is a ⚠ warning in the Problems
+panel, so you notice before committing or screen-sharing. Lines mentioning
+`example`, `xxxxxxxx` or `<your` are skipped as placeholders. The check is
+local; nothing is logged or sent. Off: `devtools.secret_scan: false`.
+
 ## Docs workbench
 
 ### Link checking
