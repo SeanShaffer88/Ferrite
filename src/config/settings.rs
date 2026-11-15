@@ -2940,7 +2940,9 @@ fn remove_config_value_at_path(
             }
         } else if let serde_json::Value::Object(map) = current {
             if is_last {
-                return map.remove(*segment);
+                // shift_remove keeps key order under serde_json `preserve_order`;
+                // a swap-remove reorders keys and changes which error serde hits first.
+                return map.shift_remove(*segment);
             }
             current = map.get_mut(*segment)?;
         } else {
@@ -4299,7 +4301,10 @@ mod tests {
     #[test]
     fn settings_without_devtools_key_loads() {
         let parsed: Settings = serde_json::from_str("{}").unwrap();
-        assert_eq!(parsed.devtools, crate::devtools::DevtoolsSettings::default());
+        assert_eq!(
+            parsed.devtools,
+            crate::devtools::DevtoolsSettings::default()
+        );
         let partial: Settings =
             serde_json::from_str(r#"{"devtools":{"query_bar":false}}"#).unwrap();
         assert!(!partial.devtools.query_bar && partial.devtools.schema_validation);

@@ -680,10 +680,13 @@ mod tests {
         idx.write().unwrap();
         let tree = repo.find_tree(idx.write_tree().unwrap()).unwrap();
         let sig = git2::Signature::now("t", "t@example.com").unwrap();
-        repo.commit(Some("HEAD"), &sig, &sig, "init", &tree, &[]).unwrap();
+        repo.commit(Some("HEAD"), &sig, &sig, "init", &tree, &[])
+            .unwrap();
         fs::write(dir.path().join("b.json"), "{}").unwrap();
         assert_eq!(
-            head_blob(dir.path(), Path::new("a.json")).unwrap().as_deref(),
+            head_blob(dir.path(), Path::new("a.json"))
+                .unwrap()
+                .as_deref(),
             Some("{\"a\":1}")
         );
         assert_eq!(head_blob(dir.path(), Path::new("b.json")).unwrap(), None);

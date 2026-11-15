@@ -206,7 +206,10 @@ fn build_cli_targets(cli: &Cli) -> Result<Vec<devtools::cli_target::OpenTarget>,
             let (data, truncated) = read_capped(std::io::stdin().lock(), STDIN_CAP)
                 .map_err(|e| format!("cannot read stdin: {e}"))?;
             if truncated {
-                eprintln!("ferrite: stdin truncated at {} MB", STDIN_CAP / (1024 * 1024));
+                eprintln!(
+                    "ferrite: stdin truncated at {} MB",
+                    STDIN_CAP / (1024 * 1024)
+                );
             }
             let file = write_stdin_file(&temp, &data).map_err(|e| e.to_string())?;
             targets.push(OpenTarget::plain(file));

@@ -107,14 +107,38 @@ impl FerriteApp {
                 ShortcutCommand::ToggleFrontmatter,
                 KeyboardAction::ToggleFrontmatter
             );
-            check_shortcut!(ShortcutCommand::ToggleProblems, KeyboardAction::Devtools(ShortcutCommand::ToggleProblems));
-            check_shortcut!(ShortcutCommand::FormatDocument, KeyboardAction::Devtools(ShortcutCommand::FormatDocument));
-            check_shortcut!(ShortcutCommand::SortKeys, KeyboardAction::Devtools(ShortcutCommand::SortKeys));
-            check_shortcut!(ShortcutCommand::MinifyJson, KeyboardAction::Devtools(ShortcutCommand::MinifyJson));
-            check_shortcut!(ShortcutCommand::ConvertToJson, KeyboardAction::Devtools(ShortcutCommand::ConvertToJson));
-            check_shortcut!(ShortcutCommand::ConvertToYaml, KeyboardAction::Devtools(ShortcutCommand::ConvertToYaml));
-            check_shortcut!(ShortcutCommand::ConvertToToml, KeyboardAction::Devtools(ShortcutCommand::ConvertToToml));
-            check_shortcut!(ShortcutCommand::CompareWithHead, KeyboardAction::Devtools(ShortcutCommand::CompareWithHead));
+            check_shortcut!(
+                ShortcutCommand::ToggleProblems,
+                KeyboardAction::Devtools(ShortcutCommand::ToggleProblems)
+            );
+            check_shortcut!(
+                ShortcutCommand::FormatDocument,
+                KeyboardAction::Devtools(ShortcutCommand::FormatDocument)
+            );
+            check_shortcut!(
+                ShortcutCommand::SortKeys,
+                KeyboardAction::Devtools(ShortcutCommand::SortKeys)
+            );
+            check_shortcut!(
+                ShortcutCommand::MinifyJson,
+                KeyboardAction::Devtools(ShortcutCommand::MinifyJson)
+            );
+            check_shortcut!(
+                ShortcutCommand::ConvertToJson,
+                KeyboardAction::Devtools(ShortcutCommand::ConvertToJson)
+            );
+            check_shortcut!(
+                ShortcutCommand::ConvertToYaml,
+                KeyboardAction::Devtools(ShortcutCommand::ConvertToYaml)
+            );
+            check_shortcut!(
+                ShortcutCommand::ConvertToToml,
+                KeyboardAction::Devtools(ShortcutCommand::ConvertToToml)
+            );
+            check_shortcut!(
+                ShortcutCommand::CompareWithHead,
+                KeyboardAction::Devtools(ShortcutCommand::CompareWithHead)
+            );
             check_shortcut!(ShortcutCommand::ZoomIn, KeyboardAction::ZoomIn);
             check_shortcut!(ShortcutCommand::ZoomOut, KeyboardAction::ZoomOut);
             check_shortcut!(ShortcutCommand::ResetZoom, KeyboardAction::ResetZoom);

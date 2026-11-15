@@ -323,7 +323,8 @@ mod tests {
     fn json_nested_key() {
         let src = "{\n  \"a\": {\n    \"b\": 1,\n    \"c\": [10, 20]\n  }\n}";
         assert_eq!(locate(src, Json, "/a/b"), Some((3, 10)));
-        assert_eq!(locate(src, Json, "/a/c/1"), Some((4, 18)));
+        // `    "c": [10, 20]`: the `2` of 20 is column 15.
+        assert_eq!(locate(src, Json, "/a/c/1"), Some((4, 15)));
     }
 
     #[test]

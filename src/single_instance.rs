@@ -540,12 +540,15 @@ fn try_forward_targets(port: u16, targets: &[OpenTarget], wait: bool) -> Forward
     }
     let _ = stream.shutdown(Shutdown::Write);
 
-    if !wait_for_ok(&stream) {
+    // One reader for both replies: "OK" and "CLOSED" can arrive in a single
+    // segment, and a second BufReader would lose what the first buffered.
+    let mut reader = BufReader::new(&stream);
+    if !read_ok(&mut reader) {
         return ForwardAttempt::NoHandshake;
     }
     if wait {
         let _ = stream.set_read_timeout(None);
-        if !wait_for_closed(&stream) {
+        if !read_closed(&mut reader) {
             return ForwardAttempt::WaitInterrupted;
         }
     }
@@ -553,20 +556,23 @@ fn try_forward_targets(port: u16, targets: &[OpenTarget], wait: bool) -> Forward
 }
 
 /// Block until the primary sends `CLOSED`. EOF or an error means it went away.
-fn wait_for_closed(stream: &TcpStream) -> bool {
-    let mut reader = BufReader::new(stream);
+fn read_closed(reader: &mut impl BufRead) -> bool {
     let mut line = String::new();
     matches!(reader.read_line(&mut line), Ok(n) if n > 0 && line.trim() == "CLOSED")
 }
 
-fn wait_for_ok(stream: &TcpStream) -> bool {
-    let mut reader = BufReader::new(stream);
+fn read_ok(reader: &mut impl BufRead) -> bool {
     let mut line = String::new();
     match reader.read_line(&mut line) {
         Ok(0) => false,
         Ok(_) => line.trim() == "OK",
         Err(_) => false,
     }
+}
+
+#[cfg(test)]
+fn wait_for_ok(stream: &TcpStream) -> bool {
+    read_ok(&mut BufReader::new(stream))
 }
 
 /// Resolve a path the secondary is about to forward against *this* process CWD.
@@ -803,8 +809,10 @@ mod tests {
         let port = listener.local_addr().unwrap().port();
         let server = std::thread::spawn(move || {
             let (mut stream, _) = listener.accept().expect("accept");
-            let mut buf = [0u8; 256];
-            let _ = std::io::Read::read(&mut stream, &mut buf);
+            // Drain the request to EOF: closing with unread bytes makes Windows
+            // send RST, which can discard the OK before the client reads it.
+            let mut sink = Vec::new();
+            let _ = std::io::Read::read_to_end(&mut stream, &mut sink);
             stream.write_all(b"OK\n").expect("ok");
             // Simulate a crash: close without CLOSED.
             drop(stream);
@@ -813,6 +821,23 @@ mod tests {
             try_forward_targets(port, &[OpenTarget::plain(PathBuf::from("/tmp/x.md"))], true);
         server.join().expect("server thread");
         assert_eq!(attempt, ForwardAttempt::WaitInterrupted);
+    }
+
+    #[test]
+    fn test_wait_ok_and_closed_in_one_write_is_normal_close() {
+        let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+        let port = listener.local_addr().unwrap().port();
+        let server = std::thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept");
+            let mut sink = Vec::new();
+            let _ = std::io::Read::read_to_end(&mut stream, &mut sink);
+            // Tab closed immediately: both replies land in one segment.
+            stream.write_all(b"OK\nCLOSED\n").expect("write");
+        });
+        let attempt =
+            try_forward_targets(port, &[OpenTarget::plain(PathBuf::from("/tmp/z.md"))], true);
+        server.join().expect("server thread");
+        assert_eq!(attempt, ForwardAttempt::Ok);
     }
 
     #[test]
@@ -836,12 +861,17 @@ mod tests {
         let port = listener.local_addr().unwrap().port();
         let server = std::thread::spawn(move || {
             let (mut stream, _) = listener.accept().expect("accept");
-            stream.write_all(b"/tmp/a.md\nT\t3\t\t/tmp/b.md\n").expect("write");
+            stream
+                .write_all(b"/tmp/a.md\nT\t3\t\t/tmp/b.md\n")
+                .expect("write");
         });
         let stream = TcpStream::connect(("127.0.0.1", port)).expect("connect");
         let message = read_message_from_stream(stream);
         server.join().expect("server thread");
-        assert_eq!(message.targets[0], OpenTarget::plain(PathBuf::from("/tmp/a.md")));
+        assert_eq!(
+            message.targets[0],
+            OpenTarget::plain(PathBuf::from("/tmp/a.md"))
+        );
         assert_eq!(message.targets[1].line, Some(3));
         assert!(message.wait.is_none());
     }

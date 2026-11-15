@@ -52,8 +52,8 @@ pub use nav_buttons::{
 pub use outline_panel::{OutlinePanel, OutlinePanelTab};
 pub use pipeline::{PipelinePanel, TabPipelineState};
 pub use problems_panel::{DocInput, ProblemsPanel};
-pub use query_bar::{pointer_to_tree_path, QueryBarState};
 pub use productivity_panel::ProductivityPanel;
+pub use query_bar::{pointer_to_tree_path, QueryBarState};
 pub use quick_switcher::QuickSwitcher;
 pub use ribbon::{markdown_cheatsheet_trigger_rect, Ribbon, RibbonAction};
 pub use runtime_modules::RuntimeModulesInfo;

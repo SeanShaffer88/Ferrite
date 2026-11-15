@@ -2423,7 +2423,10 @@ impl FerriteApp {
                     mappings: &self.state.settings.devtools.schema_mappings,
                 })
             });
-            if self.problems_panel.tick(doc, enabled, std::time::Instant::now()) {
+            if self
+                .problems_panel
+                .tick(doc, enabled, std::time::Instant::now())
+            {
                 ctx.request_repaint_after(std::time::Duration::from_millis(100));
             }
         }

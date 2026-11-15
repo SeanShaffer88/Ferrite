@@ -144,7 +144,11 @@ mod tests {
         let kinds: Vec<_> = d.iter().map(|e| (e.pointer.as_str(), e.kind)).collect();
         assert_eq!(
             kinds,
-            [("/a", DiffKind::Changed), ("/b", DiffKind::Removed), ("/c", DiffKind::Added)]
+            [
+                ("/a", DiffKind::Changed),
+                ("/b", DiffKind::Removed),
+                ("/c", DiffKind::Added)
+            ]
         );
         assert_eq!(d[0].old.as_deref(), Some("1"));
         assert_eq!(d[0].new.as_deref(), Some("9"));
@@ -183,7 +187,10 @@ mod tests {
     fn text_diff_unified_and_empty() {
         let d = render_text_diff("a", "b", "x\ny\n", "x\nz\n");
         assert!(d.contains("-y") && d.contains("+z"));
-        assert_eq!(render_text_diff("a", "b", "same\n", "same\n"), "No differences.\n");
+        assert_eq!(
+            render_text_diff("a", "b", "same\n", "same\n"),
+            "No differences.\n"
+        );
     }
 
     #[test]

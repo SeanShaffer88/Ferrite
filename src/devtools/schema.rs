@@ -85,7 +85,12 @@ fn to_ref(raw: &str, doc_path: &Path) -> Option<SchemaRef> {
 /// Convert a simple glob (`*`, `**`, `?`) to an end-anchored regex.
 fn glob_matches(pattern: &str, path: &str) -> bool {
     let mut re = String::from("(^|/)");
-    let mut chars = pattern.replace('\\', "/").chars().collect::<Vec<_>>().into_iter().peekable();
+    let mut chars = pattern
+        .replace('\\', "/")
+        .chars()
+        .collect::<Vec<_>>()
+        .into_iter()
+        .peekable();
     while let Some(c) = chars.next() {
         match c {
             '*' if chars.peek() == Some(&'*') => {
@@ -191,9 +196,7 @@ pub fn validate(content: &str, ft: StructuredFileType, schema: &SchemaRef) -> Ve
             .and_then(|s| serde_json::from_str::<Value>(&s).map_err(|e| e.to_string()))
         {
             Ok(v) => v,
-            Err(e) => {
-                return vec![info(format!("schema file {} unusable: {e}", p.display()))]
-            }
+            Err(e) => return vec![info(format!("schema file {} unusable: {e}", p.display()))],
         },
         SchemaRef::Bundled(text) => match serde_json::from_str(text) {
             Ok(v) => v,
@@ -273,7 +276,11 @@ mod tests {
     fn yaml_and_toml_validate_too() {
         let y = validate("name: x\ncount: no\n", Yaml, &pkg_schema());
         assert!(y.iter().any(|p| p.pointer == "/count" && p.line == 2));
-        let t = validate("name = \"x\"\nversion = \"1\"\ncount = \"no\"\n", Toml, &pkg_schema());
+        let t = validate(
+            "name = \"x\"\nversion = \"1\"\ncount = \"no\"\n",
+            Toml,
+            &pkg_schema(),
+        );
         assert!(t.iter().any(|p| p.pointer == "/count" && p.line == 3));
     }
 
@@ -336,7 +343,12 @@ mod tests {
             &[],
         );
         assert_eq!(r, Some(SchemaRef::Remote("https://x.dev/s.json".into())));
-        let r = resolve_schema(Path::new("/w/a.toml"), "#:schema ./s.json\na = 1\n", Toml, &[]);
+        let r = resolve_schema(
+            Path::new("/w/a.toml"),
+            "#:schema ./s.json\na = 1\n",
+            Toml,
+            &[],
+        );
         assert!(matches!(r, Some(SchemaRef::Local(_))));
     }
 
@@ -351,13 +363,21 @@ mod tests {
         let m = vec![("config/*.yaml".to_string(), "/s/app.json".to_string())];
         let r = resolve_schema(Path::new("/w/config/app.yaml"), "a: 1", Yaml, &m);
         assert_eq!(r, Some(SchemaRef::Local(PathBuf::from("/s/app.json"))));
-        assert_eq!(resolve_schema(Path::new("/w/other/app.yaml"), "a: 1", Yaml, &m), None);
+        assert_eq!(
+            resolve_schema(Path::new("/w/other/app.yaml"), "a: 1", Yaml, &m),
+            None
+        );
     }
 
     #[test]
     fn resolve_prefers_in_file_over_mapping() {
         let m = vec![("*.json".to_string(), "/s/map.json".to_string())];
-        let r = resolve_schema(Path::new("/w/a.json"), r#"{"$schema":"/s/own.json"}"#, Json, &m);
+        let r = resolve_schema(
+            Path::new("/w/a.json"),
+            r#"{"$schema":"/s/own.json"}"#,
+            Json,
+            &m,
+        );
         assert_eq!(r, Some(SchemaRef::Local(PathBuf::from("/s/own.json"))));
     }
 }

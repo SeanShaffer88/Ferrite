@@ -566,7 +566,10 @@ impl FerriteApp {
                             format!("ℹ {}", self.problems_panel.problems().len())
                         };
                         if ui
-                            .add(egui::Button::new(egui::RichText::new(label).size(12.0)).frame(false))
+                            .add(
+                                egui::Button::new(egui::RichText::new(label).size(12.0))
+                                    .frame(false),
+                            )
                             .on_hover_text(t!("devtools.problems.status_tooltip").to_string())
                             .clicked()
                         {

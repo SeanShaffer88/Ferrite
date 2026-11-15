@@ -14,7 +14,11 @@ pub struct OpenTarget {
 impl OpenTarget {
     /// Target with no position.
     pub fn plain(path: PathBuf) -> Self {
-        Self { path, line: None, col: None }
+        Self {
+            path,
+            line: None,
+            col: None,
+        }
     }
 }
 
@@ -51,7 +55,11 @@ pub fn parse_open_target(arg: &str) -> OpenTarget {
         [c, l] => (Some(*l), Some(*c)),
         _ => (None, None),
     };
-    OpenTarget { path: PathBuf::from(rest), line, col }
+    OpenTarget {
+        path: PathBuf::from(rest),
+        line,
+        col,
+    }
 }
 
 /// Encode for the single-instance protocol. Targets without a position stay a
@@ -70,7 +78,11 @@ pub fn decode_target(line: &str) -> OpenTarget {
     if let Some(body) = line.strip_prefix("T\t") {
         let mut it = body.splitn(3, '\t');
         if let (Some(l), Some(c), Some(p)) = (it.next(), it.next(), it.next()) {
-            return OpenTarget { path: PathBuf::from(p), line: positive(l), col: positive(c) };
+            return OpenTarget {
+                path: PathBuf::from(p),
+                line: positive(l),
+                col: positive(c),
+            };
         }
     }
     OpenTarget::plain(PathBuf::from(line))
@@ -138,7 +150,10 @@ mod tests {
 
     #[test]
     fn windows_drive_with_line() {
-        assert_eq!(t(r"C:\a b\x.rs:12:3"), (r"C:\a b\x.rs".into(), Some(12), Some(3)));
+        assert_eq!(
+            t(r"C:\a b\x.rs:12:3"),
+            (r"C:\a b\x.rs".into(), Some(12), Some(3))
+        );
     }
 
     #[test]
@@ -169,9 +184,17 @@ mod tests {
 
     #[test]
     fn encode_decode_target_round_trip() {
-        let o = OpenTarget { path: PathBuf::from("a/b.rs"), line: Some(7), col: Some(2) };
+        let o = OpenTarget {
+            path: PathBuf::from("a/b.rs"),
+            line: Some(7),
+            col: Some(2),
+        };
         assert_eq!(decode_target(&encode_target(&o)), o);
-        let l = OpenTarget { path: PathBuf::from("a.rs"), line: Some(9), col: None };
+        let l = OpenTarget {
+            path: PathBuf::from("a.rs"),
+            line: Some(9),
+            col: None,
+        };
         assert_eq!(decode_target(&encode_target(&l)), l);
     }
 
@@ -184,7 +207,11 @@ mod tests {
 
     #[test]
     fn tab_in_path_survives() {
-        let o = OpenTarget { path: PathBuf::from("a\tb.rs"), line: Some(1), col: None };
+        let o = OpenTarget {
+            path: PathBuf::from("a\tb.rs"),
+            line: Some(1),
+            col: None,
+        };
         assert_eq!(decode_target(&encode_target(&o)), o);
     }
 
@@ -196,7 +223,10 @@ mod tests {
 
     #[test]
     fn same_name_outside_dot_git_not_detected() {
-        assert_eq!(detect_git_editor_file(Path::new("/repo/docs/COMMIT_EDITMSG")), None);
+        assert_eq!(
+            detect_git_editor_file(Path::new("/repo/docs/COMMIT_EDITMSG")),
+            None
+        );
     }
 
     #[test]

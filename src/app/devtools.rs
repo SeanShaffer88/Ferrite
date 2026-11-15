@@ -3,11 +3,11 @@
 
 use super::FerriteApp;
 use crate::config::ShortcutCommand;
+use crate::devtools::cli_target::OpenTarget;
 use crate::devtools::convert::{convert, reformat, ReformatOpts};
 use crate::devtools::diff::{diff_values, render_report, render_text_diff};
 use crate::devtools::value::parse_to_value;
 use crate::markdown::tree_viewer::StructuredFileType;
-use crate::devtools::cli_target::OpenTarget;
 use crate::single_instance::WaitHandle;
 use eframe::egui;
 use rust_i18n::t;
@@ -45,14 +45,21 @@ fn ext_for(ft: StructuredFileType) -> &'static str {
 
 /// Sibling path with the new extension; never overwrites an existing file.
 fn converted_path(src: &Path, to: StructuredFileType) -> PathBuf {
-    let stem = src.file_stem().and_then(|s| s.to_str()).unwrap_or("converted");
+    let stem = src
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or("converted");
     let dir = src.parent().unwrap_or(Path::new("."));
     let ext = ext_for(to);
     let mut candidate = dir.join(format!("{stem}.{ext}"));
     let mut n = 0;
     while candidate.exists() {
         n += 1;
-        let tag = if n == 1 { "-converted".to_string() } else { format!("-converted{n}") };
+        let tag = if n == 1 {
+            "-converted".to_string()
+        } else {
+            format!("-converted{n}")
+        };
         candidate = dir.join(format!("{stem}{tag}.{ext}"));
     }
     candidate
@@ -84,9 +91,13 @@ impl FerriteApp {
                 };
                 let minify = cmd == ShortcutCommand::MinifyJson;
                 if minify && ft != StructuredFileType::Json {
-                    return self.devtools_toast(t!("devtools.convert.minify_json_only").to_string());
+                    return self
+                        .devtools_toast(t!("devtools.convert.minify_json_only").to_string());
                 }
-                let opts = ReformatOpts { sort_keys: !minify, minify };
+                let opts = ReformatOpts {
+                    sort_keys: !minify,
+                    minify,
+                };
                 match reformat(&content, ft, opts) {
                     Ok(out) => {
                         if let Some(tab) = self.state.active_tab_mut() {
@@ -94,7 +105,8 @@ impl FerriteApp {
                         }
                         if !out.lossy.is_empty() {
                             self.devtools_toast(
-                                t!("devtools.convert.lost", what = out.lossy.join(", ")).to_string(),
+                                t!("devtools.convert.lost", what = out.lossy.join(", "))
+                                    .to_string(),
                             );
                         }
                     }
@@ -152,7 +164,9 @@ impl FerriteApp {
     /// Compare the active tab (including unsaved edits) with `HEAD`; the report
     /// opens as a normal tab.
     fn compare_active_with_head(&mut self, ctx: &egui::Context) {
-        let Some(tab) = self.state.active_tab() else { return };
+        let Some(tab) = self.state.active_tab() else {
+            return;
+        };
         let Some(path) = tab.path.clone() else { return };
         let content = tab.content.clone();
         let Ok(repo) = git2::Repository::discover(&path) else {
@@ -177,14 +191,22 @@ impl FerriteApp {
         let structured = ft.and_then(|ft| {
             let a = parse_to_value(&head, ft).ok()?;
             let b = parse_to_value(&content, ft).ok()?;
-            Some(render_report(&format!("HEAD:{name}"), name, &diff_values(&a, &b)))
+            Some(render_report(
+                &format!("HEAD:{name}"),
+                name,
+                &diff_values(&a, &b),
+            ))
         });
         let report = structured
             .unwrap_or_else(|| render_text_diff(&format!("HEAD:{name}"), name, &head, &content));
         let dir = std::env::temp_dir().join("ferrite-diff");
         let file = dir.join(format!("{name}.diff"));
-        if std::fs::create_dir_all(&dir).and_then(|_| std::fs::write(&file, report)).is_err() {
-            return self.devtools_toast(t!("devtools.convert.failed", error = "temp file").to_string());
+        if std::fs::create_dir_all(&dir)
+            .and_then(|_| std::fs::write(&file, report))
+            .is_err()
+        {
+            return self
+                .devtools_toast(t!("devtools.convert.failed", error = "temp file").to_string());
         }
         self.open_os_paths_in_focused_window(ctx, vec![file], "compare");
     }

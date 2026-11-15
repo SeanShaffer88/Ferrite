@@ -30,7 +30,12 @@ fn sort_value(v: Value) -> Value {
         Value::Object(m) => {
             let mut entries: Vec<(String, Value)> = m.into_iter().collect();
             entries.sort_by(|a, b| a.0.cmp(&b.0));
-            Value::Object(entries.into_iter().map(|(k, v)| (k, sort_value(v))).collect::<Map<_, _>>())
+            Value::Object(
+                entries
+                    .into_iter()
+                    .map(|(k, v)| (k, sort_value(v)))
+                    .collect::<Map<_, _>>(),
+            )
         }
         Value::Array(a) => Value::Array(a.into_iter().map(sort_value).collect()),
         other => other,
@@ -113,7 +118,10 @@ pub fn reformat(
 ) -> Result<Converted, String> {
     let mut value = parse_to_value(content, ft).map_err(|e| e.to_string())?;
     if value.is_null() {
-        return Ok(Converted { text: content.to_string(), lossy: Vec::new() });
+        return Ok(Converted {
+            text: content.to_string(),
+            lossy: Vec::new(),
+        });
     }
     if o.sort_keys {
         value = sort_value(value);
@@ -175,7 +183,10 @@ mod tests {
 
     #[test]
     fn sort_keys_is_stable_and_recursive() {
-        let o = ReformatOpts { sort_keys: true, minify: true };
+        let o = ReformatOpts {
+            sort_keys: true,
+            minify: true,
+        };
         let out = reformat(r#"{"b":{"z":1,"y":2},"a":0}"#, Json, o).unwrap();
         assert_eq!(out.text, r#"{"a":0,"b":{"y":2,"z":1}}"#);
         let again = reformat(&out.text, Json, o).unwrap();
@@ -184,7 +195,10 @@ mod tests {
 
     #[test]
     fn minify_json_has_no_whitespace() {
-        let o = ReformatOpts { sort_keys: false, minify: true };
+        let o = ReformatOpts {
+            sort_keys: false,
+            minify: true,
+        };
         let out = reformat("{ \"a\" : [ 1, 2 ] }", Json, o).unwrap();
         assert_eq!(out.text, r#"{"a":[1,2]}"#);
     }

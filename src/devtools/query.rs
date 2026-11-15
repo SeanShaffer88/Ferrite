@@ -71,7 +71,13 @@ mod tests {
     fn dollar_dot_name_finds_key() {
         let v = json!({"a": {"b": 1}});
         let h = run_query(&v, "$.a.b").unwrap();
-        assert_eq!(h, vec![QueryHit { pointer: "/a/b".into(), preview: "1".into() }]);
+        assert_eq!(
+            h,
+            vec![QueryHit {
+                pointer: "/a/b".into(),
+                preview: "1".into()
+            }]
+        );
     }
 
     #[test]
@@ -84,7 +90,10 @@ mod tests {
 
     #[test]
     fn bad_expression_returns_syntax_error() {
-        assert!(matches!(run_query(&json!({}), "$.[["), Err(QueryError::Syntax(_))));
+        assert!(matches!(
+            run_query(&json!({}), "$.[["),
+            Err(QueryError::Syntax(_))
+        ));
     }
 
     #[test]
@@ -96,7 +105,10 @@ mod tests {
     #[test]
     fn hit_cap_enforced() {
         let v = Value::Array((0..MAX_HITS + 1).map(Value::from).collect());
-        assert_eq!(run_query(&v, "$[*]"), Err(QueryError::TooManyHits(MAX_HITS)));
+        assert_eq!(
+            run_query(&v, "$[*]"),
+            Err(QueryError::TooManyHits(MAX_HITS))
+        );
     }
 
     #[test]

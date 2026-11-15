@@ -36,15 +36,16 @@ fn parse_yaml(content: &str) -> Result<Value, ParseError> {
 }
 
 fn parse_toml(content: &str) -> Result<Value, ParseError> {
-    let parsed: toml::Value = toml::from_str(content.trim_start_matches('\u{feff}')).map_err(|e| {
-        let line = e
-            .span()
-            .map(|s| content[..s.start.min(content.len())].matches('\n').count() + 1);
-        ParseError {
-            message: e.message().to_string(),
-            line,
-        }
-    })?;
+    let parsed: toml::Value =
+        toml::from_str(content.trim_start_matches('\u{feff}')).map_err(|e| {
+            let line = e
+                .span()
+                .map(|s| content[..s.start.min(content.len())].matches('\n').count() + 1);
+            ParseError {
+                message: e.message().to_string(),
+                line,
+            }
+        })?;
     Ok(toml_to_json(parsed))
 }
 
@@ -72,9 +73,15 @@ mod tests {
     #[test]
     fn parses_json_yaml_toml_to_same_value() {
         let want = json!({"name": "x", "n": 3, "list": [1, 2]});
-        let j = parse_to_value(r#"{"name":"x","n":3,"list":[1,2]}"#, StructuredFileType::Json);
+        let j = parse_to_value(
+            r#"{"name":"x","n":3,"list":[1,2]}"#,
+            StructuredFileType::Json,
+        );
         let y = parse_to_value("name: x\nn: 3\nlist: [1, 2]\n", StructuredFileType::Yaml);
-        let t = parse_to_value("name = \"x\"\nn = 3\nlist = [1, 2]\n", StructuredFileType::Toml);
+        let t = parse_to_value(
+            "name = \"x\"\nn = 3\nlist = [1, 2]\n",
+            StructuredFileType::Toml,
+        );
         assert_eq!(j.unwrap(), want);
         assert_eq!(y.unwrap(), want);
         assert_eq!(t.unwrap(), want);

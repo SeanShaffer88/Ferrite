@@ -67,7 +67,11 @@ impl QueryBarState {
                     }),
                 };
                 if let Ok(mut g) = slot.lock() {
-                    *g = Some((generation, result));
+                    // A slow, older job must never overwrite a newer result.
+                    let newer_waiting = g.as_ref().is_some_and(|(have, _)| *have > generation);
+                    if !newer_waiting {
+                        *g = Some((generation, result));
+                    }
                 }
             });
         if spawned.is_err() {
@@ -119,17 +123,22 @@ impl QueryBarState {
             ui.weak(t!("devtools.query.results", count = self.hits.len()).to_string());
         }
         if self.running {
-            ui.ctx().request_repaint_after(std::time::Duration::from_millis(50));
+            ui.ctx()
+                .request_repaint_after(std::time::Duration::from_millis(50));
         }
         if !self.hits.is_empty() {
-            ScrollArea::vertical().id_salt("devtools_query_hits").max_height(140.0).show(ui, |ui| {
-                for h in &self.hits {
-                    let text = RichText::new(format!("{} = {}", h.pointer, h.preview)).monospace();
-                    if ui.add(egui::Button::new(text).frame(false)).clicked() {
-                        clicked = Some(h.pointer.clone());
+            ScrollArea::vertical()
+                .id_salt("devtools_query_hits")
+                .max_height(140.0)
+                .show(ui, |ui| {
+                    for h in &self.hits {
+                        let text =
+                            RichText::new(format!("{} = {}", h.pointer, h.preview)).monospace();
+                        if ui.add(egui::Button::new(text).frame(false)).clicked() {
+                            clicked = Some(h.pointer.clone());
+                        }
                     }
-                }
-            });
+                });
         }
         clicked
     }

@@ -39,7 +39,12 @@ pub fn build_diff_file(a: &Path, b: &Path, out_dir: &Path) -> Result<PathBuf, St
         std::fs::read_to_string(p).map_err(|e| format!("cannot read {}: {e}", p.display()))
     };
     let (ta, tb) = (read(a)?, read(b)?);
-    let name = |p: &Path| p.file_name().and_then(|n| n.to_str()).unwrap_or("file").to_string();
+    let name = |p: &Path| {
+        p.file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("file")
+            .to_string()
+    };
     let (na, nb) = (name(a), name(b));
     let report = match (structured(a), structured(b)) {
         (Some(fa), Some(fb)) => {
@@ -103,7 +108,9 @@ mod tests {
         std::fs::write(&a, r#"{"x":1}"#).unwrap();
         std::fs::write(&b, "x: 1\n").unwrap();
         let out = build_diff_file(&a, &b, &dir.path().join("out")).unwrap();
-        assert!(std::fs::read_to_string(out).unwrap().contains("No differences."));
+        assert!(std::fs::read_to_string(out)
+            .unwrap()
+            .contains("No differences."));
     }
 
     #[test]
@@ -120,7 +127,11 @@ mod tests {
     #[test]
     fn diff_missing_file_errors() {
         let dir = TempDir::new().unwrap();
-        let e = build_diff_file(&dir.path().join("no.json"), &dir.path().join("b.json"), dir.path());
+        let e = build_diff_file(
+            &dir.path().join("no.json"),
+            &dir.path().join("b.json"),
+            dir.path(),
+        );
         assert!(e.unwrap_err().contains("cannot read"));
     }
 
@@ -130,6 +141,8 @@ mod tests {
         let (a, b) = (dir.path().join("a.json"), dir.path().join("b.json"));
         std::fs::write(&a, "{nope").unwrap();
         std::fs::write(&b, "{}").unwrap();
-        assert!(build_diff_file(&a, &b, dir.path()).unwrap_err().contains("a.json"));
+        assert!(build_diff_file(&a, &b, dir.path())
+            .unwrap_err()
+            .contains("a.json"));
     }
 }

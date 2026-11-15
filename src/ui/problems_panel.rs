@@ -88,7 +88,10 @@ impl ProblemsPanel {
 
     /// Count of problems at error severity.
     pub fn error_count(&self) -> usize {
-        self.problems.iter().filter(|p| p.severity == Severity::Error).count()
+        self.problems
+            .iter()
+            .filter(|p| p.severity == Severity::Error)
+            .count()
     }
 
     /// Accept a worker result. Returns false (and ignores it) if it is stale.
@@ -149,15 +152,26 @@ impl ProblemsPanel {
             }
         }
 
-        // Cheap change detection: length every frame, content at most every 150 ms.
+        // Cheap change detection: length every frame, content at most every 150 ms
+        // when idle. While an edit is pending, check every tick so the debounce is
+        // measured from the real last edit, not the last throttled check.
         let key_path = doc.path.map(Path::to_path_buf);
         let len = doc.content.len();
-        let due = self
-            .last_check
-            .map(|t| now.duration_since(t) >= Duration::from_millis(150))
+        let due = self.pending_since.is_some()
+            || self
+                .last_check
+                .map(|t| now.duration_since(t) >= Duration::from_millis(150))
+                .unwrap_or(true);
+        let len_changed = self
+            .fingerprint
+            .as_ref()
+            .map(|f| f.1 != len)
             .unwrap_or(true);
-        let len_changed = self.fingerprint.as_ref().map(|f| f.1 != len).unwrap_or(true);
-        let path_changed = self.fingerprint.as_ref().map(|f| f.0 != key_path).unwrap_or(true);
+        let path_changed = self
+            .fingerprint
+            .as_ref()
+            .map(|f| f.0 != key_path)
+            .unwrap_or(true);
         if len_changed || path_changed || due {
             self.last_check = Some(now);
             let fp = (key_path, len, fingerprint(doc.content));
@@ -198,27 +212,29 @@ impl ProblemsPanel {
             ui.weak(t!("devtools.problems.none").to_string());
             return out;
         }
-        egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
-            for p in &self.problems {
-                let icon = match p.severity {
-                    Severity::Error => "✖",
-                    Severity::Warning => "⚠",
-                    Severity::Info => "ℹ",
-                };
-                let tag = match p.source {
-                    ProblemSource::Schema => "schema",
-                    ProblemSource::Lint => "syntax",
-                    ProblemSource::Lsp => "lsp",
-                };
-                let text = format!("{icon} L{}:{}  {}  [{tag}]", p.line, p.col, p.message);
-                let resp = ui
-                    .add(egui::Button::new(RichText::new(text)).frame(false))
-                    .on_hover_text(t!("devtools.problems.jump_hint").to_string());
-                if resp.clicked() {
-                    out.jump_to_line = Some(p.line);
+        egui::ScrollArea::vertical()
+            .auto_shrink([false, false])
+            .show(ui, |ui| {
+                for p in &self.problems {
+                    let icon = match p.severity {
+                        Severity::Error => "✖",
+                        Severity::Warning => "⚠",
+                        Severity::Info => "ℹ",
+                    };
+                    let tag = match p.source {
+                        ProblemSource::Schema => "schema",
+                        ProblemSource::Lint => "syntax",
+                        ProblemSource::Lsp => "lsp",
+                    };
+                    let text = format!("{icon} L{}:{}  {}  [{tag}]", p.line, p.col, p.message);
+                    let resp = ui
+                        .add(egui::Button::new(RichText::new(text)).frame(false))
+                        .on_hover_text(t!("devtools.problems.jump_hint").to_string());
+                    if resp.clicked() {
+                        out.jump_to_line = Some(p.line);
+                    }
                 }
-            }
-        });
+            });
         out
     }
 }
@@ -303,7 +319,11 @@ mod tests {
         let start = Instant::now();
         p.tick(Some(doc(&big)), true, start);
         // Includes one 50 MB copy for the worker; must not parse or validate inline.
-        assert!(start.elapsed() < Duration::from_millis(500), "{:?}", start.elapsed());
+        assert!(
+            start.elapsed() < Duration::from_millis(500),
+            "{:?}",
+            start.elapsed()
+        );
         assert_eq!(p.jobs_started, 1);
     }
 
