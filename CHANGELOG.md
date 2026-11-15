@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Renamed
+- **Ferrite is now Forgepad** — a fork of [Ferrite](https://github.com/OlaProeis/Ferrite) by Ola Proeis (MIT). Binary `forgepad`, Cargo package `forgepad`, app ID `forgepad` / `io.github.seanshaffer88.Forgepad` / `com.seanshaffer88.forgepad`, repository `SeanShaffer88/Forgepad`. New MSI `UpgradeCode` and Inno Setup `AppId`, so Forgepad installs alongside Ferrite instead of replacing it.
+- **Settings move automatically** — on first launch Forgepad copies the `ferrite` config folder to `forgepad`; the old folder is kept. `FORGEPAD_DATA_DIR` replaces `FERRITE_DATA_DIR` (still honoured).
+- **Update check** now follows Forgepad releases, not upstream Ferrite.
+- Per-workspace `.ferrite/` folders, internal type names and entries below this line keep the Ferrite name.
+
 ### Added
 
 #### Developer tools — config/data editor (phase 1)

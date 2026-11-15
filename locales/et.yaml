@@ -1,10 +1,10 @@
-# Ferrite - Estonian (Eesti)
+# Forgepad - Estonian (Eesti)
 # This file contains all user-facing strings for internationalization.
 # Naming convention: category.subcategory.key (e.g., menu.file.open)
 
 # Application metadata
 app:
-  name: "Ferrite"
+  name: "Forgepad"
 
 # Menu bar items
 
@@ -243,7 +243,7 @@ settings:
   recently_changed: Hiljuti muudetud
   essentials: Põhiseaded
   essentials_hint: Levinud seaded. Kõigi seadete nägemiseks kasuta otsingut või ülal olevaid kategooriafiltreid.
-  about_button_tooltip: Ferrite'i teave, uuendused ja lingid
+  about_button_tooltip: Forgepad'i teave, uuendused ja lingid
   font_size:
     small: Väike
     medium: Keskmine
@@ -284,16 +284,16 @@ settings:
   files:
     title: Failid
     show_welcome: Näita tervitust tühjal käivitamisel
-    show_welcome_tooltip: Ava tervituskaart, kui Ferrite käivitub ilma dokumentideta.
-    allow_multiple_instances: Luba mitu Ferrite'i akent/eksemplari
-    allow_multiple_instances_tooltip: Kui see on sisse lülitatud, avab iga käivitus uue Ferrite'i akna, selle asemel et failid juba töötavale eksemplarile edastada. Lipu --new-instance kehtib ühe käivituse kohta.
+    show_welcome_tooltip: Ava tervituskaart, kui Forgepad käivitub ilma dokumentideta.
+    allow_multiple_instances: Luba mitu Forgepad'i akent/eksemplari
+    allow_multiple_instances_tooltip: Kui see on sisse lülitatud, avab iga käivitus uue Forgepad'i akna, selle asemel et failid juba töötavale eksemplarile edastada. Lipu --new-instance kehtib ühe käivituse kohta.
   appearance:
     title: Välimus
     language: Keel
     system_title_bar: "Kasuta süsteemi tiitliriba"
-    system_title_bar_hint: "Näita süsteemi akna tiitliriba Ferrite'i kohandatud raami asemel."
-    system_title_bar_restart: "Muudatuse jõustamiseks taaskäivitage Ferrite."
-    system_title_bar_windows_tooltip: "Windowsis pole toetatud. Ferrite kasutab Windowsis renderdamispiirangute tõttu kohandatud aknaraami."
+    system_title_bar_hint: "Näita süsteemi akna tiitliriba Forgepad'i kohandatud raami asemel."
+    system_title_bar_restart: "Muudatuse jõustamiseks taaskäivitage Forgepad."
+    system_title_bar_windows_tooltip: "Windowsis pole toetatud. Forgepad kasutab Windowsis renderdamispiirangute tõttu kohandatud aknaraami."
   keyboard:
     title: Klahvistik
     cancel: Katkesta
@@ -517,7 +517,7 @@ terminal:
   menu:
     workspaces: Tööalad
   filter:
-    ferrite_workspace: Ferrite'i tööala
+    ferrite_workspace: Forgepad'i tööala
 productivity:
   workspace_hint: Ava tööala ning ülesanded ja märked säilivad
 view_mode:
@@ -546,7 +546,7 @@ about:
   issue_tooltip: Ava veahaldus veebibrauseris
   built_with: Kompileerimisel oli kasutusel
   license_type: MIT litsents
-  copyright: © 2026 Ferrite'i kaasautorid
+  copyright: © 2026 Forgepad'i kaasautorid
   version: Versioon %{version}
 notification:
   restored_auto_save: Taastatud automaatsest salvestusest

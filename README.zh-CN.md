@@ -1,5 +1,9 @@
 # Ferrite
 
+> **注意：** 本中文说明来自上游项目 [Ferrite](https://github.com/OlaProeis/Ferrite)，尚未针对 **Forgepad**（Ferrite 的分支）更新。安装方式、下载链接和功能说明以 [英文 README](README.md) 为准。
+> *This Chinese README is inherited from upstream Ferrite and has not been updated for Forgepad; see the [English README](README.md).*
+
+
 **简体中文** | [English](README.md)
 
 <div align="center">

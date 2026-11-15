@@ -39,39 +39,39 @@ jobs:
         shell: pwsh
         run: |
           mkdir release
-          copy target\release\ferrite.exe release\
+          copy target\release\forgepad.exe release\
           mkdir release\portable
           # Add a readme inside portable folder so it gets included in the zip
           # (zip files don't include empty directories)
           $portableReadme = @(
-            "This folder stores your Ferrite settings and session data."
+            "This folder stores your Forgepad settings and session data."
             ""
             "You can safely delete this file - it's just here to ensure"
             "the portable folder is included in the zip archive."
           ) -join "`r`n"
           Set-Content -Path release\portable\README.txt -Value $portableReadme -NoNewline
           $readme = @(
-            "Ferrite - Portable Edition"
+            "Forgepad - Portable Edition"
             "==========================="
             ""
-            "This is the portable version of Ferrite. All your settings,"
+            "This is the portable version of Forgepad. All your settings,"
             "sessions, and data will be stored in the 'portable' folder"
-            "next to ferrite.exe."
+            "next to forgepad.exe."
             ""
             "To use:"
             "1. Extract this folder anywhere (USB drive, local folder, etc.)"
-            "2. Run ferrite.exe"
+            "2. Run forgepad.exe"
             "3. Your configuration will be saved in the 'portable' subfolder"
             ""
             "This version does not modify your system - perfect for USB drives"
-            "or trying Ferrite without installation."
+            "or trying Forgepad without installation."
             ""
             "For a traditional Windows installation, use the .msi installer instead."
             ""
-            "Website: https://getferrite.dev"
+            "Website: https://getforgepad.dev"
           ) -join "`r`n"
           Set-Content -Path release\README.txt -Value $readme -NoNewline
-          Compress-Archive -Path release\* -DestinationPath ferrite-portable-windows-x64.zip
+          Compress-Archive -Path release\* -DestinationPath forgepad-portable-windows-x64.zip
 
       - name: Install cargo-wix
         run: cargo install cargo-wix
@@ -80,7 +80,7 @@ jobs:
         run: cargo wix --nocapture
 
       - name: Copy MSI to workspace root
-        run: copy target\wix\*.msi .\ferrite-windows-x64.msi
+        run: copy target\wix\*.msi .\forgepad-windows-x64.msi
 
       - name: Build Inno Setup installer (optional, unsigned)
         shell: pwsh
@@ -99,8 +99,8 @@ jobs:
           }
           choco install innosetup -y --no-progress
           $version = "${{ github.ref_name }}".TrimStart('v')
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DMyAppVersion=$version installer\ferrite.iss
-          Copy-Item installer\Output\ferrite-windows-x64-setup.exe .\ferrite-windows-x64-setup.exe
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DMyAppVersion=$version installer\forgepad.iss
+          Copy-Item installer\Output\forgepad-windows-x64-setup.exe .\forgepad-windows-x64-setup.exe
 
       - name: Build PortableApps.com installer
         shell: pwsh
@@ -114,7 +114,7 @@ jobs:
           python -c @"
           from PIL import Image
           src = 'assets/icons/icon_256.png'
-          dst = 'portable/FerriteMDPortable/App/AppInfo'
+          dst = 'portable/ForgepadPortable/App/AppInfo'
           img = Image.open(src).convert('RGBA')
           for size, name in [(16,'appicon_16.png'),(32,'appicon_32.png'),(128,'appicon_128.png')]:
               img.resize((size,size), Image.Resampling.LANCZOS).save(f'{dst}/{name}','PNG')
@@ -124,20 +124,20 @@ jobs:
           "@
 
           # Update appinfo.ini version fields to match the release tag
-          $appinfo = Get-Content portable/FerriteMDPortable/App/AppInfo/appinfo.ini -Raw
+          $appinfo = Get-Content portable/ForgepadPortable/App/AppInfo/appinfo.ini -Raw
           $appinfo = $appinfo -replace 'PackageVersion=.*', "PackageVersion=$version.0"
           $appinfo = $appinfo -replace 'DisplayVersion=.*', "DisplayVersion=$version"
-          Set-Content -Path portable/FerriteMDPortable/App/AppInfo/appinfo.ini -Value $appinfo -NoNewline
+          Set-Content -Path portable/ForgepadPortable/App/AppInfo/appinfo.ini -Value $appinfo -NoNewline
 
           # Copy the release binary into the PAF structure
-          New-Item -ItemType Directory -Force -Path portable\FerriteMDPortable\App\Ferrite | Out-Null
-          Copy-Item target\release\ferrite.exe portable\FerriteMDPortable\App\Ferrite\ferrite.exe
+          New-Item -ItemType Directory -Force -Path portable\ForgepadPortable\App\Forgepad | Out-Null
+          Copy-Item target\release\forgepad.exe portable\ForgepadPortable\App\Forgepad\forgepad.exe
 
           # Compile the .paf.exe installer with NSIS
           choco install nsis -y --no-progress
           $nsisExe = "C:\Program Files (x86)\NSIS\makensis.exe"
           & $nsisExe /DAPPVERSION=$version portable\installer.nsi
-          Copy-Item "portable\FerriteMDPortable_${version}_English.paf.exe" .\ferrite-portableapps.paf.exe
+          Copy-Item "portable\ForgepadPortable_${version}_English.paf.exe" .\forgepad-portableapps.paf.exe
 
       # Upload Windows artifacts together for SignPath signing
       - name: Upload unsigned Windows artifacts for signing
@@ -146,15 +146,15 @@ jobs:
         with:
           name: unsigned-windows-artifacts
           path: |
-            ferrite-portable-windows-x64.zip
-            ferrite-windows-x64.msi
-            ferrite-portableapps.paf.exe
+            forgepad-portable-windows-x64.zip
+            forgepad-windows-x64.msi
+            forgepad-portableapps.paf.exe
 
       - name: Upload unsigned Inno Setup installer
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-windows-inno-setup
-          path: ferrite-windows-x64-setup.exe
+          name: forgepad-windows-inno-setup
+          path: forgepad-windows-x64-setup.exe
 
   # Sign Windows artifacts with SignPath (OSS code signing)
   sign-windows:
@@ -173,7 +173,7 @@ jobs:
         with:
           api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
           organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
-          project-slug: 'Ferrite'
+          project-slug: 'Forgepad'
           signing-policy-slug: 'release-signing'
           github-artifact-id: '${{ needs.build-windows.outputs.artifact-id }}'
           wait-for-completion: true
@@ -185,20 +185,20 @@ jobs:
       - name: Upload signed portable zip
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-portable-windows-x64
-          path: signed/ferrite-portable-windows-x64.zip
+          name: forgepad-portable-windows-x64
+          path: signed/forgepad-portable-windows-x64.zip
 
       - name: Upload signed MSI
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-windows-msi
-          path: signed/ferrite-windows-x64.msi
+          name: forgepad-windows-msi
+          path: signed/forgepad-windows-x64.msi
 
       - name: Upload signed PortableApps installer
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-portableapps
-          path: signed/ferrite-portableapps.paf.exe
+          name: forgepad-portableapps
+          path: signed/forgepad-portableapps.paf.exe
 
   build-linux:
     name: Build Linux
@@ -227,8 +227,8 @@ jobs:
       - name: Create release archive
         run: |
           mkdir release
-          cp target/release/ferrite release/
-          tar -czvf ferrite-linux-x64.tar.gz -C release .
+          cp target/release/forgepad release/
+          tar -czvf forgepad-linux-x64.tar.gz -C release .
 
       - name: Build .deb package (Debian/Ubuntu)
         run: cargo deb --no-build
@@ -238,26 +238,26 @@ jobs:
 
       - name: Copy packages to workspace root
         run: |
-          cp target/debian/*.deb ./ferrite-editor_amd64.deb
-          cp target/generate-rpm/*.rpm ./ferrite-editor.x86_64.rpm
+          cp target/debian/*.deb ./forgepad-editor_amd64.deb
+          cp target/generate-rpm/*.rpm ./forgepad-editor.x86_64.rpm
 
       - name: Upload tar.gz artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-linux-x64
-          path: ferrite-linux-x64.tar.gz
+          name: forgepad-linux-x64
+          path: forgepad-linux-x64.tar.gz
 
       - name: Upload .deb artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-linux-deb
-          path: ferrite-editor_amd64.deb
+          name: forgepad-linux-deb
+          path: forgepad-editor_amd64.deb
 
       - name: Upload .rpm artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-linux-rpm
-          path: ferrite-editor.x86_64.rpm
+          name: forgepad-linux-rpm
+          path: forgepad-editor.x86_64.rpm
 
   build-macos-arm64:
     name: Build macOS (Apple Silicon)
@@ -278,8 +278,8 @@ jobs:
       - name: Generate macOS .icns icon
         run: |
           if [ -d "assets/icons/macos/app.iconset" ]; then
-            iconutil -c icns assets/icons/macos/app.iconset -o assets/icons/macos/Ferrite.icns
-            echo "Generated Ferrite.icns"
+            iconutil -c icns assets/icons/macos/app.iconset -o assets/icons/macos/Forgepad.icns
+            echo "Generated Forgepad.icns"
           else
             echo "Warning: app.iconset not found, skipping .icns generation"
           fi
@@ -290,27 +290,27 @@ jobs:
       - name: Create release archive
         run: |
           mkdir release
-          cp -R target/release/bundle/osx/Ferrite.app release/
-          tar -czvf ferrite-macos-arm64.tar.gz -C release .
+          cp -R target/release/bundle/osx/Forgepad.app release/
+          tar -czvf forgepad-macos-arm64.tar.gz -C release .
 
       - name: Create DMG installer
         run: |
           mkdir -p dmg-staging
-          cp -R target/release/bundle/osx/Ferrite.app dmg-staging/
+          cp -R target/release/bundle/osx/Forgepad.app dmg-staging/
           ln -s /Applications dmg-staging/Applications
-          hdiutil create -volname "Ferrite" -srcfolder dmg-staging -ov -format UDZO "ferrite-macos-arm64.dmg"
+          hdiutil create -volname "Forgepad" -srcfolder dmg-staging -ov -format UDZO "forgepad-macos-arm64.dmg"
 
       - name: Upload tar.gz artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-macos-arm64
-          path: ferrite-macos-arm64.tar.gz
+          name: forgepad-macos-arm64
+          path: forgepad-macos-arm64.tar.gz
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-macos-arm64-dmg
-          path: ferrite-macos-arm64.dmg
+          name: forgepad-macos-arm64-dmg
+          path: forgepad-macos-arm64.dmg
 
   build-macos-intel:
     name: Build macOS (Intel)
@@ -336,27 +336,27 @@ jobs:
       - name: Create release archive
         run: |
           mkdir release
-          cp -R target/x86_64-apple-darwin/release/bundle/osx/Ferrite.app release/
-          tar -czvf ferrite-macos-x64.tar.gz -C release .
+          cp -R target/x86_64-apple-darwin/release/bundle/osx/Forgepad.app release/
+          tar -czvf forgepad-macos-x64.tar.gz -C release .
 
       - name: Create DMG installer
         run: |
           mkdir -p dmg-staging
-          cp -R target/x86_64-apple-darwin/release/bundle/osx/Ferrite.app dmg-staging/
+          cp -R target/x86_64-apple-darwin/release/bundle/osx/Forgepad.app dmg-staging/
           ln -s /Applications dmg-staging/Applications
-          hdiutil create -volname "Ferrite" -srcfolder dmg-staging -ov -format UDZO "ferrite-macos-x64.dmg"
+          hdiutil create -volname "Forgepad" -srcfolder dmg-staging -ov -format UDZO "forgepad-macos-x64.dmg"
 
       - name: Upload tar.gz artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-macos-x64
-          path: ferrite-macos-x64.tar.gz
+          name: forgepad-macos-x64
+          path: forgepad-macos-x64.tar.gz
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ferrite-macos-x64-dmg
-          path: ferrite-macos-x64.dmg
+          name: forgepad-macos-x64-dmg
+          path: forgepad-macos-x64.dmg
 
   # NOTE: musl static build disabled - GUI apps with font rendering (freetype, fontconfig)
   # and graphics (X11/Wayland) dependencies cannot be easily built as static musl binaries.
@@ -376,80 +376,80 @@ jobs:
       - name: Download signed Windows portable zip
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-portable-windows-x64
+          name: forgepad-portable-windows-x64
 
       - name: Download signed Windows MSI
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-windows-msi
+          name: forgepad-windows-msi
 
       - name: Download Linux artifact
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-linux-x64
+          name: forgepad-linux-x64
 
       - name: Download Linux .deb artifact
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-linux-deb
+          name: forgepad-linux-deb
 
       - name: Download Linux .rpm artifact
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-linux-rpm
+          name: forgepad-linux-rpm
 
       - name: Download macOS ARM64 artifact
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-macos-arm64
+          name: forgepad-macos-arm64
 
       - name: Download macOS ARM64 DMG
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-macos-arm64-dmg
+          name: forgepad-macos-arm64-dmg
 
       - name: Download macOS Intel artifact
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-macos-x64
+          name: forgepad-macos-x64
 
       - name: Download macOS Intel DMG
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-macos-x64-dmg
+          name: forgepad-macos-x64-dmg
 
       - name: Download signed PortableApps installer
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-portableapps
+          name: forgepad-portableapps
 
       - name: Download unsigned Inno Setup installer
         uses: actions/download-artifact@v4
         with:
-          name: ferrite-windows-inno-setup
+          name: forgepad-windows-inno-setup
 
       - name: Rename PortableApps installer with version
         run: |
           VERSION="${{ github.ref_name }}"
           VERSION="${VERSION#v}"
-          mv ferrite-portableapps.paf.exe "FerriteMDPortable_${VERSION}_English.paf.exe"
+          mv forgepad-portableapps.paf.exe "ForgepadPortable_${VERSION}_English.paf.exe"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: Ferrite ${{ github.ref_name }}
+          name: Forgepad ${{ github.ref_name }}
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true
           files: |
-            ferrite-portable-windows-x64.zip
-            ferrite-windows-x64.msi
-            ferrite-linux-x64.tar.gz
-            ferrite-editor_amd64.deb
-            ferrite-editor.x86_64.rpm
-            ferrite-macos-arm64.dmg
-            ferrite-macos-arm64.tar.gz
-            ferrite-macos-x64.dmg
-            ferrite-macos-x64.tar.gz
-            FerriteMDPortable_*_English.paf.exe
-            ferrite-windows-x64-setup.exe
+            forgepad-portable-windows-x64.zip
+            forgepad-windows-x64.msi
+            forgepad-linux-x64.tar.gz
+            forgepad-editor_amd64.deb
+            forgepad-editor.x86_64.rpm
+            forgepad-macos-arm64.dmg
+            forgepad-macos-arm64.tar.gz
+            forgepad-macos-x64.dmg
+            forgepad-macos-x64.tar.gz
+            ForgepadPortable_*_English.paf.exe
+            forgepad-windows-x64-setup.exe

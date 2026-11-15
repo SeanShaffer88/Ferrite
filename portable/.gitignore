@@ -5,10 +5,10 @@
 tools/
 
 # The release binary is copied here during builds — don't commit
-FerriteMDPortable/App/Ferrite/ferrite.exe
+ForgepadPortable/App/Forgepad/forgepad.exe
 
 # Icons are generated from source during CI — don't commit
-FerriteMDPortable/App/AppInfo/appicon.ico
-FerriteMDPortable/App/AppInfo/appicon_16.png
-FerriteMDPortable/App/AppInfo/appicon_32.png
-FerriteMDPortable/App/AppInfo/appicon_128.png
+ForgepadPortable/App/AppInfo/appicon.ico
+ForgepadPortable/App/AppInfo/appicon_16.png
+ForgepadPortable/App/AppInfo/appicon_32.png
+ForgepadPortable/App/AppInfo/appicon_128.png

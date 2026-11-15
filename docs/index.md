@@ -3,14 +3,14 @@
 > **Index rules:** This file is a documentation map only. Do not add project history, task lists, architecture overviews, or session notes. When adding docs, append a single bullet with a one-line description under the appropriate section.
 
 ## Core Context
-- `ai-context.md` - Ferrite v0.3.1 — Leftover Bug Fix & Editor Closeout (PRD) agent rules, architecture, and where things live.
+- `ai-context.md` - Forgepad v0.3.1 — Leftover Bug Fix & Editor Closeout (PRD) agent rules, architecture, and where things live.
 
 ## Technical Docs
 - `technical/config/atomic-config-save.md` — Atomic `config.json.tmp` save; `config.json.bak` is the previous file; failed full load does not overwrite `.bak` until `note_user_settings_edit`.
 - `technical/config/settings-debounced-save.md` — SI-4 / ISS-74: Settings toggles flush to `config.json` after 500 ms debounce (`poll_settings_save_debounce`) or immediately when the Settings tab closes; round 3 anchors the debounce on the first unsaved change, uses one clock, and stops per-frame geometry dirtying.
 - `technical/config/corrupt-config-rename.md` — Syntax-invalid `config.json` renamed to `config.json.corrupt-YYYYMMDD-HHMMSS` (keep 3); defaults loaded; `ConfigLoadOutcome::CorruptFileRenamed` and `AppState.corrupt_config_renamed_to`.
 - `technical/config/tolerant-settings-load.md` — Per-field tolerant `config.json` load (ISS-9): `from_json_tolerant`, `TolerantSettingsLoad.dropped_field_count`, wired in `load_config_internal` after the file parses as JSON.
-- `technical/config/config-load-toasts.md` — One-shot startup toasts for corrupt config rename and invalid-field recovery; `notification.config_*` locale keys; `show_pending_config_load_toasts` in `FerriteApp`.
+- `technical/config/config-load-toasts.md` — One-shot startup toasts for corrupt config rename and invalid-field recovery; `notification.config_*` locale keys; `show_pending_config_load_toasts` in `ForgepadApp`.
 - `technical/config/temp-data-dir-test-helper.md` — `with_temp_data_dir` isolates config/session tests; audit fails if a test calls `get_config_dir()` outside that helper.
 - `technical/config/shipped-language-locales.md` — ISS-56: all 10 `locales/*.yaml` in `Language::all()`; ja/zh_Hans title-bar and keyboard command keys; `language_all_matches_locale_files` + extended `locale_keys_exist_in_all_yaml`.
 - `technical/platform/macos-open-with.md` — macOS Finder Open With (#154); winit 0.30 openURLs inject + AE queue; cold/warm tab routing via `handle_macos_open_paths`; CLI escape hatch.
@@ -20,7 +20,7 @@
 - `technical/platform/linux-custom-title-bar-iss-54.md` — ISS-54: Linux X11 custom title bar double-click restore + drag-from-maximised; `PreMaximizeGeometry` temp storage; `title_bar_drag` state machine and deferred `StartDrag`.
 - `technical/platform/emoji-rendering-limitation.md` — ISS-30: epaint outline-only emoji (no CBDT/COLR colour); U+FE0F zero-width via patched `vendor/epaint` + pre-warm filters in `src/fonts.rs`.
 - `technical/files/session-persistence.md` - Session save/restore, crash recovery, identity-gated recovery, live-PID `session.lock` staleness, `--new-instance` session/config isolation, Quick note exit-dialog line, and workspace file-watcher external reload.
-- `technical/files/session-restore-caret-only.md` — ISS-36: restore applies caret only (drops persisted selection); `Tab::apply_restored_caret_only`, `pending_restore_editor_reset`, `FerriteEditor::reset_transient_input_state` on first raw frame.
+- `technical/files/session-restore-caret-only.md` — ISS-36: restore applies caret only (drops persisted selection); `Tab::apply_restored_caret_only`, `pending_restore_editor_reset`, `ForgepadEditor::reset_transient_input_state` on first raw frame.
 - `technical/files/iss-36-session-restore-typing-investigation.md` — ISS-36 SES-6 investigation: automated restore-then-type did not reproduce the buffer replacement; hardening from the caret, checkout, and anomalous-undo work; QA row needs a second sighting.
 - `technical/files/recovery-conflict-banner.md` — Recovery-vs-disk banner hides when the live buffer matches the restore-time disk snapshot and shows again on a later edit (`recovery_conflict_banner_visible`).
 - `technical/files/closed-tab-recovery.md` — Tab close deletes `recovery/<id>.json`, rewrites `session.recovery.json` to the live tab set, and prunes other recovery blobs (`discard_closed_tab_recovery`).
@@ -40,14 +40,14 @@
 - `technical/editor/indent-selection.md` — Raw Tab/Shift+Tab block indent/outdent (#177, ISS-51, ISS-67); any non-empty range (single- or multi-line) indents its lines instead of replacing text; outdent strips one leading `\t` before spaces; soft/hard insert from settings; multi-cursor; rendered list Tab not implemented (ISS-71).
 - `technical/editor/undo-coalescing.md` — Typing-run undo merge via `record_with_meta` (700 ms); raw editor via `record_external_edit_from_snapshot_coalesced`; focus/mode/caret-jump breaks; Split/Rendered fenced code blocks are one group on Done or focus-out.
 - `technical/editor/auto-close-brackets.md` — Auto-pair, wrap, and skip-over; type-through and backtick/quote-run guards via `should_insert_auto_closer`; mermaid-fence and parenthesis caret regression tests.
-- `technical/editor/ferrite-editor.md` — FerriteEditor widget architecture and input; Raw Enter is plain newline only—no list-marker continuation (ISS-49/STAT-3; Rendered uses `split_list_item`).
-- `technical/editor/ferrite-editor-storage-checkout.md` — ISS-36: per-tab `Option<FerriteEditor>` slot (no `mem::replace` placeholder); `get_ferrite_editor_mut` returns `None` while checked out for `EditorWidget::show`.
+- `technical/editor/forgepad-editor.md` — ForgepadEditor widget architecture and input; Raw Enter is plain newline only—no list-marker continuation (ISS-49/STAT-3; Rendered uses `split_list_item`).
+- `technical/editor/forgepad-editor-storage-checkout.md` — ISS-36: per-tab `Option<ForgepadEditor>` slot (no `mem::replace` placeholder); `get_forgepad_editor_mut` returns `None` while checked out for `EditorWidget::show`.
 - `technical/editor/anomalous-buffer-shrink-undo.md` — ISS-36: classify large one-frame buffer shrinks; error log + dedicated undo groups (`record_anomalous_buffer_shrink_groups`) so one Ctrl+Z restores pre-frame text; never blocks the edit.
 - `technical/editor/primary-selection-paste.md` — Linux X11/Wayland primary selection (#183); 150 ms debounced publish; raw-editor middle-click paste; Linux-only setting.
 - `technical/editor/spellcheck.md` — Spellcheck (#184): bundled en_US Hunspell, Markdown tokenizer (`MIN_SPELLCHECK_WORD_CHARS` 3, link text vs URL skips), worker; Settings toggle (off by default); raw-only 300-squiggle cap, context-menu suggestions, status-bar loading.
-- `technical/editor/diagnostic-squiggle-wrap.md` — ISS-48: spell/LSP squiggles under wrapped lines via `rendering/squiggle.rs` (galley row `x_offset`, per-row segments); tests `cargo test --bin ferrite squiggle`.
+- `technical/editor/diagnostic-squiggle-wrap.md` — ISS-48: spell/LSP squiggles under wrapped lines via `rendering/squiggle.rs` (galley row `x_offset`, per-row segments); tests `cargo test --bin forgepad squiggle`.
 - `technical/editor/diagnostic-hover-popup-guard.md` — SPL-3 / ISS-75: suppress raw diagnostic hover tooltips (spell “Unknown word”, LSP) while a context menu/popup is open; `any_popup_open` in `src/app/mod.rs` combines same-pass, memory-tracked and previous-frame popup state so the tooltip is suppressed before the context menu renders.
-- `technical/editor/raw-table-column-guides.md` — ISS-61: Raw GFM table column guides per row from each line’s galley (`pos_from_cursor`); monospace keeps header continuous segments; wrap-off only with `TABLE_GUIDES_DISABLED_WRAP_REASON`; tests `cargo test --bin ferrite table_guides`.
+- `technical/editor/raw-table-column-guides.md` — ISS-61: Raw GFM table column guides per row from each line’s galley (`pos_from_cursor`); monospace keeps header continuous segments; wrap-off only with `TABLE_GUIDES_DISABLED_WRAP_REASON`; tests `cargo test --bin forgepad table_guides`.
 - `technical/document-statistics.md` — Stats panel metrics, `DocumentStats` struct, and caching.
 - `technical/markdown/rendered-edit-container-prefix.md` — Canonical `split_container_prefix` for Rendered/Split click-to-edit: seed without `>` / list markers, re-attach on commit; AST heading level and culled `end_line`.
 - `technical/markdown/rendered-edit-source-range.md` - Span math for rendered paragraph/list commits (`block_replace_end_line`, `update_source_range`); fixes multi-line buffer duplication without bumping `source_epoch`.
@@ -92,12 +92,12 @@
 - `technical/ui/settings-all-view-scroll.md` — ISS-14: All chip shows recents + Essentials only; content `ScrollArea` uses `auto_shrink([false,false])` + `max_height(available_height())` so long lists scroll in the tab.
 - `technical/ui/status-bar.md` — Bottom bar: cached `Tab::text_stats()` via `content_version` (ISS-25), line ops/`record_edit` bumps, Vim label gated on `settings.vim_mode`.
 - `technical/ui/emoji-font-fallback.md` — OS emoji font fallback on Proportional/Monospace for document text (#168); Phosphor UI icons unchanged.
-- `technical/ui/settings-search-emoji-font.md` — ISS-29: Settings search `ferrite-settings-input` font (bundled Noto Emoji before OS color); Phosphor family inherits Proportional fallbacks for epaint replacement glyphs.
+- `technical/ui/settings-search-emoji-font.md` — ISS-29: Settings search `forgepad-settings-input` font (bundled Noto Emoji before OS color); Phosphor family inherits Proportional fallbacks for epaint replacement glyphs.
 - `technical/ui/rendered-raw-fonts.md` — Separate Rendered-view font (`rendered_font_family`, None = same as editor) and keyed `custom:<name>` registry via `FontSelection` (#176).
 - `technical/terminal/terminal-nerd-fonts.md` — Terminal font picker (`terminal_font_family`) and lazy Nerd Font PUA fallback with cell clipping (#185).
 - `technical/terminal/terminal-settings-validation.md` — Non-blocking red hints for terminal startup command, prompt regex lines, and custom sound path (ISS-19); validators in `terminal_validation.rs`.
 - `technical/ui/ribbon-window-control.md` - New Window icon in the ribbon right cluster (beside Export/Terminal); title-bar Window menu removed; `RibbonAction::NewWindow` wiring unchanged.
-- `technical/ui/raw-editor-context-menu.md` - Raw FerriteEditor right-click menu (Copy/Cut/Paste/Select All/Undo); `EditorWidget` + app-level undo via `EditorOutput.request_undo`.
+- `technical/ui/raw-editor-context-menu.md` - Raw ForgepadEditor right-click menu (Copy/Cut/Paste/Select All/Undo); `EditorWidget` + app-level undo via `EditorOutput.request_undo`.
 - `technical/ui/tab-context-menu.md` - Tab strip right-click menu; i18n labels (`tab.new_tab`/`tab.close`), hover rows via background-layer fill, content-sized popup in `action_registry.rs`.
 - `technical/ui/command-palette.md` - Searchable command launcher (Alt+Space); deferred dispatch, fuzzy search, palette-only commands via unbound defaults.
 - `technical/ui/preview-lock.md` - Per-tab preview read-only flag; padlock overlay, command-palette **Lock editing** toggle, session persistence, markdown/CSV/tree gating.
@@ -127,7 +127,7 @@
 - `../grokbot/november/rerun-v0.3.1-round4.md` — Round-4 hand-off GrokBot executed against `e56243c` (ISS-76/77/78 arrow nav + status bar + locked preview, ISS-79 Mermaid curve, SES-3 window close, sanity rows); Section E still lists the ISS-69 YouTube rows.
 - `../grokbot/november/rerun4/qa-rerun4-report-v0.3.1-linux.md` — Round-4 report at `e56243c` / HEAD `1ad150b` (33 rows, 22 PASS / 0 FAIL / 1 PARTIAL / 10 BLOCKED, no ISS-80+); ISS-76…79 and SES-3a–h fixed; only ISS-69 (task 1) still blocks the Linux gate.
 - `technical/platform/v0.3.1-grok-bot-qa-brief.md` — Original hand-off brief for an autonomous Linux agent: build `0.3.1-experimental`, run the automated gate + minimal/total checklists with Linux translations, extra rows for #176/#178/#183–#186, and the report format.
-- `technical/platform/grokbot-qa-tier-a-rerun.md` — Ship gate: Windows agent preflight (`cargo test --bin ferrite`, clippy); Linux Xvfb re-run checklist for ISS-2/5/6/7/9 rows and QA report updates.
+- `technical/platform/grokbot-qa-tier-a-rerun.md` — Ship gate: Windows agent preflight (`cargo test --bin forgepad`, clippy); Linux Xvfb re-run checklist for ISS-2/5/6/7/9 rows and QA report updates.
 - `technical/platform/grokbot-qa-tier-b-status.md` — Tier B closeout (round 1 tasks 22–27) for ISS-12/13/14/18/24/29/54 with links to feature docs; statuses now also in the canonical report.
 - `technical/platform/grokbot-qa-round2-rerun-gate.md` — Round 2 close-out GrokBot handoff, QA report Status semantics, and §9 ship gate; FAILs become new issues.
 

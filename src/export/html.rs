@@ -857,7 +857,7 @@ pub fn generate_html_document_export(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Ferrite">
+    <meta name="generator" content="Forgepad">
     <title>{title}</title>
     <style>
 {styles}

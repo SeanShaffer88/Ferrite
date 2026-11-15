@@ -1,7 +1,7 @@
 # Developer tools
 
 Tools for the config and data files developers edit every day, plus the
-command-line behaviour needed to use Ferrite as `$EDITOR`. Everything works
+command-line behaviour needed to use Forgepad as `$EDITOR`. Everything works
 offline. Credits and licenses: [`devtools-credits.md`](devtools-credits.md).
 
 The on/off switches and the commit-message column are also in **Settings → Editor** (search "developer"). All settings live under `"devtools"` in `config.json`:
@@ -98,26 +98,26 @@ compared by value: key order and formatting do not count, and the report
 lists each added, removed and changed path. Other files get a line diff. The
 report opens as a new tab.
 
-From the terminal: `ferrite --diff old.json new.json` (see below).
+From the terminal: `forgepad --diff old.json new.json` (see below).
 
 ### Change bars
 
 In Raw and Split view, the gutter shows how each line differs from the last
 commit (git `HEAD`): a **green** bar for added lines, **blue** for changed
 lines, and a **red** mark where lines were deleted. Bars update as you type
-and pick up commits made outside Ferrite within a few seconds. Files over
+and pick up commits made outside Forgepad within a few seconds. Files over
 2 MB are skipped. Turn off with `devtools.git_gutter: false` or in
 Settings → Editor.
 
 ## Command line
 
 ```text
-ferrite file.rs:40          open at line 40
-ferrite file.rs:40:5        line 40, column 5
-ferrite --goto file.rs:40   same, explicit
-ferrite -                   read standard input into a new tab
-ferrite --wait file         return only when the tab is closed
-ferrite --diff a b          compare two files
+forgepad file.rs:40          open at line 40
+forgepad file.rs:40:5        line 40, column 5
+forgepad --goto file.rs:40   same, explicit
+forgepad -                   read standard input into a new tab
+forgepad --wait file         return only when the tab is closed
+forgepad --diff a b          compare two files
 ```
 
 - `path:line[:col]` only splits off numbers ≥ 1, so `x.rs:abc`, `x.rs:0` and
@@ -125,18 +125,18 @@ ferrite --diff a b          compare two files
   literally named `x:12` exists, it is opened as-is.
 - A line past the end goes to the last line; a column past the line end goes
   to the end of the line.
-- If Ferrite is already running, the file opens in that window, at the given
+- If Forgepad is already running, the file opens in that window, at the given
   position.
 - `-` reads up to 64 MB of standard input (invalid UTF-8 is replaced) into a
-  file in Ferrite's per-user cache folder and opens it.
+  file in Forgepad's per-user cache folder and opens it.
 
 Full reference: [`cli.md`](cli.md).
 
-## Use Ferrite as `$EDITOR`
+## Use Forgepad as `$EDITOR`
 
 `--wait` (`-w`) makes the command block until you close the tab(s) it opened,
 which is what git, crontab and similar tools need. Closing the tab, the
-window, or quitting Ferrite all count as closing. If Ferrite crashes or is
+window, or quitting Forgepad all count as closing. If Forgepad crashes or is
 killed first, the waiting command exits with code **1**, so git aborts the
 commit instead of using a half-written message.
 
@@ -148,34 +148,34 @@ reopened by session restore.
 **Git (all platforms):**
 
 ```bash
-git config --global core.editor "ferrite --wait"
+git config --global core.editor "forgepad --wait"
 ```
 
 **bash / zsh** (`~/.bashrc` or `~/.zshrc`):
 
 ```bash
-export EDITOR="ferrite --wait"
+export EDITOR="forgepad --wait"
 export VISUAL="$EDITOR"
 ```
 
 **PowerShell** (`$PROFILE`):
 
 ```powershell
-$env:EDITOR = "ferrite --wait"
+$env:EDITOR = "forgepad --wait"
 ```
 
-**crontab:** with `EDITOR` set as above, `crontab -e` opens in Ferrite.
+**crontab:** with `EDITOR` set as above, `crontab -e` opens in Forgepad.
 
-**Where the binary is:** if `ferrite` is not on `PATH`, use the full path:
+**Where the binary is:** if `forgepad` is not on `PATH`, use the full path:
 
 | OS | Typical path |
 |---|---|
-| Windows (MSI) | `C:\Program Files\Ferrite\ferrite.exe` |
-| macOS (DMG) | `/Applications/Ferrite.app/Contents/MacOS/ferrite` |
-| Linux (.deb / .rpm) | `/usr/bin/ferrite` |
+| Windows (MSI) | `C:\Program Files\Forgepad\forgepad.exe` |
+| macOS (DMG) | `/Applications/Forgepad.app/Contents/MacOS/forgepad` |
+| Linux (.deb / .rpm) | `/usr/bin/forgepad` |
 
 On Windows, quote paths with spaces for git:
-`git config --global core.editor "'C:/Program Files/Ferrite/ferrite.exe' --wait"`.
+`git config --global core.editor "'C:/Program Files/Forgepad/forgepad.exe' --wait"`.
 
 ## Docs workbench
 

@@ -28,12 +28,12 @@ jobs:
         shell: pwsh
         run: |
           mkdir release
-          copy target\release\ferrite.exe release\
-          Compress-Archive -Path release\* -DestinationPath ferrite-windows-x64-unsigned.zip
+          copy target\release\forgepad.exe release\
+          Compress-Archive -Path release\* -DestinationPath forgepad-windows-x64-unsigned.zip
       - uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: ferrite-windows-x64-unsigned.zip
+          path: forgepad-windows-x64-unsigned.zip
 
   build-linux:
     name: Build Linux
@@ -50,12 +50,12 @@ jobs:
       - name: Package
         run: |
           mkdir release
-          cp target/release/ferrite release/
-          tar -czvf ferrite-linux-x64.tar.gz -C release .
+          cp target/release/forgepad release/
+          tar -czvf forgepad-linux-x64.tar.gz -C release .
       - uses: actions/upload-artifact@v4
         with:
           name: linux
-          path: ferrite-linux-x64.tar.gz
+          path: forgepad-linux-x64.tar.gz
 
   build-macos:
     name: Build macOS (Apple Silicon, unsigned)
@@ -68,12 +68,12 @@ jobs:
       - name: Package
         run: |
           mkdir release
-          cp target/release/ferrite release/
-          tar -czvf ferrite-macos-arm64-unsigned.tar.gz -C release .
+          cp target/release/forgepad release/
+          tar -czvf forgepad-macos-arm64-unsigned.tar.gz -C release .
       - uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: ferrite-macos-arm64-unsigned.tar.gz
+          path: forgepad-macos-arm64-unsigned.tar.gz
 
   release:
     name: Publish pre-release
@@ -88,7 +88,7 @@ jobs:
           merge-multiple: true
       - uses: softprops/action-gh-release@v1
         with:
-          name: Ferrite ${{ github.ref_name }} (test build)
+          name: Forgepad ${{ github.ref_name }} (test build)
           prerelease: true
           draft: false
           body: |
@@ -96,7 +96,7 @@ jobs:
             Not an official release. Windows SmartScreen and macOS Gatekeeper will warn
             because the binaries are not signed.
 
-            - Windows: unzip and run `ferrite.exe`.
-            - Linux: `tar -xzf ferrite-linux-x64.tar.gz && ./ferrite`
-            - macOS: `tar -xzf ferrite-macos-arm64-unsigned.tar.gz && xattr -d com.apple.quarantine ferrite && ./ferrite`
+            - Windows: unzip and run `forgepad.exe`.
+            - Linux: `tar -xzf forgepad-linux-x64.tar.gz && ./forgepad`
+            - macOS: `tar -xzf forgepad-macos-arm64-unsigned.tar.gz && xattr -d com.apple.quarantine forgepad && ./forgepad`
           files: dist/*

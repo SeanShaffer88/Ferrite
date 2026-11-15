@@ -1,4 +1,4 @@
-# Ferrite - English (Base Language)
+# Forgepad - English (Base Language)
 # This file contains all user-facing strings for internationalization.
 # Naming convention: category.subcategory.key (e.g., menu.file.open)
 
@@ -239,9 +239,9 @@ settings:
     remember_files: ""
     files_count: ""
     show_welcome: "Zobrazit uvítání při prázdném spuštění"
-    show_welcome_tooltip: "Otevřít kartu Vítejte, když se Ferrite spustí bez dokumentů."
-    allow_multiple_instances: "Povolit více oken/instancí Ferrite"
-    allow_multiple_instances_tooltip: "Je-li zapnuto, každé spuštění otevře nové okno Ferrite místo předání souborů běžící instanci. Přepínač --new-instance platí pro jedno spuštění."
+    show_welcome_tooltip: "Otevřít kartu Vítejte, když se Forgepad spustí bez dokumentů."
+    allow_multiple_instances: "Povolit více oken/instancí Forgepad"
+    allow_multiple_instances_tooltip: "Je-li zapnuto, každé spuštění otevře nové okno Forgepad místo předání souborů běžící instanci. Přepínač --new-instance platí pro jedno spuštění."
   appearance:
     title: ""
     language: ""

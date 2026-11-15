@@ -1,10 +1,10 @@
-# Ferrite - German (Deutsch)
+# Forgepad - German (Deutsch)
 # This file contains all user-facing strings for internationalization.
 # Naming convention: category.subcategory.key (e.g., menu.file.open)
 
 # Application metadata
 app:
-  name: "Ferrite"
+  name: "Forgepad"
 
 # Menu bar items
 menu:
@@ -132,7 +132,7 @@ settings:
   recently_changed: "Zuletzt geändert"
   essentials: "Wichtigste Einstellungen"
   essentials_hint: "Häufig genutzte Einstellungen. Nutzen Sie die Suche oder die Kategorie-Filter oben, um alles zu sehen."
-  about_button_tooltip: "Über Ferrite, Updates und Links"
+  about_button_tooltip: "Über Forgepad, Updates und Links"
   default_view_hint: "Ansicht für neue Registerkarten (die bestehenden Tabs behalten
     ihre Ansicht)"
   font_size:
@@ -286,9 +286,9 @@ settings:
     remember_files: "Merke die letzten %{count} Dateien"
     files_count: "%{count} Dateien"
     show_welcome: "Willkommen bei leerem Start anzeigen"
-    show_welcome_tooltip: "Die Willkommensseite öffnen, wenn Ferrite ohne geladene Dokumente startet."
-    allow_multiple_instances: "Mehrere Ferrite-Fenster/Instanzen zulassen"
-    allow_multiple_instances_tooltip: "Wenn aktiviert, öffnet jeder Start ein neues Ferrite-Fenster statt Dateien an die laufende Instanz weiterzuleiten. Das Flag --new-instance gilt für einen einzelnen Start."
+    show_welcome_tooltip: "Die Willkommensseite öffnen, wenn Forgepad ohne geladene Dokumente startet."
+    allow_multiple_instances: "Mehrere Forgepad-Fenster/Instanzen zulassen"
+    allow_multiple_instances_tooltip: "Wenn aktiviert, öffnet jeder Start ein neues Forgepad-Fenster statt Dateien an die laufende Instanz weiterzuleiten. Das Flag --new-instance gilt für einen einzelnen Start."
   appearance:
     title: "Aussehen"
     language: "Sprache"
@@ -297,9 +297,9 @@ settings:
     syntax_theme_hint: "Farbschema für Hervorhebung von Code-Syntax"
     syntax_theme_auto: "automatisch (passend zum App-Farbschema)"
     system_title_bar: "System-Titelleiste verwenden"
-    system_title_bar_hint: "Native Fenstertitelleiste anstelle der Ferrite-eigenen Titelleiste anzeigen."
-    system_title_bar_restart: "Starten Sie Ferrite neu, damit diese Änderung wirksam wird."
-    system_title_bar_windows_tooltip: "Unter Windows nicht unterstützt. Ferrite verwendet dort aufgrund von Rendering-Einschränkungen eine eigene Titelleiste."
+    system_title_bar_hint: "Native Fenstertitelleiste anstelle der Forgepad-eigenen Titelleiste anzeigen."
+    system_title_bar_restart: "Starten Sie Forgepad neu, damit diese Änderung wirksam wird."
+    system_title_bar_windows_tooltip: "Unter Windows nicht unterstützt. Forgepad verwendet dort aufgrund von Rendering-Einschränkungen eine eigene Titelleiste."
   keyboard:
     title: "Tastatur"
     reset_all: "Alle Tastenkürzel zurücksetzen"
@@ -495,7 +495,7 @@ about:
   # License section
   license: "Lizenz"
   license_type: "MIT-Lizenz"
-  copyright: "© 2026 Ferrite-Entwicklungshelfer"
+  copyright: "© 2026 Forgepad-Entwicklungshelfer"
   version: "Version %{version}"
 
 # Keyboard shortcuts
@@ -744,7 +744,7 @@ recovery:
     time_label: "Letzte Änderung: %{time}"
   session:
     title: "Sitzung wiederherstellen"
-    crash_detected: "Ferrite hat erkannt, dass die vorherige Sitzung nicht richtig
+    crash_detected: "Forgepad hat erkannt, dass die vorherige Sitzung nicht richtig
       beendet wurde."
     restore_question: "Letzte Sitzung wiederherstellen?"
     restore: "Sitzung wiederherstellen"
@@ -976,7 +976,7 @@ terminal:
     macros: Makros
   filter:
     terminal_layout: Terminal-Layout
-    ferrite_workspace: Ferrite-Arbeitsordner
+    ferrite_workspace: Forgepad-Arbeitsordner
   error:
     shell_not_found: Überprüfe, dass die Shell installiert und der Pfad korrekt 
       ist

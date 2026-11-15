@@ -1,10 +1,10 @@
-# Ferrite - English (Base Language)
+# Forgepad - English (Base Language)
 # This file contains all user-facing strings for internationalization.
 # Naming convention: category.subcategory.key (e.g., menu.file.open)
 
 # Application metadata
 app:
-  name: "Ferrite"
+  name: "Forgepad"
 
 # Menu bar items
 menu:
@@ -58,14 +58,14 @@ settings:
   clear_search: "Limpar pesquisa"
   files:
     show_welcome: "Mostrar boas-vindas ao iniciar vazio"
-    show_welcome_tooltip: "Abrir a aba de boas-vindas quando o Ferrite inicia sem documentos."
-    allow_multiple_instances: "Permitir várias janelas/instâncias do Ferrite"
-    allow_multiple_instances_tooltip: "Quando ativado, cada inicialização abre uma nova janela do Ferrite em vez de encaminhar os arquivos para a instância em execução. A opção --new-instance faz o mesmo para uma única inicialização."
+    show_welcome_tooltip: "Abrir a aba de boas-vindas quando o Forgepad inicia sem documentos."
+    allow_multiple_instances: "Permitir várias janelas/instâncias do Forgepad"
+    allow_multiple_instances_tooltip: "Quando ativado, cada inicialização abre uma nova janela do Forgepad em vez de encaminhar os arquivos para a instância em execução. A opção --new-instance faz o mesmo para uma única inicialização."
   appearance:
     system_title_bar: "Usar barra de título do sistema"
-    system_title_bar_hint: "Mostrar a barra de título nativa da janela em vez do chrome personalizado do Ferrite."
-    system_title_bar_restart: "Reinicie o Ferrite para que esta alteração tenha efeito."
-    system_title_bar_windows_tooltip: "Não suportado no Windows. O Ferrite usa chrome de janela personalizado no Windows devido a limitações de renderização."
+    system_title_bar_hint: "Mostrar a barra de título nativa da janela em vez do chrome personalizado do Forgepad."
+    system_title_bar_restart: "Reinicie o Forgepad para que esta alteração tenha efeito."
+    system_title_bar_windows_tooltip: "Não suportado no Windows. O Forgepad usa chrome de janela personalizado no Windows devido a limitações de renderização."
   editor:
     rendered_font_family: "Fonte da vista renderizada"
     same_as_editor: "Igual ao editor"

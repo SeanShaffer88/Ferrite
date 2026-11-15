@@ -159,7 +159,7 @@ pub fn log_memory(label: &str) {
 
 /// Ferrite - A fast, lightweight text editor for Markdown, JSON, and more.
 #[derive(Parser, Debug)]
-#[command(name = "ferrite", version, about, long_about = None)]
+#[command(name = "forgepad", version, about, long_about = None)]
 struct Cli {
     /// Files or directory to open on startup.
     ///
@@ -207,7 +207,7 @@ fn build_cli_targets(cli: &Cli) -> Result<Vec<devtools::cli_target::OpenTarget>,
                 .map_err(|e| format!("cannot read stdin: {e}"))?;
             if truncated {
                 eprintln!(
-                    "ferrite: stdin truncated at {} MB",
+                    "forgepad: stdin truncated at {} MB",
                     STDIN_CAP / (1024 * 1024)
                 );
             }
@@ -247,11 +247,12 @@ fn parse_log_level(s: &str) -> Result<LogLevel, String> {
 // can opt into native decorations via Settings → Appearance → Use system title bar.
 
 /// Application name constant.
-const APP_NAME: &str = "Ferrite";
+const APP_NAME: &str = "Forgepad";
 
 fn main() -> eframe::Result<()> {
     // Trace file works in release (no console on Windows). Check %TEMP%\ferrite_startup_trace.log
-    if std::env::var("FERRITE_DIAG")
+    if std::env::var("FORGEPAD_DIAG")
+        .or_else(|_| std::env::var("FERRITE_DIAG"))
         .ok()
         .is_some_and(|v| matches!(v.as_str(), "1" | "true" | "yes" | "on"))
     {
@@ -274,7 +275,7 @@ fn main() -> eframe::Result<()> {
     let cli_targets = match build_cli_targets(&cli) {
         Ok(t) => t,
         Err(msg) => {
-            eprintln!("ferrite: {msg}");
+            eprintln!("forgepad: {msg}");
             std::process::exit(2);
         }
     };
@@ -375,7 +376,7 @@ fn main() -> eframe::Result<()> {
     let mut viewport = crate::ui::apply_window_chrome(
         eframe::egui::ViewportBuilder::default()
             .with_title(APP_NAME)
-            .with_app_id("ferrite")
+            .with_app_id("forgepad")
             .with_inner_size([window_size.width, window_size.height])
             .with_min_inner_size([400.0, 300.0]),
         use_native_decorations,

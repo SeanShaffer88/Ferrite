@@ -1,6 +1,6 @@
-# Contributing to Ferrite
+# Contributing to Forgepad
 
-Thank you for your interest in contributing to Ferrite! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Forgepad! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -46,8 +46,8 @@ Please be respectful and constructive in all interactions. We welcome contributo
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/Ferrite.git
-cd Ferrite
+git clone https://github.com/YOUR_USERNAME/Forgepad.git
+cd Forgepad
 
 # Build debug version (faster compilation)
 cargo build
@@ -93,7 +93,7 @@ When `cargo build` reports `dead_code`, triage before silencing:
 
 1. **Remove** — Stale helpers, legacy modal `show()` methods superseded by special tabs, and other unreachable code with no callers.
 2. **Wire** — If the symbol is part of an incomplete feature (e.g. a shortcut variant with no `check_shortcut!` mapping), connect it or delete the dead path.
-3. **`#[allow(dead_code)]`** — Use only for intentional public API (FerriteEditor, `TextBuffer`, terminal VTE helpers, dialog result helpers). Prefer item- or `impl`-level allows with a one-line rationale; avoid crate-level allows except `#[cfg(test)]` helpers.
+3. **`#[allow(dead_code)]`** — Use only for intentional public API (ForgepadEditor, `TextBuffer`, terminal VTE helpers, dialog result helpers). Prefer item- or `impl`-level allows with a one-line rationale; avoid crate-level allows except `#[cfg(test)]` helpers.
 
 Do not run bulk deletion tools; review each warning. See `docs/technical/build-warnings-0.2.7.md` for the v0.2.7 warning inventory context.
 
@@ -217,7 +217,7 @@ refactor(theme): extract color constants to module
 src/
 ├── main.rs              # Entry point, eframe setup, memory allocators
 ├── app/                 # Main application (refactored from single app.rs)
-│   ├── mod.rs           # FerriteApp struct, update loop coordination
+│   ├── mod.rs           # ForgepadApp struct, update loop coordination
 │   ├── keyboard.rs      # Keyboard shortcut handling
 │   ├── input_handling.rs # Input processing
 │   ├── file_ops.rs      # File operations (open, save, close)
@@ -245,8 +245,8 @@ src/
 │   └── snippets.rs      # Text expansion snippets
 ├── editor/              # Text editor components
 │   ├── widget.rs        # EditorWidget wrapper
-│   ├── ferrite/         # Custom rope-based editor (high-performance)
-│   │   ├── editor.rs    # Main FerriteEditor widget
+│   ├── forgepad/         # Custom rope-based editor (high-performance)
+│   │   ├── editor.rs    # Main ForgepadEditor widget
 │   │   ├── buffer.rs    # TextBuffer (rope via ropey)
 │   │   ├── cursor.rs    # Cursor management
 │   │   ├── selection.rs # Selection handling
@@ -326,7 +326,7 @@ See [docs/index.md](docs/index.md) for detailed technical documentation.
 
 ## Translating
 
-Ferrite uses [Weblate](https://hosted.weblate.org/projects/ferrite/) for community translations. You can help translate Ferrite into your language!
+Forgepad shares its translations with upstream Ferrite on [Weblate](https://hosted.weblate.org/projects/ferrite/) for community translations. You can help translate Forgepad into your language!
 
 ### How to Contribute Translations
 
@@ -374,7 +374,7 @@ Releases are automated via GitHub Actions when a version tag is pushed (`git tag
 
 ### Code Signing (Windows)
 
-Windows binaries (`ferrite.exe` and `.msi` installer) are signed via [SignPath.io](https://signpath.io) with a certificate from [SignPath Foundation](https://signpath.org).
+Windows binaries (`forgepad.exe` and `.msi` installer) are signed via [SignPath.io](https://signpath.io) with a certificate from [SignPath Foundation](https://signpath.org).
 
 **Required GitHub repository secrets:**
 - `SIGNPATH_API_TOKEN` — API token from SignPath.io dashboard (user must have submitter permissions)

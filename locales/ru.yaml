@@ -1,10 +1,10 @@
-# Ferrite - English (Base Language)
+# Forgepad - English (Base Language)
 # This file contains all user-facing strings for internationalization.
 # Naming convention: category.subcategory.key (e.g., menu.file.open)
 
 # Application metadata
 app:
-  name: "Ferrite"
+  name: "Forgepad"
 
 # Menu bar items
 menu:
@@ -239,9 +239,9 @@ settings:
     remember_files: ""
     files_count: ""
     show_welcome: "Показывать приветствие при пустом запуске"
-    show_welcome_tooltip: "Открывать вкладку приветствия, если Ferrite запускается без документов."
-    allow_multiple_instances: "Разрешить несколько окон/экземпляров Ferrite"
-    allow_multiple_instances_tooltip: "Если включено, каждый запуск открывает новое окно Ferrite вместо передачи файлов уже запущенному экземпляру. Флаг --new-instance делает то же для одного запуска."
+    show_welcome_tooltip: "Открывать вкладку приветствия, если Forgepad запускается без документов."
+    allow_multiple_instances: "Разрешить несколько окон/экземпляров Forgepad"
+    allow_multiple_instances_tooltip: "Если включено, каждый запуск открывает новое окно Forgepad вместо передачи файлов уже запущенному экземпляру. Флаг --new-instance делает то же для одного запуска."
   appearance:
     title: ""
     language: ""

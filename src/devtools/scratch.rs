@@ -14,8 +14,8 @@ static COUNTER: AtomicU32 = AtomicU32::new(0);
 /// (falls back to the system temp directory when no cache dir is known).
 pub fn dir(sub: &str) -> PathBuf {
     dirs::cache_dir()
-        .map(|c| c.join("ferrite").join("generated"))
-        .unwrap_or_else(|| std::env::temp_dir().join("ferrite-generated"))
+        .map(|c| c.join("forgepad").join("generated"))
+        .unwrap_or_else(|| std::env::temp_dir().join("forgepad-generated"))
         .join(sub)
 }
 
