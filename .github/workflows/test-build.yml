@@ -1,0 +1,102 @@
+# Unsigned test builds for trying out a branch before an official release.
+# Usage: git tag test-v0.3.2-dev.1 && git push origin test-v0.3.2-dev.1
+#
+# Builds Windows, Linux and macOS binaries WITHOUT code signing (no SignPath
+# secrets needed) and publishes them as a GitHub pre-release. Official
+# releases still go through release.yml (tags `v*`).
+
+name: Test Build
+
+on:
+  push:
+    tags:
+      - 'test-v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-windows:
+    name: Build Windows (unsigned)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.92.0
+      - name: Build release
+        run: cargo build --release --locked
+      - name: Package
+        shell: pwsh
+        run: |
+          mkdir release
+          copy target\release\ferrite.exe release\
+          Compress-Archive -Path release\* -DestinationPath ferrite-windows-x64-unsigned.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: ferrite-windows-x64-unsigned.zip
+
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libsoup-3.0-dev libxcb-shape0-dev libxcb-xfixes0-dev libfontconfig1-dev
+      - uses: dtolnay/rust-toolchain@1.92.0
+      - name: Build release
+        run: cargo build --release --locked
+      - name: Package
+        run: |
+          mkdir release
+          cp target/release/ferrite release/
+          tar -czvf ferrite-linux-x64.tar.gz -C release .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: ferrite-linux-x64.tar.gz
+
+  build-macos:
+    name: Build macOS (Apple Silicon, unsigned)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.92.0
+      - name: Build release
+        run: cargo build --release --locked
+      - name: Package
+        run: |
+          mkdir release
+          cp target/release/ferrite release/
+          tar -czvf ferrite-macos-arm64-unsigned.tar.gz -C release .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: ferrite-macos-arm64-unsigned.tar.gz
+
+  release:
+    name: Publish pre-release
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v1
+        with:
+          name: Ferrite ${{ github.ref_name }} (test build)
+          prerelease: true
+          draft: false
+          body: |
+            **Unsigned test build** of `${{ github.sha }}` for trying out unreleased changes.
+            Not an official release. Windows SmartScreen and macOS Gatekeeper will warn
+            because the binaries are not signed.
+
+            - Windows: unzip and run `ferrite.exe`.
+            - Linux: `tar -xzf ferrite-linux-x64.tar.gz && ./ferrite`
+            - macOS: `tar -xzf ferrite-macos-arm64-unsigned.tar.gz && xattr -d com.apple.quarantine ferrite && ./ferrite`
+          files: dist/*
