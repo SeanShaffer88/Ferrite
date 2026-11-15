@@ -930,6 +930,7 @@ impl FerriteApp {
                             // Raw mode: use the plain EditorWidget with optional minimap
                             let zen_max_column_width = self.state.settings.zen_max_column_width;
                             let max_line_width = self.state.settings.max_line_width;
+                            let git_editor_ruler = self.state.settings.devtools.git_editor_ruler;
 
                             // Capture scroll offset before mutable borrow for scroll detection
                             let prev_scroll_offset = self.state
@@ -1220,6 +1221,7 @@ impl FerriteApp {
                                     .scroll_to_line(scroll_to_line)
                                     .zen_mode(zen_mode, zen_max_column_width)
                                     .max_line_width(max_line_width) // Apply when not in Zen Mode
+                                    .git_editor_ruler(git_editor_ruler)
                                     .transient_highlight(transient_hl)
                                     .highlight_matching_pairs(highlight_matching_pairs)
                                     .syntax_highlighting(

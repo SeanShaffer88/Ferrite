@@ -27,6 +27,8 @@ pub struct DevtoolsSettings {
     pub query_bar: bool,
     /// Schema mappings: (file glob, schema path or URL). In-file references win.
     pub schema_mappings: Vec<(String, String)>,
+    /// Column guide for git commit/tag/merge messages (`None` = off).
+    pub git_editor_ruler: Option<u32>,
 }
 
 impl Default for DevtoolsSettings {
@@ -35,6 +37,7 @@ impl Default for DevtoolsSettings {
             schema_validation: true,
             query_bar: true,
             schema_mappings: Vec::new(),
+            git_editor_ruler: Some(72),
         }
     }
 }
@@ -48,6 +51,15 @@ mod tests {
         let d = DevtoolsSettings::default();
         assert!(d.schema_validation && d.query_bar);
         assert!(d.schema_mappings.is_empty());
+        assert_eq!(d.git_editor_ruler, Some(72));
+    }
+
+    #[test]
+    fn git_editor_ruler_can_be_turned_off() {
+        let d: DevtoolsSettings = serde_json::from_str(r#"{"git_editor_ruler":null}"#).unwrap();
+        assert_eq!(d.git_editor_ruler, None);
+        let d: DevtoolsSettings = serde_json::from_str(r#"{"git_editor_ruler":50}"#).unwrap();
+        assert_eq!(d.git_editor_ruler, Some(50));
     }
 
     #[test]

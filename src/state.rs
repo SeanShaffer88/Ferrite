@@ -6190,7 +6190,18 @@ impl AppState {
         }
     }
 
+    /// Git's own message/todo files (COMMIT_EDITMSG, git-rebase-todo, ...) are
+    /// one-shot: never restore them in a later session or keep recovery blobs.
+    fn is_git_editor_tab(tab: &Tab) -> bool {
+        tab.path
+            .as_deref()
+            .is_some_and(|p| crate::devtools::cli_target::detect_git_editor_file(p).is_some())
+    }
+
     fn tab_should_persist_in_session(tab: &Tab) -> bool {
+        if Self::is_git_editor_tab(tab) {
+            return false;
+        }
         match &tab.kind {
             // Special tabs are UI panels — never persist (see docs/technical/ui/special-tabs.md).
             TabKind::Special(_) => false,
@@ -6290,7 +6301,7 @@ impl AppState {
         use crate::config::save_recovery_content;
 
         for tab in &self.tabs {
-            if tab.is_special() || skip_tab_ids.contains(&tab.id) {
+            if tab.is_special() || skip_tab_ids.contains(&tab.id) || Self::is_git_editor_tab(tab) {
                 continue;
             }
             if tab.is_modified() {
@@ -9493,6 +9504,45 @@ mod tests {
                 .all(|t| !is_reserved_special_tab_display_title(&t.display_title)),
             "special tabs must not be written to session state"
         );
+    }
+
+    #[test]
+    fn test_git_editor_files_skip_session_and_recovery() {
+        use std::path::PathBuf;
+
+        crate::config::with_temp_data_dir(|_data| {
+            let git_id = 910_150_001usize;
+            let doc_id = 910_150_002usize;
+            let git_path = PathBuf::from("/tmp/repo/.git/COMMIT_EDITMSG");
+            let doc_path = PathBuf::from("/tmp/repo/notes.md");
+
+            let mut state = AppState::with_settings(Settings::default());
+            state.tabs.clear();
+            let mut git_tab = Tab::with_file(git_id, git_path, String::new());
+            git_tab.set_content("fix: unsaved message".to_string());
+            state.tabs.push(git_tab);
+            let mut doc_tab = Tab::with_file(doc_id, doc_path.clone(), "a".to_string());
+            doc_tab.set_content("a + edit".to_string());
+            state.tabs.push(doc_tab);
+            state.ensure_primary_window();
+            if let Some(window) = state.window_by_id_mut(PRIMARY_WINDOW_ID) {
+                window.tab_ids = vec![git_id, doc_id];
+                window.active_tab_index = 0;
+            }
+
+            let session = state.capture_session_state();
+            let paths: Vec<_> = session
+                .windows
+                .iter()
+                .flat_map(|w| w.tabs.iter())
+                .filter_map(|t| t.path.clone())
+                .collect();
+            assert_eq!(paths, vec![doc_path]);
+
+            state.save_recovery_content();
+            assert!(crate::config::load_recovery_content(git_id).is_none());
+            assert!(crate::config::load_recovery_content(doc_id).is_some());
+        });
     }
 
     #[test]
