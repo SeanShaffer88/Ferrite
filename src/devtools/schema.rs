@@ -380,4 +380,67 @@ mod tests {
         );
         assert_eq!(r, Some(SchemaRef::Local(PathBuf::from("/s/own.json"))));
     }
+
+    #[test]
+    fn resolve_prefers_inline_schema_over_bundled() {
+        let p = Path::new("/w/package.json");
+        assert!(matches!(
+            resolve_schema(p, "{}", Json, &[]),
+            Some(SchemaRef::Bundled(_))
+        ));
+        let r = resolve_schema(p, r#"{"$schema":"./own.json"}"#, Json, &[]);
+        assert_eq!(r, Some(SchemaRef::Local(PathBuf::from("/w/./own.json"))));
+    }
+
+    #[test]
+    fn bundled_package_json_reports_bad_type_on_its_line() {
+        let src = "{\n  \"name\": \"x\",\n  \"private\": \"yes\"\n}";
+        let p = check_document(Some(Path::new("/w/package.json")), src, Json, &[]);
+        assert!(
+            p.iter()
+                .any(|p| p.source == ProblemSource::Schema && p.line == 3),
+            "{p:?}"
+        );
+        let ok = "{\n  \"name\": \"x\",\n  \"private\": true\n}";
+        assert!(check_document(Some(Path::new("/w/package.json")), ok, Json, &[]).is_empty());
+    }
+
+    #[test]
+    fn bundled_cargo_toml_accepts_this_repo_manifest() {
+        let src = include_str!("../../Cargo.toml");
+        let p = check_document(Some(Path::new("/w/Cargo.toml")), src, Toml, &[]);
+        assert!(p.is_empty(), "{p:?}");
+    }
+
+    #[test]
+    fn bundled_workflow_accepts_this_repo_ci_and_flags_bad_job() {
+        let path = Path::new("/w/.github/workflows/ci.yml");
+        for src in [
+            include_str!("../../.github/workflows/ci.yml"),
+            include_str!("../../.github/workflows/release.yml"),
+        ] {
+            let p = check_document(Some(path), src, Yaml, &[]);
+            assert!(p.is_empty(), "{p:?}");
+        }
+        let bad = "on: push\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps: 3\n";
+        let p = check_document(Some(path), bad, Yaml, &[]);
+        // `oneOf` failures are reported at the job, not the inner key.
+        assert!(
+            p.iter().any(|p| p.line == 3 && p.pointer == "/jobs/build"),
+            "{p:?}"
+        );
+    }
+
+    #[test]
+    fn locate_falls_back_to_line_1() {
+        // A pointer the locator cannot find still yields a usable position.
+        let schema = SchemaRef::Inline(json!({"required": ["x"]}));
+        let p = validate("[1]", Json, &schema);
+        assert!(p.is_empty());
+        let schema = SchemaRef::Inline(json!({"properties": {"a": {"type": "string"}}}));
+        let p = validate("{\"a\": 1}", Json, &schema);
+        assert_eq!((p[0].line, p[0].col), (1, 7));
+        let p = validate("{}", Json, &SchemaRef::Inline(json!({"required": ["x"]})));
+        assert_eq!((p[0].line, p[0].col), (1, 1));
+    }
 }
