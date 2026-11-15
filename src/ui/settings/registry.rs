@@ -739,4 +739,20 @@ static ENTRIES: &[SettingEntry] = &[
         featured: false,
         render: devtools::render_git_gutter,
     },
+    SettingEntry {
+        id: "devtools.history_max",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.history_max").to_string(),
+        keywords: &[
+            "history",
+            "version",
+            "snapshot",
+            "backup",
+            "restore",
+            "local history",
+            "developer",
+        ],
+        featured: false,
+        render: devtools::render_history_max,
+    },
 ];

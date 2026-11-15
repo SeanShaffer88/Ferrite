@@ -10,6 +10,7 @@ pub mod codeblocks;
 pub mod convert;
 pub mod diff;
 pub mod frontmatter;
+pub mod history;
 pub mod linechanges;
 pub mod links;
 pub mod locate;
@@ -41,6 +42,8 @@ pub struct DevtoolsSettings {
     pub code_block_lint: bool,
     /// Gutter change bars against the last git commit.
     pub git_gutter: bool,
+    /// Local snapshots kept per file on save (0 turns version history off).
+    pub history_max: u32,
 }
 
 impl Default for DevtoolsSettings {
@@ -53,6 +56,7 @@ impl Default for DevtoolsSettings {
             link_check: true,
             code_block_lint: true,
             git_gutter: true,
+            history_max: 20,
         }
     }
 }

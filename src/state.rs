@@ -5722,6 +5722,14 @@ impl AppState {
         encoded_bytes: Vec<u8>,
         save_as: bool,
     ) -> Result<SaveCompletion, crate::error::Error> {
+        // Version history: snapshot before overwriting. Never blocks the save.
+        let history_max = self.settings.devtools.history_max as usize;
+        if let Err(e) = crate::devtools::history::record_save(&path, &encoded_bytes, history_max) {
+            warn!(
+                "Version history snapshot failed for {}: {e}",
+                path.display()
+            );
+        }
         std::fs::write(&path, &encoded_bytes).map_err(|e| crate::error::Error::FileWrite {
             path: path.clone(),
             source: e,

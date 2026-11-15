@@ -664,6 +664,7 @@ pub enum ShortcutCommand {
     CheckWorkspaceLinks,
     AddCursorAbove,
     AddCursorBelow,
+    ShowFileHistory,
 }
 
 impl ShortcutCommand {
@@ -758,6 +759,7 @@ impl ShortcutCommand {
             CheckWorkspaceLinks,
             AddCursorAbove,
             AddCursorBelow,
+            ShowFileHistory,
         ]
     }
 
@@ -852,6 +854,7 @@ impl ShortcutCommand {
             ShortcutCommand::CheckWorkspaceLinks => "Check Links in Workspace",
             ShortcutCommand::AddCursorAbove => "Add Cursor Above",
             ShortcutCommand::AddCursorBelow => "Add Cursor Below",
+            ShortcutCommand::ShowFileHistory => "Show File History",
         }
     }
 
@@ -944,7 +947,8 @@ impl ShortcutCommand {
             | ShortcutCommand::NewReadme
             | ShortcutCommand::NewChangelog
             | ShortcutCommand::NewAdr
-            | ShortcutCommand::CheckWorkspaceLinks => "Other",
+            | ShortcutCommand::CheckWorkspaceLinks
+            | ShortcutCommand::ShowFileHistory => "Other",
         }
     }
 
@@ -1043,6 +1047,7 @@ impl ShortcutCommand {
             ShortcutCommand::NewChangelog => KeyBinding::new(M::ctrl_shift_alt(), C),
             ShortcutCommand::NewAdr => KeyBinding::new(M::ctrl_shift_alt(), A),
             ShortcutCommand::CheckWorkspaceLinks => KeyBinding::new(M::ctrl_shift_alt(), L),
+            ShortcutCommand::ShowFileHistory => KeyBinding::new(M::ctrl_shift_alt(), V),
         }
     }
 }

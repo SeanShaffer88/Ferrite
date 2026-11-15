@@ -4139,7 +4139,8 @@ impl FerriteApp {
             | ShortcutCommand::NewReadme
             | ShortcutCommand::NewChangelog
             | ShortcutCommand::NewAdr
-            | ShortcutCommand::CheckWorkspaceLinks => self.handle_devtools_command(ctx, cmd),
+            | ShortcutCommand::CheckWorkspaceLinks
+            | ShortcutCommand::ShowFileHistory => self.handle_devtools_command(ctx, cmd),
             ShortcutCommand::ToggleFrontmatter => {
                 if !self.state.settings.outline_enabled {
                     self.state.settings.outline_enabled = true;

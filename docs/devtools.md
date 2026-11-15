@@ -100,6 +100,26 @@ report opens as a new tab.
 
 From the terminal: `forgepad --diff old.json new.json` (see below).
 
+### Version history
+
+Every time you save, Forgepad keeps a snapshot of the file in its own config
+folder (`<config>/forgepad/history/`), never next to your files. The first
+save also keeps the file as it was before you started, so you can always get
+back to the original. Saves within two minutes of each other replace the newest
+snapshot, so auto-save doesn't crowd out real versions.
+
+**Show File History** (Ctrl+Shift+Alt+V) lists snapshots, newest first:
+
+- **Compare** opens a diff between the snapshot and the current text (by value
+  for JSON/YAML/TOML).
+- **Restore** puts the snapshot into the editor as a normal edit — undo with
+  Ctrl+Z, and nothing is written until you save.
+- **Clear history for this file** deletes its snapshots.
+
+20 snapshots are kept per file by default (Settings → Editor, 0 turns history
+off). Files over 5 MB are not snapshotted. This works for any file, in a git
+repository or not.
+
 ### Change bars
 
 In Raw and Split view, the gutter shows how each line differs from the last
@@ -247,4 +267,5 @@ Existing files are never overwritten.
 - `devtools.link_check: false` — no link warnings in Markdown.
 - `devtools.code_block_lint: false` — no code-block syntax warnings.
 - `devtools.git_gutter: false` — no change bars.
+- `devtools.history_max: 0` — no version history.
 - The command-line features cost nothing unless you use them.

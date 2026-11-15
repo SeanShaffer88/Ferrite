@@ -18,6 +18,18 @@ use std::time::{Duration, Instant};
 /// (the file could not be opened at all).
 const WAIT_OPEN_GRACE: Duration = Duration::from_secs(5);
 
+/// Open version-history window.
+pub(crate) struct HistoryView {
+    path: PathBuf,
+    entries: Vec<crate::devtools::history::Entry>,
+}
+
+#[derive(Clone, Copy)]
+enum HistoryAction {
+    Compare,
+    Restore,
+}
+
 type Changes = std::sync::Arc<Vec<Option<crate::devtools::linechanges::LineChange>>>;
 
 /// Gutter change bars for the active tab (diff against git HEAD).
@@ -230,6 +242,7 @@ impl FerriteApp {
             }
             ShortcutCommand::NewAdr => self.new_adr(ctx),
             ShortcutCommand::CheckWorkspaceLinks => self.start_link_report(),
+            ShortcutCommand::ShowFileHistory => self.open_history(),
             _ => {}
         }
     }
@@ -257,27 +270,184 @@ impl FerriteApp {
             }
         };
         let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("file");
+        self.open_diff_report(ctx, &path, &format!("HEAD:{name}"), &head, &content);
+    }
+
+    /// Diff `old` against `new` (by value for JSON/YAML/TOML, else by line)
+    /// and open the report as a tab.
+    fn open_diff_report(
+        &mut self,
+        ctx: &egui::Context,
+        path: &Path,
+        old_label: &str,
+        old: &str,
+        new: &str,
+    ) {
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("file");
         let ft = path
             .extension()
             .and_then(|e| e.to_str())
             .and_then(StructuredFileType::from_extension);
         let structured = ft.and_then(|ft| {
-            let a = parse_to_value(&head, ft).ok()?;
-            let b = parse_to_value(&content, ft).ok()?;
-            Some(render_report(
-                &format!("HEAD:{name}"),
-                name,
-                &diff_values(&a, &b),
-            ))
+            let a = parse_to_value(old, ft).ok()?;
+            let b = parse_to_value(new, ft).ok()?;
+            Some(render_report(old_label, name, &diff_values(&a, &b)))
         });
-        let report = structured
-            .unwrap_or_else(|| render_text_diff(&format!("HEAD:{name}"), name, &head, &content));
+        let report = structured.unwrap_or_else(|| render_text_diff(old_label, name, old, new));
         let Ok(file) = crate::devtools::scratch::write_new("diff", name, "diff", report.as_bytes())
         else {
             return self
                 .devtools_toast(t!("devtools.convert.failed", error = "temp file").to_string());
         };
         self.open_os_paths_in_focused_window(ctx, vec![file], "compare");
+    }
+
+    /// Open the version-history window for the active tab's file.
+    fn open_history(&mut self) {
+        let Some(path) = self.state.active_tab().and_then(|t| t.path.clone()) else {
+            return self.devtools_toast(t!("devtools.history.no_file").to_string());
+        };
+        if self.state.settings.devtools.history_max == 0 {
+            return self.devtools_toast(t!("devtools.history.disabled").to_string());
+        }
+        let entries = crate::devtools::history::list(&path);
+        self.history_view = Some(HistoryView { path, entries });
+    }
+
+    /// Draw the version-history window. Call every frame.
+    pub(crate) fn show_history_window(&mut self, ctx: &egui::Context) {
+        use crate::devtools::history;
+        let Some(view) = &self.history_view else {
+            return;
+        };
+        let path = view.path.clone();
+        let entries = view.entries.clone();
+        let name = path
+            .file_name()
+            .map(|n| n.to_string_lossy().into_owned())
+            .unwrap_or_default();
+        let mut open = true;
+        let mut action: Option<(usize, HistoryAction)> = None;
+        let mut clear = false;
+        egui::Window::new(t!("devtools.history.title", name = name.clone()).to_string())
+            .id(egui::Id::new("forgepad_history_window"))
+            .open(&mut open)
+            .default_width(440.0)
+            .collapsible(false)
+            .show(ctx, |ui| {
+                ui.weak(t!("devtools.history.hint").to_string());
+                ui.add_space(4.0);
+                if entries.is_empty() {
+                    ui.label(t!("devtools.history.empty").to_string());
+                }
+                egui::ScrollArea::vertical()
+                    .max_height(360.0)
+                    .show(ui, |ui| {
+                        for (i, e) in entries.iter().enumerate() {
+                            ui.horizontal(|ui| {
+                                let mut text = history::label(e);
+                                if e.original {
+                                    text.push_str(&format!(
+                                        " · {}",
+                                        t!("devtools.history.original")
+                                    ));
+                                }
+                                ui.monospace(text);
+                                ui.weak(format!("{:.1} KB", e.size as f64 / 1024.0));
+                                ui.with_layout(
+                                    egui::Layout::right_to_left(egui::Align::Center),
+                                    |ui| {
+                                        if ui
+                                            .button(t!("devtools.history.restore").to_string())
+                                            .on_hover_text(
+                                                t!("devtools.history.restore_tooltip").to_string(),
+                                            )
+                                            .clicked()
+                                        {
+                                            action = Some((i, HistoryAction::Restore));
+                                        }
+                                        if ui
+                                            .button(t!("devtools.history.compare").to_string())
+                                            .on_hover_text(
+                                                t!("devtools.history.compare_tooltip").to_string(),
+                                            )
+                                            .clicked()
+                                        {
+                                            action = Some((i, HistoryAction::Compare));
+                                        }
+                                    },
+                                );
+                            });
+                        }
+                    });
+                ui.separator();
+                if !entries.is_empty()
+                    && ui
+                        .button(t!("devtools.history.clear").to_string())
+                        .on_hover_text(t!("devtools.history.clear_tooltip").to_string())
+                        .clicked()
+                {
+                    clear = true;
+                }
+            });
+        if !open || ctx.input(|i| i.key_pressed(egui::Key::Escape)) {
+            self.history_view = None;
+            return;
+        }
+        if clear {
+            if let Err(e) = history::clear(&path) {
+                self.devtools_toast(
+                    t!("devtools.convert.failed", error = e.to_string()).to_string(),
+                );
+            }
+            self.history_view = Some(HistoryView {
+                path,
+                entries: Vec::new(),
+            });
+            return;
+        }
+        let Some((i, act)) = action else {
+            return;
+        };
+        let Some(entry) = entries.get(i) else {
+            return;
+        };
+        let old = match history::read(entry) {
+            Ok(t) => t,
+            Err(e) => {
+                return self.devtools_toast(
+                    t!("devtools.convert.failed", error = e.to_string()).to_string(),
+                )
+            }
+        };
+        let target = normalized(&path);
+        let current = self
+            .state
+            .tabs()
+            .iter()
+            .find(|t| t.path.as_deref().map(normalized).as_ref() == Some(&target))
+            .map(|t| (t.id, t.content.clone()));
+        match act {
+            HistoryAction::Compare => {
+                let new = current
+                    .map(|(_, c)| c)
+                    .or_else(|| std::fs::read_to_string(&path).ok())
+                    .unwrap_or_default();
+                let label = format!("{} {}", name, history::label(entry));
+                self.open_diff_report(ctx, &path, &label, &old, &new);
+            }
+            HistoryAction::Restore => {
+                let Some((id, _)) = current else {
+                    return self.devtools_toast(t!("devtools.history.open_first").to_string());
+                };
+                if let Some(tab) = self.state.tab_by_id_mut(id) {
+                    tab.set_content(old);
+                }
+                self.devtools_toast(
+                    t!("devtools.history.restored", when = history::label(entry)).to_string(),
+                );
+            }
+        }
     }
 
     /// Refresh gutter change bars for the active tab. Call once per frame.

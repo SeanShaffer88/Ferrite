@@ -187,6 +187,8 @@ pub struct FerriteApp {
     git_gutter: devtools::GitGutter,
     /// Frames left to check that a restored window is on a connected monitor.
     offscreen_check_frames: u8,
+    /// Open "File History" window, if any.
+    history_view: Option<devtools::HistoryView>,
     /// Running "Check Links in Workspace" job: report file or error.
     link_report_rx: Option<std::sync::mpsc::Receiver<Result<std::path::PathBuf, String>>>,
     /// Terminal panel state
@@ -612,6 +614,7 @@ impl FerriteApp {
             wait_groups: Vec::new(),
             git_gutter: Default::default(),
             offscreen_check_frames: 30,
+            history_view: None,
             link_report_rx: None,
             terminal_panel_state,
             productivity_panel,
@@ -3140,6 +3143,7 @@ impl eframe::App for FerriteApp {
         self.poll_wait_groups(ctx);
         self.poll_link_report(ctx);
         self.update_git_gutter(ctx);
+        self.show_history_window(ctx);
         if let Some(viewport_id) = self.pending_forwarded_open_viewport.take() {
             ctx.send_viewport_cmd_to(viewport_id, egui::ViewportCommand::Focus);
         }

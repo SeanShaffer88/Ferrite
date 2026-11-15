@@ -76,6 +76,24 @@ pub(super) fn render_git_gutter(
     )
 }
 
+/// How many save snapshots to keep per file (0 = version history off).
+pub(super) fn render_history_max(
+    _panel: &mut SettingsPanel,
+    ui: &mut Ui,
+    ctx: &mut SettingsCtx<'_>,
+) -> bool {
+    let mut changed = false;
+    ui.horizontal(|ui| {
+        ui.label(t!("settings.devtools.history_max"))
+            .on_hover_text(t!("settings.devtools.history_max_tooltip"));
+        changed = ui
+            .add(DragValue::new(&mut ctx.settings.devtools.history_max).range(0..=100))
+            .on_hover_text(t!("settings.devtools.history_max_tooltip"))
+            .changed();
+    });
+    changed
+}
+
 /// Column guide for git commit messages: on/off plus the column.
 pub(super) fn render_git_editor_ruler(
     _panel: &mut SettingsPanel,

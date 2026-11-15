@@ -100,6 +100,7 @@ pub(super) fn shortcut_command_name(cmd: &ShortcutCommand) -> String {
         ShortcutCommand::CheckWorkspaceLinks => "Check Links in Workspace".to_string(),
         ShortcutCommand::AddCursorAbove => "Add Cursor Above".to_string(),
         ShortcutCommand::AddCursorBelow => "Add Cursor Below".to_string(),
+        ShortcutCommand::ShowFileHistory => "Show File History".to_string(),
         ShortcutCommand::ZoomIn => t!("shortcuts.commands.zoom_in").to_string(),
         ShortcutCommand::ZoomOut => t!("shortcuts.commands.zoom_out").to_string(),
         ShortcutCommand::ResetZoom => t!("shortcuts.commands.reset_zoom").to_string(),
