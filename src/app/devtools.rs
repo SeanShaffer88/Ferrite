@@ -31,6 +31,17 @@ pub(crate) struct WaitGroup {
     registered: Instant,
 }
 
+impl WaitGroup {
+    /// Update from the currently open paths; true when the waiter is released
+    /// (its files were open and are now all closed, or never opened in time).
+    fn step(&mut self, open: &[PathBuf]) -> bool {
+        let any_open = self.paths.iter().any(|p| open.contains(p));
+        self.armed |= any_open;
+        let gave_up = !self.armed && self.registered.elapsed() > WAIT_OPEN_GRACE;
+        (self.armed && !any_open) || gave_up
+    }
+}
+
 fn normalized(p: &Path) -> PathBuf {
     crate::path_utils::normalize_path(p.canonicalize().unwrap_or_else(|_| p.to_path_buf()))
 }
@@ -63,6 +74,22 @@ fn converted_path(src: &Path, to: StructuredFileType) -> PathBuf {
         candidate = dir.join(format!("{stem}{tag}.{ext}"));
     }
     candidate
+}
+
+/// 1-based (line, col) → (clamped 1-based line, char index). A line past the
+/// end clamps to the last line; a column past the line end clamps to its end.
+fn target_position(text: &str, line: u32, col: Option<u32>) -> (usize, usize) {
+    let lines: Vec<&str> = text.split('\n').collect();
+    let idx = (line.max(1) as usize - 1).min(lines.len() - 1);
+    let start: usize = lines[..idx].iter().map(|l| l.chars().count() + 1).sum();
+    let len = lines[idx].trim_end_matches('\r').chars().count();
+    let offset = col.map_or(0, |c| c.max(1) as usize - 1).min(len);
+    (idx + 1, start + offset)
+}
+
+#[cfg(test)]
+fn target_char_index(text: &str, line: u32, col: Option<u32>) -> usize {
+    target_position(text, line, col).1
 }
 
 impl FerriteApp {
@@ -240,10 +267,7 @@ impl FerriteApp {
             .collect();
         let mut finished = Vec::new();
         for (i, g) in self.wait_groups.iter_mut().enumerate() {
-            let any_open = g.paths.iter().any(|p| open.contains(p));
-            g.armed |= any_open;
-            let gave_up = !g.armed && g.registered.elapsed() > WAIT_OPEN_GRACE;
-            if (g.armed && !any_open) || gave_up {
+            if g.step(&open) {
                 finished.push(i);
             }
         }
@@ -273,21 +297,15 @@ impl FerriteApp {
         if !on_target {
             return;
         }
-        self.handle_go_to_line(line as usize);
-        if let Some(col) = target.col.filter(|c| *c > 1) {
-            if let Some(tab) = self.state.active_tab_mut() {
-                let line_idx = (line as usize).saturating_sub(1);
-                let start = crate::app::helpers::line_col_to_char_index(&tab.content, line_idx, 0);
-                let len = tab
-                    .content
-                    .lines()
-                    .nth(line_idx)
-                    .map(|l| l.trim_end_matches('\r').chars().count())
-                    .unwrap_or(0);
-                let idx = start + (col as usize - 1).min(len);
-                tab.cursors.set_single(crate::state::Selection::cursor(idx));
-                tab.sync_cursor_from_primary();
-            }
+        let Some(tab) = self.state.active_tab() else {
+            return;
+        };
+        let (clamped_line, idx) = target_position(&tab.content, line, target.col);
+        // Scrolls to the line; the caret is then placed exactly below.
+        self.handle_go_to_line(clamped_line);
+        if let Some(tab) = self.state.active_tab_mut() {
+            tab.cursors.set_single(crate::state::Selection::cursor(idx));
+            tab.sync_cursor_from_primary();
         }
     }
 
@@ -300,5 +318,60 @@ impl FerriteApp {
             let paths: Vec<PathBuf> = targets.iter().map(|t| t.path.clone()).collect();
             self.register_wait(&paths, None, true);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn group(path: &str) -> WaitGroup {
+        WaitGroup {
+            paths: vec![PathBuf::from(path)],
+            handle: None,
+            quit_when_done: false,
+            armed: false,
+            registered: Instant::now(),
+        }
+    }
+
+    #[test]
+    fn two_waiters_on_different_files_independent() {
+        let (a, b) = (PathBuf::from("/r/a.md"), PathBuf::from("/r/b.md"));
+        let mut ga = group("/r/a.md");
+        let mut gb = group("/r/b.md");
+        assert!(!ga.step(&[a.clone(), b.clone()]) && !gb.step(&[a.clone(), b.clone()]));
+        // Close a only: only its waiter is released.
+        assert!(ga.step(std::slice::from_ref(&b)));
+        assert!(!gb.step(std::slice::from_ref(&b)));
+        assert!(gb.step(&[]));
+    }
+
+    #[test]
+    fn waiter_not_released_before_file_first_opens() {
+        let mut g = group("/r/slow.md");
+        assert!(!g.step(&[]), "still inside the open grace period");
+        g.registered = Instant::now() - WAIT_OPEN_GRACE - Duration::from_millis(1);
+        assert!(
+            g.step(&[]),
+            "never opened: give up so the caller is not stuck"
+        );
+    }
+
+    #[test]
+    fn line_past_eof_clamps_to_last_line() {
+        let text = "one\ntwo\nthree";
+        // Line 40 of a 3-line file: start of the last line.
+        assert_eq!(target_char_index(text, 40, None), 8);
+        assert_eq!(target_char_index(text, 40, Some(3)), 10);
+    }
+
+    #[test]
+    fn column_clamps_to_line_end_and_ignores_crlf() {
+        let text = "ab\r\ncdef\r\n";
+        assert_eq!(target_char_index(text, 1, Some(99)), 2);
+        assert_eq!(target_char_index(text, 2, Some(3)), 6);
+        assert_eq!(target_char_index(text, 2, None), 4);
+        assert_eq!(target_char_index("", 5, Some(5)), 0);
     }
 }
