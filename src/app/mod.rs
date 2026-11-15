@@ -189,6 +189,8 @@ pub struct FerriteApp {
     offscreen_check_frames: u8,
     /// Open "File History" window, if any.
     history_view: Option<devtools::HistoryView>,
+    /// Status-bar structure path: (tab id, content version, caret, path).
+    breadcrumb_cache: Option<(usize, u64, usize, String)>,
     /// Running "Check Links in Workspace" job: report file or error.
     link_report_rx: Option<std::sync::mpsc::Receiver<Result<std::path::PathBuf, String>>>,
     /// Terminal panel state
@@ -615,6 +617,7 @@ impl FerriteApp {
             git_gutter: Default::default(),
             offscreen_check_frames: 30,
             history_view: None,
+            breadcrumb_cache: None,
             link_report_rx: None,
             terminal_panel_state,
             productivity_panel,

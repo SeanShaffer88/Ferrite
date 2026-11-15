@@ -755,4 +755,21 @@ static ENTRIES: &[SettingEntry] = &[
         featured: false,
         render: devtools::render_history_max,
     },
+    SettingEntry {
+        id: "devtools.breadcrumb",
+        section: SettingsSection::Editor,
+        label: || t!("settings.devtools.breadcrumb").to_string(),
+        keywords: &[
+            "breadcrumb",
+            "path",
+            "jsonpath",
+            "status bar",
+            "json",
+            "yaml",
+            "toml",
+            "developer",
+        ],
+        featured: false,
+        render: devtools::render_breadcrumb,
+    },
 ];

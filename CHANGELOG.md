@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Per-workspace `.ferrite/` folders, internal type names and entries below this line keep the Ferrite name.
 
 ### Added
+- **Path at the caret** — The status bar shows the JSONPath of the caret in JSON, YAML and TOML files (`$.jobs.build.steps[2].run`); click to copy.
 - **Version history** — Each save keeps a local snapshot (20 per file by default; the pre-edit original is kept too). **Show File History** (Ctrl+Shift+Alt+V) compares any snapshot with the current text or restores it as an undoable edit. Works outside git. Settings → Editor → *Version history*.
 
 ### Fixed (open upstream Ferrite issues)

@@ -76,6 +76,19 @@ pub(super) fn render_git_gutter(
     )
 }
 
+pub(super) fn render_breadcrumb(
+    _panel: &mut SettingsPanel,
+    ui: &mut Ui,
+    ctx: &mut SettingsCtx<'_>,
+) -> bool {
+    toggle(
+        ui,
+        &mut ctx.settings.devtools.breadcrumb,
+        "settings.devtools.breadcrumb",
+        "settings.devtools.breadcrumb_tooltip",
+    )
+}
+
 /// How many save snapshots to keep per file (0 = version history off).
 pub(super) fn render_history_max(
     _panel: &mut SettingsPanel,

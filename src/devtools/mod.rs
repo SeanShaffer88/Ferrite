@@ -4,6 +4,7 @@
 //! modules call into this tree. Every feature has a toggle in
 //! [`DevtoolsSettings`].
 
+pub mod breadcrumb;
 pub mod cli_input;
 pub mod cli_target;
 pub mod codeblocks;
@@ -44,6 +45,8 @@ pub struct DevtoolsSettings {
     pub git_gutter: bool,
     /// Local snapshots kept per file on save (0 turns version history off).
     pub history_max: u32,
+    /// Show the JSON/YAML/TOML path at the caret in the status bar.
+    pub breadcrumb: bool,
 }
 
 impl Default for DevtoolsSettings {
@@ -57,6 +60,7 @@ impl Default for DevtoolsSettings {
             code_block_lint: true,
             git_gutter: true,
             history_max: 20,
+            breadcrumb: true,
         }
     }
 }

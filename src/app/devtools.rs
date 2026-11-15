@@ -302,6 +302,40 @@ impl FerriteApp {
         self.open_os_paths_in_focused_window(ctx, vec![file], "compare");
     }
 
+    /// JSONPath of the caret in the active JSON/YAML/TOML tab (cached).
+    pub(crate) fn breadcrumb_text(&mut self) -> Option<String> {
+        if !self.state.settings.devtools.breadcrumb {
+            return None;
+        }
+        let tab = self.state.active_tab()?;
+        let ft = tab
+            .path
+            .as_deref()
+            .and_then(|p| p.extension())
+            .and_then(|e| e.to_str())
+            .and_then(StructuredFileType::from_extension)?;
+        if tab.content.len() > crate::devtools::linechanges::MAX_DIFF_BYTES {
+            return None;
+        }
+        let head = tab.cursors.primary().head;
+        let key = (tab.id, tab.content_version(), head);
+        if let Some((id, v, h, text)) = &self.breadcrumb_cache {
+            if (*id, *v, *h) == key {
+                return Some(text.clone());
+            }
+        }
+        let byte = tab
+            .content
+            .char_indices()
+            .nth(head)
+            .map(|(b, _)| b)
+            .unwrap_or(tab.content.len());
+        let segs = crate::devtools::breadcrumb::path_at(&tab.content, ft, byte);
+        let text = crate::devtools::breadcrumb::to_jsonpath(&segs);
+        self.breadcrumb_cache = Some((key.0, key.1, key.2, text.clone()));
+        Some(text)
+    }
+
     /// Open the version-history window for the active tab's file.
     fn open_history(&mut self) {
         let Some(path) = self.state.active_tab().and_then(|t| t.path.clone()) else {

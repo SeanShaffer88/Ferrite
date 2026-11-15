@@ -554,6 +554,43 @@ impl FerriteApp {
                         self.state.toggle_about();
                     }
 
+                    // Developer tools: structure path at the caret (click to copy)
+                    if let Some(path) = self.breadcrumb_text() {
+                        let shown = if path.chars().count() > 60 {
+                            let tail: String = path
+                                .chars()
+                                .rev()
+                                .take(59)
+                                .collect::<Vec<_>>()
+                                .into_iter()
+                                .rev()
+                                .collect();
+                            format!("…{tail}")
+                        } else {
+                            path.clone()
+                        };
+                        let resp = ui
+                            .add(
+                                egui::Button::new(
+                                    egui::RichText::new(shown).monospace().size(11.0),
+                                )
+                                .frame(false),
+                            )
+                            .on_hover_text(
+                                t!("devtools.breadcrumb.tooltip", path = path.clone()).to_string(),
+                            );
+                        if resp.clicked() {
+                            ui.ctx().copy_text(path);
+                            let time = self.get_app_time();
+                            self.state.show_toast(
+                                t!("devtools.breadcrumb.copied").to_string(),
+                                time,
+                                1.5,
+                            );
+                        }
+                        ui.separator();
+                    }
+
                     // Developer tools: problem count badge (opens the Problems panel)
                     let dt = &self.state.settings.devtools;
                     if (dt.schema_validation || dt.link_check || dt.code_block_lint)

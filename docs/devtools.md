@@ -55,6 +55,14 @@ problem count in the status bar. Each row shows line:column, the message and
 its source (`schema` or `lint`). Click a row to jump to it. Close it with ✕,
 or Esc while the mouse is over the panel. Turn the feature off with `devtools.schema_validation: false`.
 
+## Path at the caret
+
+In JSON, YAML and TOML files the status bar shows where the caret is, as a
+JSONPath — for example `$.jobs.build.steps[2].run` in a GitHub workflow or
+`$.dependencies.serde` in `Cargo.toml`. Click it to copy the path, ready to
+paste into the query bar, `jq`, or a code review comment. It works while the
+file has syntax errors. Off: `devtools.breadcrumb: false`.
+
 ## Query bar
 
 In the tree viewer of a JSON, YAML or TOML file, type a

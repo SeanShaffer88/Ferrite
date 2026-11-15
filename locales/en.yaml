@@ -213,6 +213,8 @@ settings:
     git_editor_ruler: "Column guide in git commit messages"
     git_editor_ruler_tooltip: "Draw a vertical guide in COMMIT_EDITMSG and other git message files."
     git_gutter: "Show changes since the last commit in the gutter"
+    breadcrumb: "Show the JSON/YAML/TOML path at the caret in the status bar"
+    breadcrumb_tooltip: "For example $.jobs.build.steps[2].run. Click it to copy."
     history_max: "Version history: snapshots kept per file"
     history_max_tooltip: "A snapshot of each file is kept when you save (saves within 2 minutes replace the newest). 0 turns version history off. Snapshots are stored in Forgepad's config folder, not next to your files."
     git_gutter_tooltip: "Green bar: added line. Blue bar: changed line. Red mark: lines deleted here. Compares with git HEAD."
@@ -1269,6 +1271,9 @@ devtools:
     saved: "Saved %{path}"
     lost: "Not preserved: %{what}"
     minify_json_only: "Minify applies to JSON files only"
+  breadcrumb:
+    tooltip: "%{path} — click to copy this JSONPath"
+    copied: "JSONPath copied"
   history:
     title: "History — %{name}"
     hint: "Snapshots taken when this file was saved, newest first."
