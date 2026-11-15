@@ -1273,6 +1273,9 @@ devtools:
     saved: "Saved %{path}"
     lost: "Not preserved: %{what}"
     minify_json_only: "Minify applies to JSON files only"
+  permalink:
+    copied: "Copied %{text}"
+    failed: "No permalink: %{error}"
   transform:
     title: "Transform Selection"
     filter: "Type to filter, Enter to apply the first"

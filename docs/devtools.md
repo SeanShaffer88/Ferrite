@@ -110,6 +110,17 @@ filter and press Enter. Every transform is a normal edit (Ctrl+Z undoes it).
 | Encode | Base64 encode/decode (standard or URL-safe input), URL encode/decode, JSON string escape/unescape |
 | Insert | UUID (v4), ISO 8601 timestamp, Unix time — at the caret |
 
+## Line references
+
+- **Copy Permalink to Line** (Ctrl+Shift+Alt+G) copies a web link to the
+  caret line, or the selected lines, pinned to the current `HEAD` commit —
+  GitHub, GitLab, Bitbucket, Gitea/Codeberg (and GitHub-style hosts) are
+  recognised from the `origin` remote. Commit and push first so the link shows
+  what you see.
+- **Copy Path:Line** (Ctrl+Shift+Alt+N) copies `src/main.rs:42` (or
+  `:42-50` for a selection), relative to the repository or workspace — handy
+  for chats, issues and `forgepad path:line`.
+
 ## Compare
 
 **Compare with Last Commit** (Ctrl+Shift+Alt+H) diffs the current buffer,

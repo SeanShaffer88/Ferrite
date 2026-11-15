@@ -243,6 +243,8 @@ impl FerriteApp {
             ShortcutCommand::NewAdr => self.new_adr(ctx),
             ShortcutCommand::CheckWorkspaceLinks => self.start_link_report(),
             ShortcutCommand::ShowFileHistory => self.open_history(),
+            ShortcutCommand::CopyPermalink => self.copy_line_reference(ctx, true),
+            ShortcutCommand::CopyPathLine => self.copy_line_reference(ctx, false),
             ShortcutCommand::TransformSelection => {
                 self.transform_picker = Some(String::new());
             }
@@ -303,6 +305,51 @@ impl FerriteApp {
                 .devtools_toast(t!("devtools.convert.failed", error = "temp file").to_string());
         };
         self.open_os_paths_in_focused_window(ctx, vec![file], "compare");
+    }
+
+    /// Copy a web permalink (or `path:line`) for the caret line / selection.
+    fn copy_line_reference(&mut self, ctx: &egui::Context, web: bool) {
+        let Some(tab) = self.state.active_tab() else {
+            return;
+        };
+        let Some(path) = tab.path.clone() else {
+            return self.devtools_toast(t!("devtools.history.no_file").to_string());
+        };
+        let sel = tab.cursors.primary();
+        let (a, b) = (sel.anchor.min(sel.head), sel.anchor.max(sel.head));
+        let line_of = |ci: usize| tab.content.chars().take(ci).filter(|c| *c == '\n').count() + 1;
+        let l1 = line_of(a);
+        // A selection ending at the start of a line doesn't include that line.
+        let mut l2 = line_of(b);
+        if b > a && tab.content.chars().nth(b.saturating_sub(1)) == Some('\n') {
+            l2 = l2.saturating_sub(1).max(l1);
+        }
+        let text = if web {
+            match crate::devtools::permalink::permalink(&path, l1, l2) {
+                Ok(url) => url,
+                Err(e) => {
+                    return self
+                        .devtools_toast(t!("devtools.permalink.failed", error = e).to_string())
+                }
+            }
+        } else {
+            let rel = crate::devtools::permalink::repo_relative(&path)
+                .map(|(_, r)| r)
+                .or_else(|| {
+                    let root = self.state.workspace_root()?;
+                    path.strip_prefix(root)
+                        .ok()
+                        .map(|r| r.to_string_lossy().replace('\\', "/"))
+                })
+                .unwrap_or_else(|| path.display().to_string());
+            if l2 > l1 {
+                format!("{rel}:{l1}-{l2}")
+            } else {
+                format!("{rel}:{l1}")
+            }
+        };
+        ctx.copy_text(text.clone());
+        self.devtools_toast(t!("devtools.permalink.copied", text = text).to_string());
     }
 
     /// Draw the "Transform Selection" picker. Call every frame.

@@ -136,5 +136,7 @@ fn icon_for_command(cmd: ShortcutCommand) -> &'static str {
         ShortcutCommand::AddCursorBelow => CARET_DOWN,
         ShortcutCommand::ShowFileHistory => ARROW_COUNTER_CLOCKWISE,
         ShortcutCommand::TransformSelection => LIGHTNING,
+        ShortcutCommand::CopyPermalink => LINK,
+        ShortcutCommand::CopyPathLine => CLIPBOARD,
     }
 }

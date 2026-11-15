@@ -666,6 +666,8 @@ pub enum ShortcutCommand {
     AddCursorBelow,
     ShowFileHistory,
     TransformSelection,
+    CopyPermalink,
+    CopyPathLine,
 }
 
 impl ShortcutCommand {
@@ -762,6 +764,8 @@ impl ShortcutCommand {
             AddCursorBelow,
             ShowFileHistory,
             TransformSelection,
+            CopyPermalink,
+            CopyPathLine,
         ]
     }
 
@@ -858,6 +862,8 @@ impl ShortcutCommand {
             ShortcutCommand::AddCursorBelow => "Add Cursor Below",
             ShortcutCommand::ShowFileHistory => "Show File History",
             ShortcutCommand::TransformSelection => "Transform Selection…",
+            ShortcutCommand::CopyPermalink => "Copy Permalink to Line",
+            ShortcutCommand::CopyPathLine => "Copy Path:Line",
         }
     }
 
@@ -952,7 +958,9 @@ impl ShortcutCommand {
             | ShortcutCommand::NewChangelog
             | ShortcutCommand::NewAdr
             | ShortcutCommand::CheckWorkspaceLinks
-            | ShortcutCommand::ShowFileHistory => "Other",
+            | ShortcutCommand::ShowFileHistory
+            | ShortcutCommand::CopyPermalink
+            | ShortcutCommand::CopyPathLine => "Other",
         }
     }
 
@@ -1053,6 +1061,8 @@ impl ShortcutCommand {
             ShortcutCommand::CheckWorkspaceLinks => KeyBinding::new(M::ctrl_shift_alt(), L),
             ShortcutCommand::ShowFileHistory => KeyBinding::new(M::ctrl_shift_alt(), V),
             ShortcutCommand::TransformSelection => KeyBinding::new(M::ctrl_shift_alt(), X),
+            ShortcutCommand::CopyPermalink => KeyBinding::new(M::ctrl_shift_alt(), G),
+            ShortcutCommand::CopyPathLine => KeyBinding::new(M::ctrl_shift_alt(), N),
         }
     }
 }

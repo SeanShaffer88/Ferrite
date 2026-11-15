@@ -15,6 +15,7 @@ pub mod history;
 pub mod linechanges;
 pub mod links;
 pub mod locate;
+pub mod permalink;
 pub mod query;
 pub mod schema;
 pub mod schemas;

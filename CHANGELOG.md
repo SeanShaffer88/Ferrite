@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Per-workspace `.ferrite/` folders, internal type names and entries below this line keep the Ferrite name.
 
 ### Added
+- **Copy Permalink / Copy Path:Line** (Ctrl+Shift+Alt+G / N) — Web link to the current line(s) pinned to HEAD (GitHub, GitLab, Bitbucket, Gitea), or a repo-relative `path:line`.
 - **Secret scanner** — Any open file is checked for API keys, tokens, private keys, JWTs and passwords in URLs; hits are warnings in the Problems panel (`devtools.secret_scan`).
 - **Transform Selection…** (Ctrl+Shift+Alt+X) — Sort/dedupe/reverse/trim lines, case conversion (snake, camel, kebab, title), Base64 / URL / JSON-string encode and decode, insert UUID or timestamp.
 - **Path at the caret** — The status bar shows the JSONPath of the caret in JSON, YAML and TOML files (`$.jobs.build.steps[2].run`); click to copy.
