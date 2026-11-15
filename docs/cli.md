@@ -89,6 +89,69 @@ ferrite --new-instance notes.md
 
 A `--new-instance` process does not write the single-instance lock/pid files and keeps its session and config writes separate from the primary instance. See [`technical/platform/single-instance.md`](technical/platform/single-instance.md) and [`technical/files/session-persistence.md`](technical/files/session-persistence.md).
 
+### `PATH:LINE[:COL]` and `--goto <PATH:LINE[:COL]>`
+
+*(Developer tools)* Open a file at a 1-based line and column.
+
+```bash
+ferrite src/main.rs:120
+ferrite src/main.rs:120:9
+ferrite --goto "C:\a b\x.rs:12:3"
+```
+
+Only trailing numbers ≥ 1 are treated as a position; `x.rs:abc` and `x.rs:0`
+are file names. A Windows drive letter is never split. If the whole argument
+names an existing file it is opened unchanged. A line past the end goes to the
+last line; a column past the end of the line goes to its end. When Ferrite is
+already running, the position is forwarded to that window.
+
+### `-` (standard input)
+
+Read standard input (up to 64 MB; invalid UTF-8 replaced) into a temporary
+file and open it.
+
+```bash
+git log -p | ferrite -
+```
+
+### `-w, --wait`
+
+Block until every tab opened by this command is closed (tab, window or app
+close). Use it for `$EDITOR`, `$GIT_EDITOR` and `git config core.editor`.
+Git's own message files (`COMMIT_EDITMSG`, `MERGE_MSG`, `TAG_EDITMSG`,
+`git-rebase-todo`, `addp-hunk-edit.diff` inside `.git`) imply `--wait`.
+
+```bash
+git config --global core.editor "ferrite --wait"
+```
+
+Setup per shell and OS: [`devtools.md`](devtools.md#use-ferrite-as-editor).
+
+### `--diff <OLD> <NEW>`
+
+Compare two files and open the report as a tab. JSON, YAML and TOML pairs
+(any mix) are compared by value — key order and formatting are ignored. Other
+files get a unified line diff.
+
+```bash
+ferrite --diff old/config.yaml new/config.json
+```
+
+## Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | Normal exit; with `--wait`, the files were closed |
+| `1` | `--wait` only: the running Ferrite ended (crash or kill) before the files were closed |
+| `2` | Bad input: unreadable stdin, or a `--diff` file is missing or does not parse |
+
+### Single-instance protocol note
+
+Each forwarded target is one line: a plain path (as older Ferrite versions
+send), or `T<TAB>line<TAB>col<TAB>path` when a position is given. A `W` line
+asks the running instance to reply `CLOSED` once the files are closed; it
+replies `OK` first. Older senders and receivers keep working with plain paths.
+
 ## Behavior
 
 ### Opening Files

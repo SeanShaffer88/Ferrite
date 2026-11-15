@@ -195,6 +195,12 @@ impl ProblemsPanel {
     /// Draw the panel body (caller provides the surrounding bottom panel).
     pub fn show(&mut self, ui: &mut egui::Ui) -> ProblemsOutput {
         let mut out = ProblemsOutput::default();
+        // Esc closes the panel, only while the pointer is over it, so Esc keeps
+        // working for search, Vim mode and dialogs elsewhere.
+        if ui.rect_contains_pointer(ui.max_rect()) && ui.input(|i| i.key_pressed(egui::Key::Escape))
+        {
+            out.closed = true;
+        }
         ui.horizontal(|ui| {
             ui.strong(t!("devtools.problems.title", count = self.problems.len()).to_string());
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {

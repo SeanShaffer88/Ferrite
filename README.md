@@ -228,6 +228,15 @@ Native rendering of 11 diagram types directly in the preview:
 - **Recent Files & Folders** - Click filename in status bar to access recently opened files and workspace folders
 - **CJK Paragraph Indentation** - First-line indentation options for Chinese (2 chars) and Japanese (1 char) writing conventions
 
+### For Developers *(unreleased)*
+- **Schema Validation** - JSON, YAML and TOML checked against a JSON Schema as you type, fully offline: from `$schema` / `# yaml-language-server` / `#:schema`, your own glob mappings, or bundled schemas for `package.json`, `tsconfig.json`, `Cargo.toml`, `pyproject.toml`, GitHub workflows and Compose files. Problems panel with click-to-line
+- **Query Bar** - JSONPath queries in the tree viewer; click a match to jump to it
+- **Format & Convert** - Format, sort keys, minify; convert JSON ⇄ YAML ⇄ TOML with a warning when comments or nulls are lost
+- **Structured Diff** - Compare with the last commit or `ferrite --diff a b`, by value: key order and formatting don't count
+- **Use as `$EDITOR`** - `ferrite file:line:col`, `--goto`, stdin via `-`, and `--wait` for `git commit`, `crontab -e` and friends; commit messages get a 72-column guide
+
+Guide: [docs/devtools.md](docs/devtools.md) · CLI: [docs/cli.md](docs/cli.md) · Credits: [docs/devtools-credits.md](docs/devtools-credits.md)
+
 ## Installation
 
 ### Pre-built Binaries

@@ -8,6 +8,8 @@
 
 **Tech Stack:** Rust 1.92+, egui/eframe, existing `serde_json`, `serde_yaml 0.9`, `toml 0.8`, `git2`, `clap 4`. New crates need approval (Task 0).
 
+**Status (2026-11-15):** Phases 1–2 implemented; suite green. Manual GUI checks in Tasks 4, 9, 10 still owed — see `docs/technical/devtools-audit-phase*.md`.
+
 **Spec:** `docs/superpowers/specs/2026-11-14-developer-edition-design.md`. Phase 3 (docs workbench) gets its own plan later.
 
 ## Global Constraints
@@ -55,8 +57,8 @@
 
 ### Task 0: Dependency approval gate
 
-- [ ] **Step 1:** Ask Sean to approve, with exact pinned versions looked up on crates.io: a JSON Schema validator (`jsonschema`), a JSONPath crate (`serde_json_path`), a text diff crate (`similar`, needed only for non-structured `--diff` in T12). Record approved names and versions in this plan and `docs/devtools-credits.md`.
-- [ ] **Step 2:** If a crate is refused, the owning task falls back: schema → hand-rolled subset (type/required/properties/enum) with the limit documented; query → dotted-path only; diff → structured files only.
+- [x] **Step 1:** Ask Sean to approve, with exact pinned versions looked up on crates.io: a JSON Schema validator (`jsonschema`), a JSONPath crate (`serde_json_path`), a text diff crate (`similar`, needed only for non-structured `--diff` in T12). Record approved names and versions in this plan and `docs/devtools-credits.md`.
+- [x] **Step 2:** If a crate is refused, the owning task falls back: schema → hand-rolled subset (type/required/properties/enum) with the limit documented; query → dotted-path only; diff → structured files only.
 
 ### Task 1: Value tree and settings
 
@@ -65,11 +67,11 @@
 **Interfaces — Produces:**
 `pub fn parse_to_value(content: &str, ft: StructuredFileType) -> Result<serde_json::Value, ParseError>` (reuse `StructuredFileType`, `ParseError` from `src/markdown/tree_viewer.rs`); `DevtoolsSettings { schema_validation: bool, query_bar: bool, git_editor_ruler: Option<u32> }` with defaults `true, true, Some(72)`, serde-defaulted so old configs load.
 
-- [ ] **Step 1:** Tests `parses_json_yaml_toml_to_same_value`, `empty_input_returns_null_not_panic`, `whitespace_only_yaml_is_null`, `multi_document_yaml_uses_first_doc`, `invalid_json_returns_parse_error_with_line`.
-- [ ] **Step 2:** Run `cargo test -p ferrite devtools::value` — expect FAIL (undefined).
-- [ ] **Step 3:** Implement with `serde_json`, `serde_yaml::from_str`, `toml::from_str` → `Value`; empty/whitespace → `Value::Null`. Add `devtools: DevtoolsSettings` to settings with `#[serde(default)]`.
-- [ ] **Step 4:** Run tests — PASS; load an old-config fixture test `settings_without_devtools_key_loads`.
-- [ ] **Step 5:** Commit `feat(devtools): value tree and settings`.
+- [x] **Step 1:** Tests `parses_json_yaml_toml_to_same_value`, `empty_input_returns_null_not_panic`, `whitespace_only_yaml_is_null`, `multi_document_yaml_uses_first_doc`, `invalid_json_returns_parse_error_with_line`.
+- [x] **Step 2:** Run `cargo test -p ferrite devtools::value` — expect FAIL (undefined).
+- [x] **Step 3:** Implement with `serde_json`, `serde_yaml::from_str`, `toml::from_str` → `Value`; empty/whitespace → `Value::Null`. Add `devtools: DevtoolsSettings` to settings with `#[serde(default)]`.
+- [x] **Step 4:** Run tests — PASS; load an old-config fixture test `settings_without_devtools_key_loads`.
+- [x] **Step 5:** Commit `feat(devtools): value tree and settings`.
 
 ### Task 2: Pointer locate + schema validation
 
@@ -83,11 +85,11 @@
 `pub fn resolve_schema(path: &Path, content: &str, ft: StructuredFileType, mappings: &[(String, String)]) -> Option<SchemaRef>` — order: `$schema` / `# yaml-language-server: $schema=` / `#:schema` → workspace mapping → bundled filename match;
 `pub fn validate(content: &str, ft: StructuredFileType, schema: &SchemaRef) -> Vec<Problem>` — never fetches `Remote`; returns one `Schema` info problem "remote schema not fetched" instead.
 
-- [ ] **Step 1:** Tests: `required_property_missing_reports_line_of_parent`, `wrong_type_points_at_value_line`, `crlf_source_lines_match`, `utf8_bom_does_not_shift_columns`, `remote_schema_url_is_not_fetched` (assert no socket use: Remote path returns info problem), `missing_local_schema_one_problem`, `empty_file_no_problems`, `resolve_prefers_inline_schema_over_bundled`, `locate_falls_back_to_line_1`.
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Implement `locate` by scanning source for the key path (JSON token scan; YAML indentation scan; TOML table/key scan); fallback `(1,1)`. Implement `validate` with the approved validator; map each error's instance pointer through `locate`.
-- [ ] **Step 4:** Run — PASS.
-- [ ] **Step 5:** Commit `feat(devtools): schema resolve and validate`.
+- [x] **Step 1:** Tests: `required_property_missing_reports_line_of_parent`, `wrong_type_points_at_value_line`, `crlf_source_lines_match`, `utf8_bom_does_not_shift_columns`, `remote_schema_url_is_not_fetched` (assert no socket use: Remote path returns info problem), `missing_local_schema_one_problem`, `empty_file_no_problems`, `resolve_prefers_inline_schema_over_bundled`, `locate_falls_back_to_line_1`.
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Implement `locate` by scanning source for the key path (JSON token scan; YAML indentation scan; TOML table/key scan); fallback `(1,1)`. Implement `validate` with the approved validator; map each error's instance pointer through `locate`.
+- [x] **Step 4:** Run — PASS.
+- [x] **Step 5:** Commit `feat(devtools): schema resolve and validate`.
 
 ### Task 3: Bundled schemas
 
@@ -95,11 +97,11 @@
 
 **Interfaces — Produces:** `pub fn bundled_for(file_name: &str) -> Option<&'static str>` (embedded via `include_str!`). Initial set: `package.json`, `tsconfig.json`, `Cargo.toml`, GitHub Actions workflows (`.github/workflows/*.yml`), `docker-compose.yml`, `pyproject.toml`.
 
-- [ ] **Step 1:** Tests `bundled_names_resolve`, `every_bundled_schema_is_valid_json`, `total_bundled_size_under_500kb`.
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Obtain schemas from SchemaStore (Apache-2.0) during development (needs network; if blocked, ask Sean to supply files). Record source URL + license + retrieval date per file in credits. Wire `resolve_schema` bundled branch to `bundled_for`.
-- [ ] **Step 4:** Run — PASS.
-- [ ] **Step 5:** Commit `feat(devtools): bundled schema set`.
+- [x] **Step 1:** Tests `bundled_names_resolve`, `every_bundled_schema_is_valid_json`, `total_bundled_size_under_500kb`.
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Obtain schemas from SchemaStore (Apache-2.0) during development (needs network; if blocked, ask Sean to supply files). Record source URL + license + retrieval date per file in credits. Wire `resolve_schema` bundled branch to `bundled_for`.
+- [x] **Step 4:** Run — PASS.
+- [x] **Step 5:** Commit `feat(devtools): bundled schema set`.
 
 ### Task 4: Problems panel and squiggles
 
@@ -116,11 +118,11 @@ Wireframe to confirm with Sean before UI code (kept out of the repo):
 └──────────────────────────────────────────────┘
 ```
 
-- [ ] **Step 1:** Tests `stale_generation_result_is_dropped`, `rapid_edits_debounced_to_one_job`, `toggle_off_clears_problems`, `large_input_does_not_block_submit` (submit returns < 5 ms on 50 MB string).
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Implement worker job + state; panel lists problems, click jumps to line; squiggle underline fed from `Problem` line/col. Toggle from `DevtoolsSettings.schema_validation`. Every control has a tooltip; Esc closes panel.
-- [ ] **Step 4:** Run full tests — PASS; manual check on a real `package.json` with a bad type.
-- [ ] **Step 5:** Commit `feat(ui): problems panel`.
+- [x] **Step 1:** Tests `stale_generation_result_is_dropped`, `rapid_edits_debounced_to_one_job`, `toggle_off_clears_problems`, `large_input_does_not_block_submit` (submit returns < 5 ms on 50 MB string).
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Implement worker job + state; panel lists problems, click jumps to line; squiggle underline fed from `Problem` line/col. Toggle from `DevtoolsSettings.schema_validation`. Every control has a tooltip; Esc closes panel.
+- [x] **Step 4:** Run full tests — PASS; manual check on a real `package.json` with a bad type.
+- [x] **Step 5:** Commit `feat(ui): problems panel`.
 
 ### Task 5: Query bar
 
@@ -128,11 +130,11 @@ Wireframe to confirm with Sean before UI code (kept out of the repo):
 
 **Interfaces — Produces:** `pub struct QueryHit { pub pointer: String, pub preview: String }`; `pub enum QueryError { Syntax(String), TooManyHits(usize) }`; `pub fn run_query(value: &serde_json::Value, expr: &str) -> Result<Vec<QueryHit>, QueryError>` (JSONPath; cap 10 000 hits).
 
-- [ ] **Step 1:** Tests `dollar_dot_name_finds_key`, `wildcard_returns_all_items`, `bad_expression_returns_syntax_error`, `null_value_returns_empty`, `hit_cap_enforced`, `pointer_matches_tree_node_path`.
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Implement with approved JSONPath crate; convert node paths to JSON pointers. Tree viewer: query box (placeholder text via locale), results list, click expands path and scrolls. Run query on a worker for large docs (generation guard as in T4).
-- [ ] **Step 4:** Run — PASS.
-- [ ] **Step 5:** Commit `feat(devtools): query bar`.
+- [x] **Step 1:** Tests `dollar_dot_name_finds_key`, `wildcard_returns_all_items`, `bad_expression_returns_syntax_error`, `null_value_returns_empty`, `hit_cap_enforced`, `pointer_matches_tree_node_path`.
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Implement with approved JSONPath crate; convert node paths to JSON pointers. Tree viewer: query box (placeholder text via locale), results list, click expands path and scrolls. Run query on a worker for large docs (generation guard as in T4).
+- [x] **Step 4:** Run — PASS.
+- [x] **Step 5:** Commit `feat(devtools): query bar`.
 
 ### Task 6: Format and convert
 
@@ -140,11 +142,11 @@ Wireframe to confirm with Sean before UI code (kept out of the repo):
 
 **Interfaces — Produces:** `pub struct Converted { pub text: String, pub lossy: Vec<String> }`; `pub fn convert(content: &str, from: StructuredFileType, to: StructuredFileType) -> Result<Converted, String>`; `pub struct ReformatOpts { pub sort_keys: bool, pub minify: bool }`; `pub fn reformat(content: &str, ft: StructuredFileType, o: ReformatOpts) -> Result<String, String>`.
 
-- [ ] **Step 1:** Tests `json_to_yaml_round_trips_value`, `yaml_comments_reported_lossy`, `toml_null_reports_unrepresentable`, `sort_keys_is_stable_and_recursive`, `minify_json_has_no_whitespace`, `invalid_input_returns_error_unchanged_buffer`.
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Implement via `Value` + serializers. Converting shows a confirm dialog listing `lossy` items before replacing the buffer (undoable as one edit).
-- [ ] **Step 4:** Run — PASS.
-- [ ] **Step 5:** Commit `feat(devtools): format and convert`.
+- [x] **Step 1:** Tests `json_to_yaml_round_trips_value`, `yaml_comments_reported_lossy`, `toml_null_reports_unrepresentable`, `sort_keys_is_stable_and_recursive`, `minify_json_has_no_whitespace`, `invalid_input_returns_error_unchanged_buffer`.
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Implement via `Value` + serializers. Converting shows a confirm dialog listing `lossy` items before replacing the buffer (undoable as one edit).
+- [x] **Step 4:** Run — PASS.
+- [x] **Step 5:** Commit `feat(devtools): format and convert`.
 
 ### Task 7: Structured diff
 
@@ -153,16 +155,16 @@ Wireframe to confirm with Sean before UI code (kept out of the repo):
 **Interfaces — Produces:**
 `pub enum DiffKind { Added, Removed, Changed }`; `pub struct DiffEntry { pub pointer: String, pub kind: DiffKind, pub old: Option<String>, pub new: Option<String> }`; `pub fn diff_values(a: &Value, b: &Value) -> Vec<DiffEntry>`; `pub fn head_blob(repo_root: &Path, rel: &Path) -> Result<Option<String>, String>` in `src/vcs/git.rs`.
 
-- [ ] **Step 1:** Tests `key_order_ignored`, `added_removed_changed_detected`, `array_index_change_reported`, `identical_values_empty_diff`, `head_blob_none_for_untracked_file`.
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Implement recursive diff; side-by-side list view grouped by pointer; entry point "Compare with HEAD" and "Compare with file…".
-- [ ] **Step 4:** Run — PASS.
-- [ ] **Step 5:** Commit `feat(devtools): structured diff`.
+- [x] **Step 1:** Tests `key_order_ignored`, `added_removed_changed_detected`, `array_index_change_reported`, `identical_values_empty_diff`, `head_blob_none_for_untracked_file`.
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Implement recursive diff; side-by-side list view grouped by pointer; entry point "Compare with HEAD" and "Compare with file…".
+- [x] **Step 4:** Run — PASS.
+- [x] **Step 5:** Commit `feat(devtools): structured diff`.
 
 ### Task 8a: Phase 1 release docs
 
-- [ ] **Step 1:** README "For developers" section, `docs/devtools.md`, CHANGELOG entry, `docs/devtools-credits.md`, audit note `docs/technical/devtools-audit-phase1.md` (what was verified, what not).
-- [ ] **Step 2:** Commit `docs: developer tools phase 1`.
+- [x] **Step 1:** README "For developers" section, `docs/devtools.md`, CHANGELOG entry, `docs/devtools-credits.md`, audit note `docs/technical/devtools-audit-phase1.md` (what was verified, what not).
+- [x] **Step 2:** Commit `docs: developer tools phase 1`.
 
 ---
 
@@ -174,11 +176,11 @@ Wireframe to confirm with Sean before UI code (kept out of the repo):
 
 **Interfaces — Produces:** `pub struct OpenTarget { pub path: PathBuf, pub line: Option<u32>, pub col: Option<u32> }`; `pub fn parse_open_target(arg: &str) -> OpenTarget` — strips trailing `:line[:col]` only when numeric and ≥ 1 and the remaining path is non-empty; keeps Windows drive prefix.
 
-- [ ] **Step 1:** Tests `plain_path_unchanged`, `file_colon_line`, `file_colon_line_colon_col`, `windows_drive_path_kept`, `windows_drive_with_line` (`C:\a b\x.rs:12:3`), `non_numeric_suffix_part_of_name`, `line_zero_ignored`, `existing_file_named_with_colon_wins` (if the full string exists on disk, use it as-is).
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Implement; also `--goto <path:line[:col]>` alias.
-- [ ] **Step 4:** Run — PASS.
-- [ ] **Step 5:** Commit `feat(cli): path:line:col targets`.
+- [x] **Step 1:** Tests `plain_path_unchanged`, `file_colon_line`, `file_colon_line_colon_col`, `windows_drive_path_kept`, `windows_drive_with_line` (`C:\a b\x.rs:12:3`), `non_numeric_suffix_part_of_name`, `line_zero_ignored`, `existing_file_named_with_colon_wins` (if the full string exists on disk, use it as-is).
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Implement; also `--goto <path:line[:col]>` alias.
+- [x] **Step 4:** Run — PASS.
+- [x] **Step 5:** Commit `feat(cli): path:line:col targets`.
 
 ### Task 9: Forward line/col through single-instance
 
@@ -186,11 +188,11 @@ Wireframe to confirm with Sean before UI code (kept out of the repo):
 
 **Interfaces — Consumes:** `OpenTarget`. Protocol: each line is `path` (old) or `path\t<line>\t<col>` (new); old senders/receivers stay compatible.
 
-- [ ] **Step 1:** Tests `encode_decode_target_round_trip`, `legacy_plain_path_line_decodes`, `tab_in_path_is_escaped`, `line_past_eof_clamps_to_last_line`.
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Implement encode/decode helpers; receiver passes `OpenTarget` to the app, which opens the tab and moves the caret (clamped).
-- [ ] **Step 4:** Run — PASS; manual: second `ferrite x.rs:40` focuses running window at line 40.
-- [ ] **Step 5:** Commit `feat(cli): forward line and column`.
+- [x] **Step 1:** Tests `encode_decode_target_round_trip`, `legacy_plain_path_line_decodes`, `tab_in_path_is_escaped`, `line_past_eof_clamps_to_last_line`.
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Implement encode/decode helpers; receiver passes `OpenTarget` to the app, which opens the tab and moves the caret (clamped).
+- [x] **Step 4:** Run — PASS; manual: second `ferrite x.rs:40` focuses running window at line 40.
+- [x] **Step 5:** Commit `feat(cli): forward line and column`.
 
 ### Task 10: `--wait`
 
@@ -198,11 +200,11 @@ Wireframe to confirm with Sean before UI code (kept out of the repo):
 
 **Interfaces:** Protocol line `WAIT\t<path>` after the target line; primary replies `OK\n` immediately, then `CLOSED\n` when that tab closes. Exit code: `0` closed normally, `1` connection lost before `CLOSED` (primary crash/kill).
 
-- [ ] **Step 1:** Tests `wait_returns_after_closed_message`, `wait_exits_1_when_primary_dies`, `wait_without_primary_runs_own_window_and_exits_on_close`, `closing_window_via_x_sends_closed`, `two_waiters_on_different_files_independent`.
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Implement waiter registry (path → streams) in the primary; fire `CLOSED` on tab close, window close, and app exit. Use a read timeout/keepalive so a dead primary is detected.
-- [ ] **Step 4:** Run — PASS; manual: `GIT_EDITOR="ferrite --wait" git commit` blocks until tab closed, then commits.
-- [ ] **Step 5:** Commit `feat(cli): --wait`.
+- [x] **Step 1:** Tests `wait_returns_after_closed_message`, `wait_exits_1_when_primary_dies`, `wait_without_primary_runs_own_window_and_exits_on_close`, `closing_window_via_x_sends_closed`, `two_waiters_on_different_files_independent`.
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Implement waiter registry (path → streams) in the primary; fire `CLOSED` on tab close, window close, and app exit. Use a read timeout/keepalive so a dead primary is detected.
+- [x] **Step 4:** Run — PASS; manual: `GIT_EDITOR="ferrite --wait" git commit` blocks until tab closed, then commits.
+- [x] **Step 5:** Commit `feat(cli): --wait`.
 
 ### Task 11: Git editor mode
 
@@ -210,11 +212,11 @@ Wireframe to confirm with Sean before UI code (kept out of the repo):
 
 **Interfaces — Produces:** `pub enum GitEditorKind { Commit, Merge, Tag, RebaseTodo, PatchEdit }`; `pub fn detect_git_editor_file(path: &Path) -> Option<GitEditorKind>` (match `COMMIT_EDITMSG`, `MERGE_MSG`, `TAG_EDITMSG`, `git-rebase-todo`, `addp-hunk-edit.diff` inside a `.git` dir).
 
-- [ ] **Step 1:** Tests `commit_editmsg_detected`, `same_name_outside_dot_git_not_detected`, `rebase_todo_detected`, `git_editor_file_implies_wait`.
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Implement; for detected files: plain-text view, ruler at `git_editor_ruler`, skip session restore and autosave recovery, imply `--wait`.
-- [ ] **Step 4:** Run — PASS.
-- [ ] **Step 5:** Commit `feat(cli): git editor mode`.
+- [x] **Step 1:** Tests `commit_editmsg_detected`, `same_name_outside_dot_git_not_detected`, `rebase_todo_detected`, `git_editor_file_implies_wait`.
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Implement; for detected files: plain-text view, ruler at `git_editor_ruler`, skip session restore and autosave recovery, imply `--wait`.
+- [x] **Step 4:** Run — PASS.
+- [x] **Step 5:** Commit `feat(cli): git editor mode`.
 
 ### Task 12: `--diff` and stdin
 
@@ -222,16 +224,16 @@ Wireframe to confirm with Sean before UI code (kept out of the repo):
 
 **Interfaces:** `ferrite --diff <a> <b>`: both structured types → structured diff (T7); otherwise line diff if approved, else exit 2 with a clear message. `ferrite -` reads stdin to an untitled tab (read capped at 64 MB, UTF-8 lossy with a note).
 
-- [ ] **Step 1:** Tests `diff_two_json_files_opens_structured`, `diff_mismatched_types_message`, `stdin_dash_creates_untitled_buffer`, `stdin_over_cap_is_truncated_with_notice`.
-- [ ] **Step 2:** Run — FAIL.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run — PASS.
-- [ ] **Step 5:** Commit `feat(cli): --diff and stdin`.
+- [x] **Step 1:** Tests `diff_two_json_files_opens_structured`, `diff_mismatched_types_message`, `stdin_dash_creates_untitled_buffer`, `stdin_over_cap_is_truncated_with_notice`.
+- [x] **Step 2:** Run — FAIL.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run — PASS.
+- [x] **Step 5:** Commit `feat(cli): --diff and stdin`.
 
 ### Task 13: Phase 2 release docs
 
-- [ ] **Step 1:** Update `docs/cli.md` (new args, exit codes, protocol note), add "Use Ferrite as $EDITOR" to `docs/devtools.md` (bash/zsh/PowerShell, `git config core.editor`, crontab, per-OS paths), README, CHANGELOG, credits, audit note `docs/technical/devtools-audit-phase2.md`.
-- [ ] **Step 2:** Commit `docs: developer tools phase 2`.
+- [x] **Step 1:** Update `docs/cli.md` (new args, exit codes, protocol note), add "Use Ferrite as $EDITOR" to `docs/devtools.md` (bash/zsh/PowerShell, `git config core.editor`, crontab, per-OS paths), README, CHANGELOG, credits, audit note `docs/technical/devtools-audit-phase2.md`.
+- [x] **Step 2:** Commit `docs: developer tools phase 2`.
 
 ---
 

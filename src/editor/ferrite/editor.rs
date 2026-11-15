@@ -1952,7 +1952,11 @@ impl FerriteEditor {
             };
             if let Some(x) = ruler_x(text_start_x, col, col_w, scroll) {
                 if x > text_start_x - scroll && x < rect.max.x {
-                    painter.vline(x, rect.y_range(), egui::Stroke::new(1.0, separator_color));
+                    painter.vline(
+                        x,
+                        rect.y_range(),
+                        egui::Stroke::new(1.0_f32, separator_color),
+                    );
                 }
             }
         }
@@ -4330,7 +4334,7 @@ impl FerriteEditor {
 
 /// X position of a column guide after `column` monospace cells.
 fn ruler_x(text_start_x: f32, column: u32, col_width: f32, h_scroll: f32) -> Option<f32> {
-    (column > 0).then(|| text_start_x + column as f32 * col_width - h_scroll)
+    (column > 0).then_some(text_start_x + column as f32 * col_width - h_scroll)
 }
 
 #[cfg(test)]
