@@ -10,17 +10,15 @@ pub fn web_base(remote: &str) -> Option<String> {
     let r = r.strip_suffix(".git").unwrap_or(r);
     let (host, path) = if let Some(rest) = r.strip_prefix("git@") {
         rest.split_once(':')?
-    } else if let Some(rest) = r
-        .strip_prefix("ssh://")
-        .or_else(|| r.strip_prefix("https://"))
-        .or_else(|| r.strip_prefix("http://"))
-    {
+    } else {
+        let rest = r
+            .strip_prefix("ssh://")
+            .or_else(|| r.strip_prefix("https://"))
+            .or_else(|| r.strip_prefix("http://"))?;
         let rest = rest.rsplit_once('@').map(|(_, h)| h).unwrap_or(rest);
         let (host, path) = rest.split_once('/')?;
         // Drop an ssh port (`host:2222`).
         (host.split(':').next().unwrap_or(host), path)
-    } else {
-        return None;
     };
     Some(format!("https://{host}/{}", path.trim_start_matches('/')))
 }
