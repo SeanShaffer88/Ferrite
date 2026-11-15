@@ -243,6 +243,9 @@ impl FerriteApp {
             ShortcutCommand::NewAdr => self.new_adr(ctx),
             ShortcutCommand::CheckWorkspaceLinks => self.start_link_report(),
             ShortcutCommand::ShowFileHistory => self.open_history(),
+            ShortcutCommand::TransformSelection => {
+                self.transform_picker = Some(String::new());
+            }
             _ => {}
         }
     }
@@ -300,6 +303,106 @@ impl FerriteApp {
                 .devtools_toast(t!("devtools.convert.failed", error = "temp file").to_string());
         };
         self.open_os_paths_in_focused_window(ctx, vec![file], "compare");
+    }
+
+    /// Draw the "Transform Selection" picker. Call every frame.
+    pub(crate) fn show_transform_picker(&mut self, ctx: &egui::Context) {
+        use crate::devtools::transform::Transform;
+        let Some(filter) = self.transform_picker.as_mut() else {
+            return;
+        };
+        let mut chosen: Option<Transform> = None;
+        let mut open = true;
+        let needle = filter.to_lowercase();
+        let matches: Vec<Transform> = Transform::ALL
+            .iter()
+            .copied()
+            .filter(|tr| t!(tr.key()).to_lowercase().contains(&needle))
+            .collect();
+        egui::Window::new(t!("devtools.transform.title").to_string())
+            .id(egui::Id::new("forgepad_transform_picker"))
+            .open(&mut open)
+            .collapsible(false)
+            .resizable(false)
+            .default_width(320.0)
+            .anchor(egui::Align2::CENTER_TOP, [0.0, 80.0])
+            .show(ctx, |ui| {
+                let resp = ui.add(
+                    egui::TextEdit::singleline(filter)
+                        .hint_text(t!("devtools.transform.filter").to_string())
+                        .desired_width(f32::INFINITY),
+                );
+                resp.request_focus();
+                if resp.ctx.input(|i| i.key_pressed(egui::Key::Enter)) {
+                    chosen = matches.first().copied();
+                }
+                ui.separator();
+                egui::ScrollArea::vertical()
+                    .max_height(320.0)
+                    .show(ui, |ui| {
+                        for tr in &matches {
+                            if ui
+                                .add(egui::Button::new(t!(tr.key()).to_string()).frame(false))
+                                .clicked()
+                            {
+                                chosen = Some(*tr);
+                            }
+                        }
+                    });
+            });
+        if !open || ctx.input(|i| i.key_pressed(egui::Key::Escape)) {
+            self.transform_picker = None;
+            return;
+        }
+        if let Some(tr) = chosen {
+            self.transform_picker = None;
+            self.apply_transform(tr);
+        }
+    }
+
+    /// Run a transform on the primary selection (or the document / caret).
+    fn apply_transform(&mut self, tr: crate::devtools::transform::Transform) {
+        let Some(tab) = self.state.active_tab() else {
+            return;
+        };
+        let content = tab.content.clone();
+        let sel = tab.cursors.primary();
+        let (mut start, mut end) = (sel.anchor.min(sel.head), sel.anchor.max(sel.head));
+        if tr.is_insert() {
+            start = sel.head;
+            end = sel.head;
+        } else if start == end {
+            if tr.is_line_op() {
+                start = 0;
+                end = content.chars().count();
+            } else {
+                return self.devtools_toast(t!("devtools.transform.select_first").to_string());
+            }
+        }
+        let byte = |ci: usize| {
+            content
+                .char_indices()
+                .nth(ci)
+                .map(|(b, _)| b)
+                .unwrap_or(content.len())
+        };
+        let (bs, be) = (byte(start), byte(end));
+        let result = match tr.apply(&content[bs..be]) {
+            Ok(r) => r,
+            Err(e) => {
+                return self.devtools_toast(t!("devtools.transform.failed", error = e).to_string())
+            }
+        };
+        let new_len = result.chars().count();
+        let new_content = format!("{}{}{}", &content[..bs], result, &content[be..]);
+        if let Some(tab) = self.state.active_tab_mut() {
+            tab.set_content(new_content);
+            if tr.is_insert() {
+                tab.set_cursor(start + new_len);
+            } else {
+                tab.set_selection(start, start + new_len);
+            }
+        }
     }
 
     /// JSONPath of the caret in the active JSON/YAML/TOML tab (cached).

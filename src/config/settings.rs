@@ -665,6 +665,7 @@ pub enum ShortcutCommand {
     AddCursorAbove,
     AddCursorBelow,
     ShowFileHistory,
+    TransformSelection,
 }
 
 impl ShortcutCommand {
@@ -760,6 +761,7 @@ impl ShortcutCommand {
             AddCursorAbove,
             AddCursorBelow,
             ShowFileHistory,
+            TransformSelection,
         ]
     }
 
@@ -855,6 +857,7 @@ impl ShortcutCommand {
             ShortcutCommand::AddCursorAbove => "Add Cursor Above",
             ShortcutCommand::AddCursorBelow => "Add Cursor Below",
             ShortcutCommand::ShowFileHistory => "Show File History",
+            ShortcutCommand::TransformSelection => "Transform Selection…",
         }
     }
 
@@ -900,7 +903,8 @@ impl ShortcutCommand {
             | ShortcutCommand::MoveLineDown
             | ShortcutCommand::SelectNextOccurrence
             | ShortcutCommand::AddCursorAbove
-            | ShortcutCommand::AddCursorBelow => "Edit",
+            | ShortcutCommand::AddCursorBelow
+            | ShortcutCommand::TransformSelection => "Edit",
 
             ShortcutCommand::Find
             | ShortcutCommand::FindReplace
@@ -1048,6 +1052,7 @@ impl ShortcutCommand {
             ShortcutCommand::NewAdr => KeyBinding::new(M::ctrl_shift_alt(), A),
             ShortcutCommand::CheckWorkspaceLinks => KeyBinding::new(M::ctrl_shift_alt(), L),
             ShortcutCommand::ShowFileHistory => KeyBinding::new(M::ctrl_shift_alt(), V),
+            ShortcutCommand::TransformSelection => KeyBinding::new(M::ctrl_shift_alt(), X),
         }
     }
 }

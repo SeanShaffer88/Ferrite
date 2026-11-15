@@ -98,6 +98,18 @@ trip, the notification says what was lost: YAML/TOML comments, `null` values
 
 Edits made by Format, Sort Keys and Minify can be undone.
 
+## Transform Selection
+
+**Transform Selection…** (Ctrl+Shift+Alt+X) opens a small picker; type to
+filter and press Enter. Every transform is a normal edit (Ctrl+Z undoes it).
+
+| Group | Transforms |
+|---|---|
+| Lines | Sort A→Z, sort Z→A, remove duplicates, reverse, trim trailing whitespace — on the selection, or the whole document when nothing is selected |
+| Case | UPPERCASE, lowercase, Title Case, snake_case, camelCase, kebab-case (splits on punctuation and camelCase humps) |
+| Encode | Base64 encode/decode (standard or URL-safe input), URL encode/decode, JSON string escape/unescape |
+| Insert | UUID (v4), ISO 8601 timestamp, Unix time — at the caret |
+
 ## Compare
 
 **Compare with Last Commit** (Ctrl+Shift+Alt+H) diffs the current buffer,

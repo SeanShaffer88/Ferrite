@@ -135,5 +135,6 @@ fn icon_for_command(cmd: ShortcutCommand) -> &'static str {
         ShortcutCommand::AddCursorAbove => CARET_UP,
         ShortcutCommand::AddCursorBelow => CARET_DOWN,
         ShortcutCommand::ShowFileHistory => ARROW_COUNTER_CLOCKWISE,
+        ShortcutCommand::TransformSelection => LIGHTNING,
     }
 }

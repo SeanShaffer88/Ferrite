@@ -191,6 +191,8 @@ pub struct FerriteApp {
     history_view: Option<devtools::HistoryView>,
     /// Status-bar structure path: (tab id, content version, caret, path).
     breadcrumb_cache: Option<(usize, u64, usize, String)>,
+    /// Open "Transform Selection" picker: its filter text.
+    transform_picker: Option<String>,
     /// Running "Check Links in Workspace" job: report file or error.
     link_report_rx: Option<std::sync::mpsc::Receiver<Result<std::path::PathBuf, String>>>,
     /// Terminal panel state
@@ -618,6 +620,7 @@ impl FerriteApp {
             offscreen_check_frames: 30,
             history_view: None,
             breadcrumb_cache: None,
+            transform_picker: None,
             link_report_rx: None,
             terminal_panel_state,
             productivity_panel,
@@ -3147,6 +3150,7 @@ impl eframe::App for FerriteApp {
         self.poll_link_report(ctx);
         self.update_git_gutter(ctx);
         self.show_history_window(ctx);
+        self.show_transform_picker(ctx);
         if let Some(viewport_id) = self.pending_forwarded_open_viewport.take() {
             ctx.send_viewport_cmd_to(viewport_id, egui::ViewportCommand::Focus);
         }

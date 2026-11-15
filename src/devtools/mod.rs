@@ -20,6 +20,7 @@ pub mod schema;
 pub mod schemas;
 pub mod scratch;
 pub mod templates;
+pub mod transform;
 pub mod value;
 
 use serde::{Deserialize, Serialize};

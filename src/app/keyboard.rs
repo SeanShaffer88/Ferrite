@@ -156,6 +156,10 @@ impl FerriteApp {
                 KeyboardAction::Devtools(ShortcutCommand::CheckWorkspaceLinks)
             );
             check_shortcut!(
+                ShortcutCommand::TransformSelection,
+                KeyboardAction::Devtools(ShortcutCommand::TransformSelection)
+            );
+            check_shortcut!(
                 ShortcutCommand::ShowFileHistory,
                 KeyboardAction::Devtools(ShortcutCommand::ShowFileHistory)
             );
