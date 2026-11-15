@@ -461,6 +461,9 @@ jobs:
           VERSION="${VERSION#v}"
           mv forgepad-portableapps.paf.exe "ForgepadPortable_${VERSION}_English.paf.exe"
 
+      - name: SHA-256 checksums
+        run: sha256sum forgepad-* ForgepadPortable_*.paf.exe > SHA256SUMS.txt && cat SHA256SUMS.txt
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -481,3 +484,4 @@ jobs:
             forgepad-macos-x64.tar.gz
             ForgepadPortable_*_English.paf.exe
             forgepad-windows-x64-setup.exe
+            SHA256SUMS.txt

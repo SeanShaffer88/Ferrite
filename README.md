@@ -190,6 +190,8 @@ Download from **[GitHub Releases](https://github.com/SeanShaffer88/Forgepad/rele
 | Linux arm64 | `forgepad-linux-arm64.tar.gz` | Same as x64; glibc 2.35+ |
 | macOS Apple Silicon | `forgepad-macos-arm64-unsigned.tar.gz` | `tar -xzf …`, then `xattr -d com.apple.quarantine forgepad && ./forgepad` |
 
+Every release includes `SHA256SUMS.txt`; check a download with `sha256sum -c SHA256SUMS.txt` (Linux/macOS) or compare `Get-FileHash .\forgepad-windows-x64-unsigned.zip` (PowerShell).
+
 Official releases (`v…` tags) build MSI, Inno Setup, PortableApps, `.deb`, `.rpm` and `.dmg` packages through `release.yml`; Windows signing there needs SignPath secrets that this repository does not have yet.
 
 macOS troubleshooting: [docs/install/macos.md](docs/install/macos.md).

@@ -108,6 +108,8 @@ jobs:
         with:
           path: dist
           merge-multiple: true
+      - name: SHA-256 checksums
+        run: cd dist && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
       - uses: softprops/action-gh-release@v1
         with:
           name: Forgepad ${{ github.ref_name }} (test build)
@@ -116,7 +118,8 @@ jobs:
           body: |
             **Unsigned test build** of `${{ github.sha }}` for trying out unreleased changes.
             Not an official release. Windows SmartScreen and macOS Gatekeeper will warn
-            because the binaries are not signed.
+            because the binaries are not signed. Verify downloads against `SHA256SUMS.txt`
+            (`sha256sum -c SHA256SUMS.txt`, or `Get-FileHash` in PowerShell).
 
             - Windows: unzip and run `forgepad.exe`.
             - Linux: `tar -xzf forgepad-linux-x64.tar.gz && ./forgepad` (arm64: `forgepad-linux-arm64.tar.gz`, glibc 2.35+)
