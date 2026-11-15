@@ -554,6 +554,26 @@ impl FerriteApp {
                         self.state.toggle_about();
                     }
 
+                    // Developer tools: problem count badge (opens the Problems panel)
+                    if self.state.settings.devtools.schema_validation
+                        && !self.problems_panel.problems().is_empty()
+                    {
+                        ui.separator();
+                        let errors = self.problems_panel.error_count();
+                        let label = if errors > 0 {
+                            format!("✖ {errors}")
+                        } else {
+                            format!("ℹ {}", self.problems_panel.problems().len())
+                        };
+                        if ui
+                            .add(egui::Button::new(egui::RichText::new(label).size(12.0)).frame(false))
+                            .on_hover_text(t!("devtools.problems.status_tooltip").to_string())
+                            .clicked()
+                        {
+                            self.problems_panel.visible = !self.problems_panel.visible;
+                        }
+                    }
+
                     // Git branch display (if in a git repository)
                     if let Some(branch) = self.state.git_service.current_branch() {
                         ui.separator();

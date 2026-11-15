@@ -1823,7 +1823,7 @@ impl FerriteApp {
     /// Open filesystem paths in the last-focused document window.
     ///
     /// Shared by single-instance IPC and macOS warm Open With delivery.
-    fn open_os_paths_in_focused_window(
+    pub(crate) fn open_os_paths_in_focused_window(
         &mut self,
         ctx: &egui::Context,
         paths: Vec<PathBuf>,
@@ -1946,7 +1946,13 @@ impl FerriteApp {
 
             let focus_only = message.focus_only;
             let last_path = message.paths.last().cloned();
+            if let Some(handle) = message.wait.clone() {
+                self.register_wait(&message.paths, Some(handle), false);
+            }
             self.open_os_paths_in_focused_window(ctx, message.paths, "secondary instance");
+            if let Some(t) = message.targets.iter().rev().find(|t| t.line.is_some()) {
+                self.jump_to_target(t);
+            }
 
             if focus_only {
                 if let Some(path) = last_path {

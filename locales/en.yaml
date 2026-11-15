@@ -1227,3 +1227,38 @@ file_dialog:
 image_paste:
   save_document_first: "Save the document first to store images"
   clipboard_read_failed: "Could not read an image from the clipboard: %{error}"
+
+devtools:
+  problems:
+    title: "Problems (%{count})"
+    none: "No problems found"
+    close: "Close Problems panel"
+    jump_hint: "Jump to this line"
+    status_tooltip: "Show or hide the Problems panel (schema and syntax checks)"
+  query:
+    placeholder: "JSONPath query, e.g. $.dependencies.*"
+    tooltip: "Run a JSONPath query over this document. Click a result to jump to it."
+    results: "%{count} match(es)"
+    error: "Query error: %{error}"
+    too_many: "More than %{count} matches; narrow the query"
+  convert:
+    format: "Format document"
+    sort_keys: "Sort keys"
+    minify: "Minify"
+    convert_to: "Convert to %{format}"
+    lossy_title: "Conversion will lose data"
+    lossy_confirm: "Convert anyway"
+    lossy_cancel: "Cancel"
+    failed: "Could not convert: %{error}"
+    saved: "Saved %{path}"
+    lost: "Not preserved: %{what}"
+    minify_json_only: "Minify applies to JSON files only"
+  diff:
+    title: "Compare"
+    with_head: "Compare with last commit"
+    with_file: "Compare with file..."
+    no_changes: "No differences"
+    no_head: "This file is not in the last commit"
+    added: "added"
+    removed: "removed"
+    changed: "changed"

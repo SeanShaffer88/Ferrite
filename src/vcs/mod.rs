@@ -8,4 +8,4 @@
 
 mod git;
 
-pub use git::{GitAutoRefresh, GitFileStatus, GitService};
+pub use git::{head_blob, GitAutoRefresh, GitFileStatus, GitService};

@@ -120,5 +120,13 @@ fn icon_for_command(cmd: ShortcutCommand) -> &'static str {
         ShortcutCommand::PrintPreview => PRINTER,
         ShortcutCommand::InsertToc => SCROLL,
         ShortcutCommand::ToggleFrontmatter => PENCIL,
+        ShortcutCommand::ToggleProblems => LIST_CHECKS,
+        ShortcutCommand::FormatDocument
+        | ShortcutCommand::SortKeys
+        | ShortcutCommand::MinifyJson => BRACKETS_CURLY,
+        ShortcutCommand::ConvertToJson
+        | ShortcutCommand::ConvertToYaml
+        | ShortcutCommand::ConvertToToml => CODE,
+        ShortcutCommand::CompareWithHead => FILE_MAGNIFYING_GLASS,
     }
 }

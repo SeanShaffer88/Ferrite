@@ -640,11 +640,54 @@ impl GitAutoRefresh {
 // Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Contents of `rel` (relative to `repo_root`) at `HEAD`.
+///
+/// `Ok(None)` when the file is not in `HEAD` (untracked, new repo, binary or
+/// non-UTF-8 content).
+pub fn head_blob(repo_root: &Path, rel: &Path) -> Result<Option<String>, String> {
+    let repo = Repository::open(repo_root).map_err(|e| e.to_string())?;
+    let head = match repo.head() {
+        Ok(h) => h,
+        Err(e) if e.code() == ErrorCode::UnbornBranch || e.code() == ErrorCode::NotFound => {
+            return Ok(None)
+        }
+        Err(e) => return Err(e.to_string()),
+    };
+    let tree = head.peel_to_tree().map_err(|e| e.to_string())?;
+    let entry = match tree.get_path(rel) {
+        Ok(e) => e,
+        Err(e) if e.code() == ErrorCode::NotFound => return Ok(None),
+        Err(e) => return Err(e.to_string()),
+    };
+    let blob = repo.find_blob(entry.id()).map_err(|e| e.to_string())?;
+    Ok(std::str::from_utf8(blob.content()).ok().map(str::to_string))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::fs;
     use tempfile::TempDir;
+
+    #[test]
+    fn head_blob_reads_committed_and_none_for_untracked() {
+        let dir = TempDir::new().unwrap();
+        let repo = Repository::init(dir.path()).unwrap();
+        assert_eq!(head_blob(dir.path(), Path::new("a.json")).unwrap(), None);
+        fs::write(dir.path().join("a.json"), "{\"a\":1}").unwrap();
+        let mut idx = repo.index().unwrap();
+        idx.add_path(Path::new("a.json")).unwrap();
+        idx.write().unwrap();
+        let tree = repo.find_tree(idx.write_tree().unwrap()).unwrap();
+        let sig = git2::Signature::now("t", "t@example.com").unwrap();
+        repo.commit(Some("HEAD"), &sig, &sig, "init", &tree, &[]).unwrap();
+        fs::write(dir.path().join("b.json"), "{}").unwrap();
+        assert_eq!(
+            head_blob(dir.path(), Path::new("a.json")).unwrap().as_deref(),
+            Some("{\"a\":1}")
+        );
+        assert_eq!(head_blob(dir.path(), Path::new("b.json")).unwrap(), None);
+    }
 
     #[test]
     fn test_git_file_status_labels() {

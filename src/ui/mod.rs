@@ -18,7 +18,9 @@ mod nav_buttons;
 mod outline_panel;
 pub mod phosphor_icons;
 mod pipeline;
+mod problems_panel;
 mod productivity_panel;
+mod query_bar;
 mod quick_switcher;
 mod ribbon;
 mod runtime_modules;
@@ -49,6 +51,8 @@ pub use nav_buttons::{
 };
 pub use outline_panel::{OutlinePanel, OutlinePanelTab};
 pub use pipeline::{PipelinePanel, TabPipelineState};
+pub use problems_panel::{DocInput, ProblemsPanel};
+pub use query_bar::{pointer_to_tree_path, QueryBarState};
 pub use productivity_panel::ProductivityPanel;
 pub use quick_switcher::QuickSwitcher;
 pub use ribbon::{markdown_cheatsheet_trigger_rect, Ribbon, RibbonAction};

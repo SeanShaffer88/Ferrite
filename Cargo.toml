@@ -43,9 +43,9 @@ comrak = "0.22"
 syntect = "5.1"
 two-face = "0.5"  # Extra syntax definitions (PowerShell, TypeScript, etc.)
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde_json = { version = "1", features = ["preserve_order"] }
 serde_yaml = "0.9"
-toml = "0.8"
+toml = { version = "0.8", features = ["preserve_order"] }
 dirs = "5"
 open = "5"
 url = "2"
@@ -53,6 +53,11 @@ rfd = "0.14"
 log = "0.4"
 env_logger = "0.11"
 regex = "1"
+# Developer tools (approved by Sean 2026-11-14; exact pins). jsonschema without default
+# features: no HTTP/file $ref resolution, so validation stays offline.
+jsonschema = { version = "=0.61.2", default-features = false }
+serde_json_path = "=0.7.2"
+similar = "=3.2.1"
 arboard = { version = "3", features = ["wayland-data-control"] }
 clap = { version = "4", features = ["derive"] }
 # Workspace support

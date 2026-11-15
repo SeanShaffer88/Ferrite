@@ -476,6 +476,8 @@ pub struct TreeViewerState {
     parsed_content_hash: [u8; 32],
     /// File type used for `cached_tree` / `cached_parse_error`.
     parsed_file_type: Option<StructuredFileType>,
+    /// JSONPath query bar state (developer tools).
+    pub query_bar: crate::ui::QueryBarState,
 }
 
 impl TreeViewerState {
@@ -484,6 +486,19 @@ impl TreeViewerState {
     }
 
     /// Check if a path is expanded.
+    /// Expand every ancestor of a JSON pointer so the node becomes visible.
+    pub fn expand_pointer(&mut self, pointer: &str) {
+        let path = crate::ui::pointer_to_tree_path(pointer);
+        let mut prefix = String::new();
+        for (i, part) in path.split('.').enumerate() {
+            if i > 0 {
+                prefix.push('.');
+            }
+            prefix.push_str(part);
+            self.expanded.insert(prefix.clone(), true);
+        }
+    }
+
     pub fn is_expanded(&self, path: &str) -> bool {
         *self.expanded.get(path).unwrap_or(&true) // Default to expanded
     }
@@ -630,6 +645,7 @@ pub struct TreeViewer<'a> {
     state: &'a mut TreeViewerState,
     font_size: f32,
     preview_locked: bool,
+    query_bar: bool,
 }
 
 impl<'a> TreeViewer<'a> {
@@ -644,7 +660,14 @@ impl<'a> TreeViewer<'a> {
             state,
             font_size: 14.0,
             preview_locked: false,
+            query_bar: false,
         }
+    }
+
+    /// Show the JSONPath query bar (developer tools).
+    pub fn query_bar(mut self, enabled: bool) -> Self {
+        self.query_bar = enabled;
+        self
     }
 
     pub fn font_size(mut self, size: f32) -> Self {
@@ -741,6 +764,13 @@ impl<'a> TreeViewer<'a> {
             // to switch to Raw mode for editing. The raw view here was non-editable and confusing.
         });
         ui.separator();
+
+        if self.query_bar && !self.state.show_raw && self.state.cached_parse_error.is_none() {
+            if let Some(pointer) = self.state.query_bar.show(ui, self.content, self.file_type) {
+                self.state.expand_pointer(&pointer);
+            }
+            ui.separator();
+        }
 
         // Content area
         if self.state.show_raw {

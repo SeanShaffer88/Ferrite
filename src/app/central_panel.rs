@@ -2693,6 +2693,7 @@ impl FerriteApp {
                                 // Note: For structured files, the outline panel shows statistics
                                 // rather than navigation, so scroll_to_line is not used here.
                                 let tree_state = self.tree_viewer_states.entry(tab_id).or_default();
+                                let query_bar_enabled = self.state.settings.devtools.query_bar;
 
                                 if let Some(tab) = self.state.active_tab_mut() {
                                     tab.prepare_undo_snapshot_hashed();
@@ -2705,6 +2706,7 @@ impl FerriteApp {
                                     )
                                         .font_size(font_size)
                                         .preview_locked(preview_locked)
+                                        .query_bar(query_bar_enabled)
                                         .show(ui);
 
                                     if output.changed {
@@ -4118,6 +4120,14 @@ impl FerriteApp {
             ShortcutCommand::ExportPdf => self.handle_open_pdf_export_dialog(),
             ShortcutCommand::PrintPreview => self.handle_print_preview(ctx),
             ShortcutCommand::InsertToc => self.handle_insert_toc(),
+            ShortcutCommand::ToggleProblems
+            | ShortcutCommand::FormatDocument
+            | ShortcutCommand::SortKeys
+            | ShortcutCommand::MinifyJson
+            | ShortcutCommand::ConvertToJson
+            | ShortcutCommand::ConvertToYaml
+            | ShortcutCommand::ConvertToToml
+            | ShortcutCommand::CompareWithHead => self.handle_devtools_command(ctx, cmd),
             ShortcutCommand::ToggleFrontmatter => {
                 if !self.state.settings.outline_enabled {
                     self.state.settings.outline_enabled = true;

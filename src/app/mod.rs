@@ -13,6 +13,7 @@
 
 mod central_panel;
 pub(crate) mod commands;
+mod devtools;
 mod dialogs;
 mod export;
 mod file_ops;
@@ -178,6 +179,10 @@ pub struct FerriteApp {
     snippet_manager: SnippetManager,
     /// Terminal panel component
     terminal_panel: TerminalPanel,
+    /// Developer-tools Problems panel (schema / syntax checks).
+    problems_panel: crate::ui::ProblemsPanel,
+    /// `--wait` callers blocked on open files.
+    wait_groups: Vec<devtools::WaitGroup>,
     /// Terminal panel state
     terminal_panel_state: TerminalPanelState,
     /// Productivity hub panel component
@@ -597,6 +602,8 @@ impl FerriteApp {
             pending_auto_save_recovery: None,
             snippet_manager,
             terminal_panel,
+            problems_panel: crate::ui::ProblemsPanel::new(),
+            wait_groups: Vec::new(),
             terminal_panel_state,
             productivity_panel,
             #[cfg(debug_assertions)]
@@ -2401,6 +2408,42 @@ impl FerriteApp {
             }
         }
 
+        // Developer tools: Problems panel (schema / syntax checks for JSON, YAML, TOML)
+        {
+            let enabled = self.state.settings.devtools.schema_validation && !zen_mode;
+            let doc = self.state.active_tab().and_then(|tab| {
+                let path = tab.path.as_deref()?;
+                let ft = crate::markdown::tree_viewer::StructuredFileType::from_extension(
+                    path.extension()?.to_str()?,
+                )?;
+                Some(crate::ui::DocInput {
+                    path: Some(path),
+                    content: &tab.content,
+                    ft,
+                    mappings: &self.state.settings.devtools.schema_mappings,
+                })
+            });
+            if self.problems_panel.tick(doc, enabled, std::time::Instant::now()) {
+                ctx.request_repaint_after(std::time::Duration::from_millis(100));
+            }
+        }
+        let mut problems_jump: Option<usize> = None;
+        if self.problems_panel.visible && !zen_mode {
+            egui::Panel::bottom("problems_panel")
+                .resizable(true)
+                .default_size(140.0)
+                .show_inside(ui, |ui| {
+                    let out = self.problems_panel.show(ui);
+                    problems_jump = out.jump_to_line;
+                    if out.closed {
+                        self.problems_panel.visible = false;
+                    }
+                });
+        }
+        if let Some(line) = problems_jump {
+            self.handle_go_to_line(line);
+        }
+
         // Echo Demo Panel (placeholder for AI Assistant)
         // This demonstrates async workers via lazy initialization
         #[cfg(feature = "async-workers")]
@@ -3050,6 +3093,7 @@ impl eframe::App for FerriteApp {
 
         // Poll for file paths from secondary instances (single-instance protocol)
         self.handle_instance_paths(ctx);
+        self.poll_wait_groups(ctx);
         if let Some(viewport_id) = self.pending_forwarded_open_viewport.take() {
             ctx.send_viewport_cmd_to(viewport_id, egui::ViewportCommand::Focus);
         }
